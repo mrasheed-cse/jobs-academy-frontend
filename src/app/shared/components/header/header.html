@@ -1,0 +1,54 @@
+<header>
+  <nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container">
+      <a class="navbar-brand" routerLink="/">
+        <img src="/images/jobs_academy5.png" alt="Jobs Academy" height="45">
+      </a>
+
+      <div class="d-flex align-items-center order-lg-3 gap-3">
+        <div class="dropdown">
+          <a href="#" class="d-flex align-items-center text-decoration-none" data-bs-toggle="dropdown">
+            <img
+              [src]="currentUser()?.profile_picture || 'https://ui-avatars.com/api/?name=' + (currentUser()?.username || 'User') + '&background=6366f1&color=fff'"
+              class="rounded-circle border border-2 border-white"
+              width="38"
+              height="38"
+              alt="Profile"
+            >
+          </a>
+
+          <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-2 mt-2" style="border-radius: 16px;">
+            @if (!currentUser()) {
+              <li><a class="dropdown-item rounded-3 py-2" routerLink="/login">লগইন</a></li>
+              <li><a class="dropdown-item rounded-3 py-2" routerLink="/signup">সাইন আপ</a></li>
+            } @else {
+              <li><a class="dropdown-item rounded-3 py-2" routerLink="/dashboard">প্রোফাইল</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item rounded-3 py-2 text-danger" href="#" (click)="onLogout()">লগ আউট</a></li>
+            }
+          </ul>
+        </div>
+
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+          <i class="fas fa-bars-staggered"></i>
+        </button>
+      </div>
+
+      <div class="collapse navbar-collapse justify-content-center" id="navMain">
+        <ul class="navbar-nav gap-2">
+          <li class="nav-item"><a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">হোম</a></li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">প্রশ্নব্যাংক</a>
+            <ul class="dropdown-menu border-0 shadow-sm">
+              <li><a class="dropdown-item" routerLink="/past-exams">বিগত বছরের প্রশ্ন</a></li>
+              <li><a class="dropdown-item" routerLink="/model-tests">মডেল টেস্ট</a></li>
+            </ul>
+          </li>
+          <li class="nav-item"><a class="nav-link" routerLink="/quiz-games" routerLinkActive="active">কুইজ</a></li>
+          <li class="nav-item"><a class="nav-link" routerLink="/job-circular" routerLinkActive="active">প্রজ্ঞাপন</a></li>
+          <li class="nav-item"><a class="nav-link" routerLink="/news/1" routerLinkActive="active">নিউজ</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>

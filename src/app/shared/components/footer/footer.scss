@@ -1,0 +1,19 @@
+.mobile-bottom-nav {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid #e2e8f0;
+  padding: 10px 0 25px;
+  border-radius: 24px 24px 0 0;
+  z-index: 1030;
+}
+
+.mobile-tab {
+  color: var(--secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-decoration: none;
+
+  &.active-tab {
+    color: var(--primary);
+  }
+}

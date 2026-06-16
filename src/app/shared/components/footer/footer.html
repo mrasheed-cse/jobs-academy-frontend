@@ -1,0 +1,50 @@
+<footer class="bg-dark text-white pt-5 pb-5 mt-5">
+  <div class="container">
+    <div class="row gy-4">
+      <div class="col-lg-4 text-center text-lg-start">
+        <h4 class="fw-bold mb-4">Jobs Academy</h4>
+        <p class="text-secondary small lh-lg">আধুনিক প্রযুক্তির মাধ্যমে আপনার চাকরির প্রস্তুতিকে করছি আরও সহজ এবং কার্যকর। আজই যুক্ত হোন আমাদের সাথে।</p>
+      </div>
+      <div class="col-lg-4 text-center">
+        <h6 class="fw-bold mb-4">দ্রুত লিংক</h6>
+        <div class="d-flex justify-content-center gap-3">
+          <a routerLink="/model-tests" class="text-secondary text-decoration-none small">মডেল টেস্ট</a>
+          <a href="#" class="text-secondary text-decoration-none small">পলিসি</a>
+          <a href="#" class="text-secondary text-decoration-none small">যোগাযোগ</a>
+        </div>
+      </div>
+      <div class="col-lg-4 text-center text-lg-end">
+        <h6 class="fw-bold mb-4">যুক্ত থাকুন</h6>
+        <div class="d-flex justify-content-center justify-content-lg-end gap-2">
+          <a href="#" class="btn btn-outline-secondary btn-sm rounded-circle"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="btn btn-outline-secondary btn-sm rounded-circle"><i class="fab fa-youtube"></i></a>
+        </div>
+      </div>
+    </div>
+    <hr class="my-5 opacity-10">
+    <div class="text-center text-secondary small">
+      &copy; {{ currentYear }} Jobs Academy. Designed for Success.
+    </div>
+  </div>
+</footer>
+
+<nav class="mobile-bottom-nav d-md-none fixed-bottom shadow-lg">
+  <div class="d-flex justify-content-around text-center">
+    <a routerLink="/" routerLinkActive="active-tab" [routerLinkActiveOptions]="{exact: true}" class="mobile-tab">
+      <i class="fas fa-home d-block fs-5 mb-1"></i>
+      <span>হোম</span>
+    </a>
+    <a routerLink="/past-exams" routerLinkActive="active-tab" class="mobile-tab">
+      <i class="fas fa-book d-block fs-5 mb-1"></i>
+      <span>প্রশ্ন</span>
+    </a>
+    <a routerLink="/quiz-games" routerLinkActive="active-tab" class="mobile-tab">
+      <i class="fas fa-trophy d-block fs-5 mb-1"></i>
+      <span>কুইজ</span>
+    </a>
+    <a routerLink="/news/1" routerLinkActive="active-tab" class="mobile-tab">
+      <i class="fas fa-newspaper d-block fs-5 mb-1"></i>
+      <span>নিউজ</span>
+    </a>
+  </div>
+</nav>

@@ -1,0 +1,108 @@
+<section class="hero-section">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6 mb-5 mb-lg-0">
+        <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill mb-3 fw-bold">#1 Job Prep Platform</span>
+        <h1 class="hero-title mb-4">আপনার ক্যারিয়ার গড়ার <span class="text-primary">নির্ভরযোগ্য সঙ্গী</span></h1>
+        <p class="lead text-secondary mb-5">BCS, ব্যাংক ও শিক্ষক নিবন্ধনসহ সকল সরকারি চাকরির জন্য পূর্ণ প্রস্তুতি নিন এক জায়াগায়।</p>
+        <div class="d-flex gap-3 justify-content-center justify-content-lg-start">
+          <a routerLink="/model-tests" class="btn btn-primary px-4 py-3 rounded-4 fw-bold shadow-sm">প্রস্তুতি শুরু করুন</a>
+          <a href="#news-section" class="btn btn-outline-dark px-4 py-3 rounded-4 fw-bold">আজকের সংবাদ</a>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <dotlottie-player
+          src="https://lottie.host/cee2ad16-dfca-4923-a081-9703e3ce9aa7/Tt3ids5KIP.lottie"
+          background="transparent"
+          speed="1"
+          style="width: 100%; height: auto;"
+          loop
+          autoplay
+        ></dotlottie-player>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="news-section" class="py-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 text-center mb-5">
+        <h2 class="display-5 fw-bold mb-2">শীর্ষ সংবাদসমুহ</h2>
+        <p class="lead text-muted">দৈনিক চাকরি ও শিক্ষাবিষয়ক সর্বশেষ খবর</p>
+        <div class="mx-auto bg-primary rounded" style="width: 50px; height: 4px;"></div>
+      </div>
+
+      <div class="col-12">
+        @if (isLoadingNews()) {
+          <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-3 text-muted">সংবাদ লোড হচ্ছে...</p>
+          </div>
+        } @else if (news().length === 0) {
+          <div class="text-center mt-5">
+            <div class="p-5 bg-white rounded-4 border border-dashed">
+              <i class="fas fa-newspaper fa-3x text-light mb-3"></i>
+              <p class="text-muted fs-5">আজকের জন্য কোনো সংবাদ পাওয়া যায়নি।</p>
+            </div>
+          </div>
+        } @else {
+          <div id="newsCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+              @for (item of news(); track item.id; let i = $index) {
+                <div class="carousel-item" [class.active]="i === 0">
+                  <div class="row align-items-center">
+                    @if (item.images.length) {
+                      <div class="col-md-5 news-image-container">
+                        <img [src]="item.images[0].image_url" [alt]="item.title">
+                      </div>
+                    }
+                    <div [class]="item.images.length ? 'col-md-7' : 'col-12 text-center'">
+                      <h4 class="fw-bold mb-3">{{ item.title }}</h4>
+                      <p class="text-secondary">{{ item.content | slice:0:200 }}{{ item.content.length > 200 ? '…' : '' }}</p>
+                      <a [routerLink]="['/news', item.id]" class="btn-custom">আরও পড়ুন <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#newsCarousel" data-bs-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#newsCarousel" data-bs-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-5 bg-white">
+  <div class="container py-lg-5">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="feature-card">
+          <div class="icon-box bg-primary bg-opacity-10 text-primary"><i class="fas fa-layer-group"></i></div>
+          <h3 class="h4 fw-bold">বিগত বছরের প্রশ্ন</h3>
+          <p class="text-secondary">বিগত ২০ বছরের সকল চাকুরীর পরীক্ষার প্রশ্নের নির্ভুল সমাধান ও ব্যাখ্যা পান এখানে।</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="feature-card">
+          <div class="icon-box bg-success bg-opacity-10 text-success"><i class="fas fa-chart-line"></i></div>
+          <h3 class="h4 fw-bold">লাইভ লিডারবোর্ড</h3>
+          <p class="text-secondary">সারাদেশের হাজারো পরীক্ষার্থীদের মাঝে আপনার বর্তমান অবস্থান যাচাই করুন।</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="feature-card">
+          <div class="icon-box bg-warning bg-opacity-10 text-warning"><i class="fas fa-book-open"></i></div>
+          <h3 class="h4 fw-bold">স্টাডি ম্যাটেরিয়াল</h3>
+          <p class="text-secondary">সহজে বোধগম্য লেকচার শিট এবং পিডিএফ নোটস সংগ্রহ করুন আপনার প্রস্তুতির জন্য।</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

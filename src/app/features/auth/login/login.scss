@@ -1,0 +1,133 @@
+:host {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: rgb(240, 243, 246);
+}
+
+.login-container {
+  background-color: #fff;
+  border-radius: 8px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.login-header {
+  background-image: url('/images/sign_in_top.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  color: white;
+  padding: 20px;
+  text-align: center;
+  border-radius: 8px 8px 0 0;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  height: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
+  }
+
+  h2 {
+    position: relative;
+    z-index: 1;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+  }
+}
+
+.login-form {
+  padding: 30px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.btn-google {
+  background-color: #fff;
+  color: #000;
+  border: 1px solid #ccc;
+
+  &:hover {
+    background-color: #f0f0f0;
+  }
+}
+
+.or-separator {
+  text-align: center;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  color: #6c757d;
+}
+
+.form-control {
+  border-radius: 5px;
+}
+
+.btn-login {
+  background-color: #008cba;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 15px;
+  cursor: pointer;
+  width: 100%;
+
+  &:hover {
+    background-color: #0077a3;
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+}
+
+.forgot-password {
+  display: block;
+  text-align: center;
+  margin-top: 10px;
+  color: #008cba;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.btn-create-account {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 15px;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 20px;
+
+  &:hover {
+    background-color: #218838;
+  }
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: -10px;
+  margin-bottom: 15px;
+}

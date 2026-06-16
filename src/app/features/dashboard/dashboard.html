@@ -1,0 +1,9 @@
+<div class="container py-5">
+  <h2 class="fw-bold mb-4">আপনার ড্যাশবোর্ড</h2>
+  @if (currentUser()) {
+    <p>স্বাগতম, {{ currentUser()?.username }}!</p>
+  } @else {
+    <p>প্রোফাইল তথ্য লোড হচ্ছে...</p>
+  }
+  <p class="text-muted">Dashboard content coming next — exam history, subscription status, quick links.</p>
+</div>

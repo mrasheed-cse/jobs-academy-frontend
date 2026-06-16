@@ -1,1 +1,74 @@
-/* You can add global styles to this file, and also import other style files */
+/* Global styles — design tokens and shared visual language, ported from the
+   existing Jobs Academy site (frontend/templates/new_custom/new_templates/index2.html) */
+/* Inter / Hind Siliguri fonts are loaded via <link> tags in index.html
+   rather than @import here, so the production build doesn't need network
+   access at build time to inline them. */
+
+:root {
+  --primary: #6366f1;
+  --primary-hover: #4f46e5;
+  --dark: #0f172a;
+  --secondary: #64748b;
+  --light-bg: #f8fafc;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  font-family: 'Inter', 'Hind Siliguri', sans-serif;
+  background-color: var(--light-bg);
+  color: var(--dark);
+  overflow-x: hidden;
+  margin: 0;
+}
+
+/* Shared button style used across feature pages */
+.btn-custom {
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--primary);
+  border-radius: 12px;
+  font-weight: 600;
+  padding: 10px 24px;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: var(--transition);
+
+  &:hover {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-2px);
+  }
+}
+
+/* Shared feature-card style used across feature pages */
+.feature-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 24px;
+  padding: 2.5rem;
+  transition: var(--transition);
+  height: 100%;
+
+  &:hover {
+    transform: translateY(-10px);
+    border-color: var(--primary);
+    box-shadow: var(--card-shadow);
+  }
+}
+
+.icon-box {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+}
