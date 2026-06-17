@@ -1,9 +1,158 @@
-<div class="container py-5">
-  <h2 class="fw-bold mb-4">আপনার ড্যাশবোর্ড</h2>
-  @if (currentUser()) {
-    <p>স্বাগতম, {{ currentUser()?.username }}!</p>
-  } @else {
-    <p>প্রোফাইল তথ্য লোড হচ্ছে...</p>
+<div class="dashboard-wrapper py-4">
+  <div class="profile-hero">
+    <div class="row align-items-center">
+      <div class="col-auto">
+        <div class="avatar-square">{{ initial }}</div>
+      </div>
+      <div class="col ms-md-3 mt-3 mt-md-0">
+        <h1 class="fw-bold mb-1">{{ currentUser()?.username || 'Guest User' }}</h1>
+        <p class="fs-5 opacity-75 mb-3">{{ currentUser()?.phone_number || '—' }}</p>
+        <div class="d-inline-flex align-items-center bg-white bg-opacity-10 rounded-pill px-3 py-2 border border-white border-opacity-25">
+          <i class="fa-solid fa-crown text-warning me-2"></i>
+          <span class="fw-semibold">Practice Rank: #{{ activity()?.stats?.quiz_rank ?? '-' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary" role="status"></div>
+    </div>
+  } @else if (loadFailed()) {
+    <div class="alert alert-warning">কার্যকলাপের তথ্য লোড করা সম্ভব হয়নি। অনুগ্রহ করে আবার চেষ্টা করুন।</div>
+  } @else if (activity(); as data) {
+    <div class="row g-4 mb-5">
+      <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+          <div class="d-flex justify-content-between">
+            <div>
+              <div class="stat-label text-primary">Total Points</div>
+              <div class="stat-value">{{ data.stats.current_points | number }}</div>
+            </div>
+            <div class="icon-box text-primary fs-3 opacity-25"><i class="fa-solid fa-award"></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+          <div class="d-flex justify-content-between">
+            <div>
+              <div class="stat-label text-success">Wallet Balance</div>
+              <div class="stat-value">৳ {{ data.stats.total_rewards_taka }}</div>
+            </div>
+            <div class="icon-box text-success fs-3 opacity-25"><i class="fa-solid fa-coins"></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+          <div class="d-flex justify-content-between">
+            <div>
+              <div class="stat-label text-purple">Global Rank</div>
+              <div class="stat-value">#{{ data.stats.quiz_rank ?? '-' }}</div>
+            </div>
+            <div class="icon-box text-purple fs-3 opacity-25"><i class="fa-solid fa-ranking-star"></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+          <div class="d-flex justify-content-between">
+            <div>
+              <div class="stat-label text-info">Games History</div>
+              <div class="stat-value">{{ data.history.puzzles.length }}</div>
+            </div>
+            <div class="icon-box text-info fs-3 opacity-25"><i class="fa-solid fa-gamepad"></i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+      <div class="col-xl-8">
+        <div class="glass-panel h-100">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="section-title mb-0">Analytics Overview</h5>
+            <select class="form-select form-select-sm w-auto border-0 bg-light">
+              <option>Last {{ data.history.practice.length }} Sessions</option>
+            </select>
+          </div>
+          <div style="height: 380px;">
+            @if (data.history.practice.length === 0) {
+              <div class="d-flex align-items-center justify-content-center h-100 text-muted">
+                <p>এখনো কোনো প্র্যাকটিস সেশন সম্পন্ন হয়নি।</p>
+              </div>
+            } @else {
+              <canvas #practiceChartCanvas></canvas>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-4">
+        <div class="glass-panel h-100">
+          <h5 class="section-title">Performance Log</h5>
+          <div class="scroll-list">
+            @if (data.history.puzzles.length === 0) {
+              <p class="text-muted small">এখনো কোনো গেম খেলা হয়নি।</p>
+            } @else {
+              @for (puzzle of data.history.puzzles; track puzzle.puzzle__title) {
+                <div class="d-flex justify-content-between align-items-center mb-3 p-3 bg-light rounded-4">
+                  <div class="fw-bold small">{{ puzzle.puzzle__title }}</div>
+                  <span class="badge bg-primary rounded-pill">{{ puzzle.total_puzzle_score }}</span>
+                </div>
+              }
+            }
+          </div>
+          @if (data.history.puzzles.length > 0) {
+            <hr class="my-4">
+            <div style="height: 200px;">
+              <canvas #puzzleChartCanvas></canvas>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
   }
-  <p class="text-muted">Dashboard content coming next — exam history, subscription status, quick links.</p>
+
+  <div class="row g-4">
+    <div class="col-md-4">
+      <div class="dashboard-item">
+        <div class="dashboard-item-title"><i class="fa-solid fa-bell"></i> আসন্ন পরীক্ষা</div>
+        @if (upcomingExams().length === 0) {
+          <p class="text-muted small">কোনো আসন্ন পরীক্ষা নেই।</p>
+        } @else {
+          @for (exam of upcomingExams(); track exam.exam_id) {
+            <div class="mb-2">
+              <strong class="d-block small">{{ exam.title }}</strong>
+              <span class="text-muted" style="font-size: 0.8rem;">{{ exam.duration }} | {{ exam.total_questions }} প্রশ্ন</span>
+            </div>
+          }
+        }
+        <a routerLink="/model-tests" class="btn btn-primary btn-sm mt-2">সব দেখুন</a>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="dashboard-item">
+        <div class="dashboard-item-title"><i class="fa-solid fa-clock-rotate-left"></i> সাম্প্রতিক পরীক্ষা</div>
+        @if (recentAttempts().length === 0) {
+          <p class="text-muted small">এখনো কোনো পরীক্ষা দেওয়া হয়নি।</p>
+        } @else {
+          <ul class="list-unstyled">
+            @for (attempt of recentAttempts(); track attempt.id) {
+              <li class="small">{{ attempt.exam_title }} — {{ attempt.score }}%</li>
+            }
+          </ul>
+        }
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="go-to-settings">
+        <div class="go-to-settings-title"><i class="fa-solid fa-gear"></i> Settings</div>
+        <div class="text-muted small mb-2">প্রোফাইল, পছন্দ এবং ভাষা আপডেট করুন</div>
+        <a routerLink="/profile/settings" class="btn btn-primary btn-sm">সেটিংসে যান</a>
+      </div>
+    </div>
+  </div>
 </div>

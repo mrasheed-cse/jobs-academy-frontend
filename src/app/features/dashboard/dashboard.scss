@@ -1,0 +1,132 @@
+.dashboard-wrapper {
+  width: 100%;
+  padding: 0 30px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.profile-hero {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  border-radius: 20px;
+  padding: 50px 40px;
+  color: white;
+  margin-bottom: 30px;
+  box-shadow: 0 10px 30px -10px rgba(79, 70, 229, 0.4);
+}
+
+.avatar-square {
+  width: 110px;
+  height: 110px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.8rem;
+  font-weight: 700;
+}
+
+.stat-card {
+  background: #fff;
+  border-radius: 18px;
+  padding: 24px;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  transition: all 0.3s ease;
+  height: 100%;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+  }
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.text-purple {
+  color: #7c3aed !important;
+}
+
+.stat-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-top: 8px;
+}
+
+.glass-panel {
+  background: #fff;
+  border-radius: 24px;
+  padding: 30px;
+  border: 1px solid #e2e8f0;
+}
+
+.section-title {
+  font-weight: 700;
+  font-size: 1.25rem;
+  margin-bottom: 25px;
+  color: #0f172a;
+}
+
+.scroll-list {
+  max-height: 320px;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.dashboard-item {
+  background-color: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  height: 100%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.dashboard-item-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #343a40;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  i {
+    color: var(--primary);
+  }
+}
+
+.go-to-settings {
+  background-color: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  height: 100%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.go-to-settings-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #343a40;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (max-width: 768px) {
+  .dashboard-wrapper {
+    padding: 0 15px;
+  }
+
+  .profile-hero {
+    padding: 30px 20px;
+  }
+}
