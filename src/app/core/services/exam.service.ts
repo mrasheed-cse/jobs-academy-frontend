@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, catchError, of, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
   Category,
@@ -11,6 +11,7 @@ import {
   ExamSubmitRequest,
   ExamSubmitResponse,
   ExamAttempt,
+  ExamLeaderboardResponse,
   ExamType,
   Organization,
 } from '../models/exam.model';
@@ -54,12 +55,19 @@ export class ExamService {
     return this.http.post<ExamSubmitResponse>(`${this.baseUrl}/quiz/exams/${examId}/submit/`, payload);
   }
 
-  getUserAttempts(): Observable<ExamAttempt[]> {
-    return this.http.get<ExamAttempt[]>(`${this.baseUrl}/quiz/attempts/user_attempts/`);
+  // Requires exam_id — confirmed via live testing that this endpoint returns
+  // 400 without it (it answers "my attempts for THIS exam", not "all my
+  // attempts"). Also returns 404 with {message: "No attempts found..."}
+  // when the user hasn't attempted this exam yet — callers should treat
+  // that as an empty list, not a hard error.
+  getUserAttempts(examId: string): Observable<ExamAttempt[]> {
+    return this.http
+      .get<ExamAttempt[]>(`${this.baseUrl}/quiz/attempts/user_attempts/`, { params: { exam_id: examId } })
+      .pipe(catchError((err) => (err.status === 404 ? of([]) : throwError(() => err))));
   }
 
-  getExamLeaderboard(examId: string): Observable<unknown[]> {
-    return this.http.get<unknown[]>(`${this.baseUrl}/quiz/exam/${examId}/leaderboard/`);
+  getExamLeaderboard(examId: string): Observable<ExamLeaderboardResponse> {
+    return this.http.get<ExamLeaderboardResponse>(`${this.baseUrl}/quiz/exam/${examId}/leaderboard/`);
   }
 
   // --- Past exams ---
@@ -86,5 +94,21 @@ export class ExamService {
     return this.http.get<{ has_access: boolean; trial?: boolean; reason?: string }>(
       `${this.baseUrl}/api/check-permission/${examId}/`,
     );
+  }
+
+  // --- Model tests (a curated subset of Exam records) ---
+
+  getModelExamTypes(): Observable<ExamType[]> {
+    return this.http.get<ExamType[]>(`${this.baseUrl}/quiz/model/exam-types/`);
+  }
+
+  getModelExams(examTypeId: number | string): Observable<ExamListItem[]> {
+    return this.http.get<ExamListItem[]>(`${this.baseUrl}/quiz/model-exams/`, {
+      params: { exam_type: examTypeId },
+    });
+  }
+
+  getModelExamDetail(examId: string): Observable<ExamDetail> {
+    return this.http.get<ExamDetail>(`${this.baseUrl}/quiz/model-exams/${examId}/`);
   }
 }

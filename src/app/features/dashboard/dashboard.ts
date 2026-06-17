@@ -59,10 +59,13 @@ export class Dashboard implements OnInit {
       },
     });
 
-    this.examService.getUserAttempts().subscribe({
-      next: (attempts) => this.recentAttempts.set(attempts.slice(0, 5)),
-      error: () => this.recentAttempts.set([]),
-    });
+    // NOTE: there is currently no backend endpoint that returns a user's
+    // attempts across ALL exams without specifying one exam_id first
+    // (confirmed via live testing — /quiz/attempts/user_attempts/ requires
+    // exam_id). Recent-attempts history is left empty until either a
+    // cross-exam endpoint is added server-side, or this is reworked to
+    // fetch per-exam via getUserAttempts(examId) for a known set of exams.
+    this.recentAttempts.set([]);
 
     this.examService.getExams().subscribe({
       next: (exams) => this.upcomingExams.set(exams.slice(0, 3)),

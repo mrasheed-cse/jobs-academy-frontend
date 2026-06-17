@@ -1,0 +1,74 @@
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8 col-sm-10">
+      @if (isLoading()) {
+        <div class="text-center py-5">
+          <div class="spinner-border text-primary" role="status"></div>
+        </div>
+      } @else if (loadFailed() || !exam()) {
+        <p class="text-danger text-center py-4">পরীক্ষার তথ্য লোড করতে ব্যর্থ হয়েছে।</p>
+      } @else {
+        @let e = exam()!;
+        <div class="detail-card">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="card-title" [title]="e.title">{{ e.title }}</h1>
+            <span class="status-badge" [class.published]="isActive(e.status)">
+              {{ statusLabel(e.status) }}
+            </span>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="info-box">
+                <span class="info-label">মোট প্রশ্ন</span>
+                <span class="info-value">{{ e.total_questions }}</span>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="info-box">
+                <span class="info-label">মোট নম্বর</span>
+                <span class="info-value">{{ e.total_mark }}</span>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="info-box">
+                <span class="info-label">নেগেটিভ মার্কিং</span>
+                <span class="info-value">- {{ e.negative_mark }}</span>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="info-box">
+                <span class="info-label">সংস্থা</span>
+                <span class="info-value">{{ e.organization_name || 'উল্লেখ নেই' }}</span>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="info-box">
+                <span class="info-label">পদ</span>
+                <span class="info-value">{{ e.position_name || 'উল্লেখ নেই' }}</span>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="info-box">
+                <span class="info-label">সময়</span>
+                <span class="info-value">{{ formatDuration(e.duration) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="row mt-3">
+            <div class="col-6 mb-2">
+              <button type="button" class="btn w-100 btn-custom" (click)="goToStart()">পরীক্ষা শুরু করুন</button>
+            </div>
+            <div class="col-6 mb-2">
+              <button type="button" class="btn w-100 btn-custom" (click)="goToLeaderboard()">লিডারবোর্ড</button>
+            </div>
+            <div class="col-12 mb-2">
+              <button type="button" class="btn w-100 btn-custom" (click)="goToResults()">আপনার ফলাফল</button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

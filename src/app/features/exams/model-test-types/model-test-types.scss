@@ -1,0 +1,44 @@
+.page-bg {
+  background: rgb(255, 253, 208);
+  min-height: 70vh;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #534268;
+}
+
+.content-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 2px 2px 33px 0 rgba(0, 0, 0, 0.08);
+}
+
+.type-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 25px;
+}
+
+.type-card {
+  border: none;
+  background: #92d7de;
+  color: #231651;
+  border-radius: 12px;
+  padding: 10px;
+  box-shadow: 14px 14px 33px 0 rgba(0, 0, 0, 0.25);
+  min-height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: bold;
+  transition: transform 0.2s ease-in-out;
+
+  &:hover {
+    transform: scale(1.03);
+  }
+}

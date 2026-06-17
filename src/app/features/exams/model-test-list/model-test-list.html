@@ -1,0 +1,48 @@
+<div class="page-bg">
+  <div class="container py-4">
+    <ul class="nav nav-tabs mb-3">
+      <li class="nav-item">
+        <a class="nav-link fw-bold" [class.active]="activeTab() === 'withSubject'" href="#" (click)="setTab('withSubject'); $event.preventDefault()">বিষয়ভিত্তিক</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link fw-bold" [class.active]="activeTab() === 'withoutSubject'" href="#" (click)="setTab('withoutSubject'); $event.preventDefault()">সম্পূর্ণ পরীক্ষা</a>
+      </li>
+    </ul>
+
+    @if (isLoading()) {
+      <div class="text-center py-5">
+        <div class="spinner-border text-primary" role="status"></div>
+      </div>
+    } @else if (loadFailed()) {
+      <p class="text-danger text-center py-4">পরীক্ষা লোড করতে ব্যর্থ হয়েছে।</p>
+    } @else {
+      <div class="row">
+        @let visibleExams = activeTab() === 'withSubject' ? examsWithSubject() : examsWithoutSubject();
+        @if (visibleExams.length === 0) {
+          <p class="text-muted text-center py-4">কোনো পরীক্ষা পাওয়া যায়নি।</p>
+        } @else {
+          @for (exam of visibleExams; track exam.exam_id) {
+            <div class="col-12 col-md-6 col-lg-4 mb-4">
+              <div class="exam-card position-relative">
+                @if (exam.subject_name) {
+                  <div class="subject-badge">{{ exam.subject_name }}</div>
+                }
+                <div class="card-body">
+                  <div class="type-pill">{{ exam.exam_type_name || 'পরীক্ষা' }}</div>
+                  <h5 class="card-title">{{ exam.title || 'শিরোনাম নেই' }}</h5>
+                  <p class="text-muted small mb-2">{{ exam.total_mark || 0 }} নম্বর • {{ exam.total_questions || 0 }} প্রশ্ন • {{ exam.duration || 0 }}</p>
+                  <p class="mb-1"><strong>পদ:</strong> {{ exam.position_name || 'উল্লেখ নেই' }}</p>
+                  <p class="mb-3"><strong>সংস্থা:</strong> {{ exam.organization_name || 'উল্লেখ নেই' }}</p>
+                  <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-success btn-sm" (click)="openDetails(exam.exam_id)">বিস্তারিত</button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" (click)="share(exam.exam_id, exam.title)">শেয়ার</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+        }
+      </div>
+    }
+  </div>
+</div>

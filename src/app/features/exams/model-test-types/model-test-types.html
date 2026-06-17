@@ -1,0 +1,27 @@
+<div class="page-bg">
+  <div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="page-title">মডেল টেস্ট পরীক্ষাগুলো</h1>
+    </div>
+
+    <div class="content-card">
+      @if (isLoading()) {
+        <div class="text-center py-5">
+          <div class="spinner-border text-primary" role="status"></div>
+        </div>
+      } @else if (loadFailed()) {
+        <p class="text-danger text-center py-4">পরীক্ষার ধরন লোড করতে ব্যর্থ হয়েছে।</p>
+      } @else if (examTypes().length === 0) {
+        <p class="text-muted text-center py-4">কোনো পরীক্ষার ধরন পাওয়া যায়নি।</p>
+      } @else {
+        <div class="type-grid">
+          @for (type of examTypes(); track type.id) {
+            <button type="button" class="type-card" (click)="openType(type.id)">
+              <h6>{{ type.name }}</h6>
+            </button>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>

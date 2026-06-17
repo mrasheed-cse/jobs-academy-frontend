@@ -1,0 +1,46 @@
+<div class="page-bg">
+  <div class="container py-5">
+    <h4 class="text-center mb-4 section-title">লিডারবোর্ড</h4>
+
+    @if (isLoading()) {
+      <div class="text-center py-5">
+        <div class="spinner-border text-primary" role="status"></div>
+      </div>
+    } @else if (loadFailed()) {
+      <p class="text-danger text-center">লিডারবোর্ড লোড করতে ব্যর্থ হয়েছে।</p>
+    } @else if (topEntries().length === 0) {
+      <p class="text-muted text-center">এখনো কোনো ফলাফল পাওয়া যায়নি।</p>
+    } @else {
+      <div class="table-responsive">
+        <table class="table table-bordered text-center align-middle">
+          <thead>
+            <tr>
+              <th>অবস্থান</th>
+              <th>ব্যবহারকারী</th>
+              <th>পয়েন্ট</th>
+              <th>চেষ্টা</th>
+              <th>শতকরা হার</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (entry of topEntries(); track entry.id) {
+              <tr [class.table-primary]="myEntry()?.id === entry.id">
+                <td>{{ entry.rank ?? ($index + 1) }}</td>
+                <td>{{ entry.username }}</td>
+                <td>{{ entry.points }}</td>
+                <td>{{ entry.attempts }}</td>
+                <td>{{ entry.percentage }}%</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      @if (myEntry() && !topEntries().some(e => e.id === myEntry()!.id)) {
+        <div class="my-rank-card mt-4 p-3 text-center">
+          <strong>আপনার অবস্থান:</strong> #{{ myEntry()!.rank }} — {{ myEntry()!.points }} পয়েন্ট ({{ myEntry()!.percentage }}%)
+        </div>
+      }
+    }
+  </div>
+</div>

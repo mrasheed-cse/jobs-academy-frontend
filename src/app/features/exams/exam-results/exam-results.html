@@ -1,0 +1,48 @@
+<div class="page-bg">
+  <div class="container py-5">
+    <h4 class="text-center mb-4 section-title">আপনার ফলাফল</h4>
+
+    @if (isLoading()) {
+      <div class="text-center py-5">
+        <div class="spinner-border text-primary" role="status"></div>
+      </div>
+    } @else if (loadFailed()) {
+      <p class="text-danger text-center">ফলাফল লোড করতে ব্যর্থ হয়েছে।</p>
+    } @else if (attempts().length === 0) {
+      <p class="text-muted text-center">আপনি এখনো এই পরীক্ষাটি দেননি।</p>
+    } @else {
+      <div class="table-responsive">
+        <table class="table table-bordered text-center align-middle">
+          <thead>
+            <tr>
+              <th>তারিখ</th>
+              <th>প্রশ্ন</th>
+              <th>উত্তর দেওয়া</th>
+              <th>সঠিক</th>
+              <th>ভুল</th>
+              <th>নম্বর</th>
+              <th>পাস মার্ক</th>
+              <th>স্ট্যাটাস</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (attempt of attempts(); track attempt.id) {
+              <tr>
+                <td>{{ attempt.attempt_time | date:'short' }}</td>
+                <td>{{ attempt.total_questions }}</td>
+                <td>{{ attempt.answered }}</td>
+                <td class="text-success">{{ attempt.total_correct_answers }}</td>
+                <td class="text-danger">{{ attempt.wrong_answers }}</td>
+                <td>{{ attempt.score }}</td>
+                <td>{{ attempt.pass_mark }}</td>
+                <td [class.text-success]="attempt.is_passed" [class.text-danger]="!attempt.is_passed">
+                  {{ attempt.is_passed ? 'উত্তীর্ণ' : 'অনুত্তীর্ণ' }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

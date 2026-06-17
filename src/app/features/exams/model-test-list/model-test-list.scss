@@ -1,0 +1,35 @@
+.page-bg {
+  background: rgb(255, 253, 208);
+  min-height: 70vh;
+}
+
+.exam-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  height: 100%;
+}
+
+.subject-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 4px 14px;
+  border-radius: 0 8px 0 8px;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
+  color: white;
+  font-weight: bold;
+  font-size: 0.8rem;
+}
+
+.type-pill {
+  display: inline-block;
+  padding: 6px 10px;
+  margin-bottom: 12px;
+  border-radius: 6px;
+  background: #e0ffe0;
+  color: #336633;
+  font-weight: bold;
+  font-size: 0.85rem;
+}

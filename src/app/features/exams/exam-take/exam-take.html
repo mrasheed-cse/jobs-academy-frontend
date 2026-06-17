@@ -1,0 +1,95 @@
+<div class="page-bg">
+  @if (isLoading()) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary" role="status"></div>
+    </div>
+  } @else if (loadFailed() || !exam()) {
+    <p class="text-danger text-center py-5">পরীক্ষা লোড করতে ব্যর্থ হয়েছে।</p>
+  } @else {
+    @let e = exam()!;
+    <div class="text-center pt-4 pb-2">
+      <h2 class="exam-title">{{ e.title }}</h2>
+      <p class="text-muted small">{{ e.organization_name ? '---' + e.organization_name + '---' : '' }}</p>
+    </div>
+
+    <div class="container">
+      <div class="exam-panel">
+        <div class="exam-meta d-flex justify-content-between border-bottom pb-2 mb-4 small text-muted flex-wrap gap-2">
+          <div>পূর্ণমান: <span>{{ e.total_mark }}</span></div>
+          <div class="fw-bold text-danger">সময় বাকি: {{ timeDisplay() }}</div>
+        </div>
+
+        <div class="row g-4">
+          @for (q of questionRows(); track q.questionId) {
+            <div class="col-md-6 mb-4 p-3" [class.locked-question]="q.isLocked">
+              <div class="d-flex gap-2 mb-2 align-items-center">
+                <span class="fw-semibold flex-shrink-0">{{ q.index + 1 }}.</span>
+                <div class="flex-grow-1">
+                  @if (q.image) {
+                    <img [src]="q.image" alt="প্রশ্নের ছবি" class="img-fluid rounded shadow-sm question-image">
+                  } @else if (q.text) {
+                    <p class="fw-semibold mb-0">{{ q.text }}</p>
+                  }
+                </div>
+              </div>
+
+              <div class="d-grid gap-2 options-container">
+                @for (opt of q.options; track opt.id) {
+                  <button
+                    type="button"
+                    class="option-row"
+                    [class.selected]="isSelected(q.questionId, opt.id)"
+                    [disabled]="q.isLocked"
+                    (click)="selectAnswer(q.questionId, opt.id)"
+                  >
+                    <span class="option-letter">{{ opt.label }}</span>
+                    @if (opt.image) {
+                      <img [src]="opt.image" alt="অপশন" class="option-image">
+                    } @else {
+                      <span>{{ opt.text }}</span>
+                    }
+                  </button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+
+        @if (!hasFullAccess()) {
+          <div class="upsell-banner text-center p-4 rounded mt-3">
+            <h5 class="text-danger mb-2">সাবস্ক্রিপশন প্রয়োজন</h5>
+            <p class="mb-3">সকল প্রশ্ন দেখতে এবং উত্তর জমা দিতে একটি সাবস্ক্রিপশন কিনুন।</p>
+            <button type="button" class="btn btn-primary" (click)="goToSubscription()">সাবস্ক্রিপশন কিনুন</button>
+          </div>
+        }
+
+        <div class="mt-4 text-end">
+          <button type="button" class="btn btn-primary" [disabled]="isSubmitting()" (click)="onSubmitClick()">
+            {{ isSubmitting() ? 'জমা হচ্ছে…' : 'জমা দিন' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+
+@if (result()) {
+  @let r = result()!;
+  <div class="modal-backdrop-custom">
+    <div class="result-modal">
+      <h4 class="text-center mb-3">উত্তরপত্র</h4>
+      <div class="result-row"><span>মোট প্রশ্ন</span><span>{{ r.total_questions }}</span></div>
+      <div class="result-row"><span>উত্তর দেওয়া হয়েছে</span><span>{{ r.answered_questions }}</span></div>
+      <div class="result-row text-success"><span>সঠিক উত্তর</span><span>{{ r.correct_answers }}</span></div>
+      <div class="result-row text-danger"><span>ভুল উত্তর</span><span>{{ r.wrong_answers }}</span></div>
+      <div class="result-row"><span>আপনার নম্বর</span><span>{{ r.score }}/{{ r.total_questions }}</span></div>
+      <div class="result-row fw-bold text-primary"><span>মোট ফলাফল</span><span>{{ r.percentage }}%</span></div>
+      <div class="result-row fw-bold"><span>স্ট্যাটাস</span><span [class.text-success]="r.passed" [class.text-danger]="!r.passed">{{ r.passed ? 'উত্তীর্ণ' : 'অনুত্তীর্ণ' }}</span></div>
+
+      <div class="d-flex justify-content-between gap-2 mt-3">
+        <button type="button" class="btn btn-outline-secondary flex-grow-1" (click)="retryExam()">আবার চেষ্টা করুন</button>
+        <button type="button" class="btn btn-primary flex-grow-1" (click)="backToDetails()">বিস্তারিত পেজে যান</button>
+      </div>
+    </div>
+  </div>
+}

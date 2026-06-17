@@ -43,14 +43,25 @@ export interface ExamListItem {
   duration: string;
   starting_time: string;
   last_date: string;
-  organization_name: string | null;
-  department_name: string | null;
-  position_name: string | null;
-  subject_name: string | null;
-  category: string;
+  // DRF's CharField(source='organization.name') etc. are OMITTED entirely
+  // from the response (not even `null`) when the related object is unset —
+  // confirmed by direct testing against /quiz/model-exams/. Treat as
+  // optional, and check `'organization_name' in item`, not `!= null`.
+  organization_name?: string;
+  department_name?: string;
+  position_name?: string;
+  subject_name?: string;
+  category: string; // plain string here (ExamListSerializer uses StringRelatedField)
   created_by: string;
   created_at: string;
 }
+
+// Shape returned by GET /quiz/model-exams/{id}/ — despite being a "detail"
+// endpoint, ModelTestExamView reuses ExamListSerializer, so it returns the
+// SAME lightweight shape as the list endpoint (no questions[], no status,
+// no nested organization/department/position objects). Confirmed by live
+// testing; do not assume this matches ExamDetail below.
+export type ModelExamSummary = ExamListItem;
 
 export interface QuestionOption {
   id: number;
@@ -88,7 +99,14 @@ export interface ExamDetail {
   category: number;
   category_name: string;
   duration: string;
+  // Computed property on the backend (time-based), NOT a publish-workflow
+  // status — confirmed via direct model inspection. Observed values:
+  // "Upcoming" | "active" | "Ongoing" | "archived". The separate publish
+  // workflow (draft/submitted_to_admin/under_review/reviewed/published)
+  // lives on a related Status model — status_id below references it, but
+  // this `status` field does NOT reflect publish state.
   status: string;
+  status_id?: number;
   questions: Array<{ id: number; question: Question; order: number; points: number; options: QuestionOption[] }>;
   subjects: Array<{ subject: string; question_count: number }>;
   organization: number | null;
@@ -133,6 +151,21 @@ export interface ExamSubmitResponse {
   score: string;
   passed: boolean;
   percentage: string;
+}
+
+export interface ExamLeaderboardEntry {
+  id: number;
+  username: string;
+  points: number;
+  attempts: number;
+  percentage: number;
+  rank?: number;
+  profile_image: string | null;
+}
+
+export interface ExamLeaderboardResponse {
+  top_10: ExamLeaderboardEntry[];
+  me: ExamLeaderboardEntry | null;
 }
 
 export interface ExamAttempt {
