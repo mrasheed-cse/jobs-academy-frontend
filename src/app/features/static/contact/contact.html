@@ -1,0 +1,52 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-7">
+      <div class="contact-card p-5">
+        <h2 class="fw-bold mb-2">যোগাযোগ করুন</h2>
+        <p class="text-muted mb-4">আমাদের সাথে যোগাযোগ করতে নিচের ফর্মটি পূরণ করুন।</p>
+
+        @if (submitted()) {
+          <div class="alert alert-success">
+            <i class="fas fa-check-circle me-2"></i> আপনার বার্তা সফলভাবে পাঠানো হয়েছে। আমরা শীঘ্রই যোগাযোগ করব।
+          </div>
+        } @else {
+          <form [formGroup]="form" (ngSubmit)="onSubmit()">
+            <div class="mb-3">
+              <label class="form-label">আপনার নাম</label>
+              <input type="text" class="form-control" formControlName="name" placeholder="আপনার পূর্ণ নাম">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">ইমেইল ঠিকানা</label>
+              <input type="email" class="form-control" formControlName="email" placeholder="example@email.com">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">বিষয়</label>
+              <input type="text" class="form-control" formControlName="subject" placeholder="বার্তার বিষয়">
+            </div>
+            <div class="mb-4">
+              <label class="form-label">বার্তা</label>
+              <textarea class="form-control" rows="5" formControlName="message" placeholder="আপনার বার্তা লিখুন..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">বার্তা পাঠান</button>
+          </form>
+        }
+
+        <hr class="my-4">
+        <div class="row text-center">
+          <div class="col-4">
+            <i class="fas fa-envelope text-primary fa-lg mb-2 d-block"></i>
+            <small class="text-muted">info@jobs.academy</small>
+          </div>
+          <div class="col-4">
+            <i class="fab fa-facebook text-primary fa-lg mb-2 d-block"></i>
+            <small class="text-muted">Facebook</small>
+          </div>
+          <div class="col-4">
+            <i class="fab fa-youtube text-danger fa-lg mb-2 d-block"></i>
+            <small class="text-muted">YouTube</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

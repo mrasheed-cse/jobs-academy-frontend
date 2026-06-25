@@ -9,8 +9,11 @@
         <h6 class="fw-bold mb-4">দ্রুত লিংক</h6>
         <div class="d-flex justify-content-center gap-3">
           <a routerLink="/model-tests" class="text-secondary text-decoration-none small">মডেল টেস্ট</a>
-          <a href="#" class="text-secondary text-decoration-none small">পলিসি</a>
-          <a href="#" class="text-secondary text-decoration-none small">যোগাযোগ</a>
+          <a routerLink="/past-exams" class="text-secondary text-decoration-none small">বিগত প্রশ্ন</a>
+          <a routerLink="/job-circular" class="text-secondary text-decoration-none small">চাকরি</a>
+          <a routerLink="/news" class="text-secondary text-decoration-none small">সংবাদ</a>
+          <a routerLink="/privacy-policy" class="text-secondary text-decoration-none small">পলিসি</a>
+          <a routerLink="/contact-us" class="text-secondary text-decoration-none small">যোগাযোগ</a>
         </div>
       </div>
       <div class="col-lg-4 text-center text-lg-end">
@@ -31,20 +34,16 @@
 <nav class="mobile-bottom-nav d-md-none fixed-bottom shadow-lg">
   <div class="d-flex justify-content-around text-center">
     <a routerLink="/" routerLinkActive="active-tab" [routerLinkActiveOptions]="{exact: true}" class="mobile-tab">
-      <i class="fas fa-home d-block fs-5 mb-1"></i>
-      <span>হোম</span>
+      <i class="fas fa-home d-block fs-5 mb-1"></i><span>হোম</span>
     </a>
     <a routerLink="/past-exams" routerLinkActive="active-tab" class="mobile-tab">
-      <i class="fas fa-book d-block fs-5 mb-1"></i>
-      <span>প্রশ্ন</span>
+      <i class="fas fa-book d-block fs-5 mb-1"></i><span>প্রশ্ন</span>
     </a>
-    <a routerLink="/quiz-games" routerLinkActive="active-tab" class="mobile-tab">
-      <i class="fas fa-trophy d-block fs-5 mb-1"></i>
-      <span>কুইজ</span>
+    <a routerLink="/job-circular" routerLinkActive="active-tab" class="mobile-tab">
+      <i class="fas fa-briefcase d-block fs-5 mb-1"></i><span>চাকরি</span>
     </a>
-    <a routerLink="/news/1" routerLinkActive="active-tab" class="mobile-tab">
-      <i class="fas fa-newspaper d-block fs-5 mb-1"></i>
-      <span>নিউজ</span>
+    <a routerLink="/news" routerLinkActive="active-tab" class="mobile-tab">
+      <i class="fas fa-newspaper d-block fs-5 mb-1"></i><span>নিউজ</span>
     </a>
   </div>
 </nav>

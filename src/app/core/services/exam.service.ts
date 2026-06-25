@@ -70,25 +70,7 @@ export class ExamService {
     return this.http.get<ExamLeaderboardResponse>(`${this.baseUrl}/quiz/exam/${examId}/leaderboard/`);
   }
 
-  // --- Past exams ---
-
-  getPastExams(): Observable<PastExamListItem[]> {
-    return this.http.get<PastExamListItem[]>(`${this.baseUrl}/quiz/past-exams/`);
-  }
-
-  getPastExamDetail(id: number): Observable<unknown> {
-    return this.http.get(`${this.baseUrl}/quiz/past-exams/${id}/`);
-  }
-
-  submitPastExam(id: number, payload: ExamSubmitRequest): Observable<PastExamSubmitResponse> {
-    return this.http.post<PastExamSubmitResponse>(`${this.baseUrl}/quiz/past-exams/${id}/submit/`, payload);
-  }
-
-  getPastExamUserAttempts(): Observable<PastExamAttempt[]> {
-    return this.http.get<PastExamAttempt[]>(`${this.baseUrl}/quiz/past_exam/user_attempts/`);
-  }
-
-  // --- Permission check (call before allowing a user to open any exam) ---
+  // --- Permission check ---
 
   checkExamPermission(examId: string | number): Observable<{ has_access: boolean; trial?: boolean; reason?: string }> {
     return this.http.get<{ has_access: boolean; trial?: boolean; reason?: string }>(
@@ -110,5 +92,33 @@ export class ExamService {
 
   getModelExamDetail(examId: string): Observable<ExamDetail> {
     return this.http.get<ExamDetail>(`${this.baseUrl}/quiz/model-exams/${examId}/`);
+  }
+
+  // --- Past exams (historical exam records) ---
+
+  getPastExamTypes(): Observable<ExamType[]> {
+    return this.http.get<ExamType[]>(`${this.baseUrl}/quiz/exam-types/`);
+  }
+
+  getPastExamsByType(examTypeId: number | string): Observable<PastExamListItem[]> {
+    return this.http.get<PastExamListItem[]>(`${this.baseUrl}/quiz/past-exams/`, {
+      params: { exam_type: examTypeId },
+    });
+  }
+
+  getPastExamDetail(id: number): Observable<PastExamListItem> {
+    return this.http.get<PastExamListItem>(`${this.baseUrl}/quiz/past-exams/${id}/`);
+  }
+
+  getPastExamQuestions(id: number): Observable<ExamQuestionsResponse> {
+    return this.http.get<ExamQuestionsResponse>(`${this.baseUrl}/quiz/past-exams/${id}/questions/`);
+  }
+
+  submitPastExam(id: number, payload: ExamSubmitRequest): Observable<PastExamSubmitResponse> {
+    return this.http.post<PastExamSubmitResponse>(`${this.baseUrl}/quiz/past-exams/${id}/submit/`, payload);
+  }
+
+  getPastExamLeaderboard(id: number): Observable<ExamLeaderboardResponse> {
+    return this.http.get<ExamLeaderboardResponse>(`${this.baseUrl}/quiz/past-exam/${id}/leaderboard/`);
   }
 }

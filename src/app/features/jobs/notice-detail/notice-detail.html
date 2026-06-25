@@ -1,0 +1,17 @@
+<div class="container py-5">
+  <a routerLink="/notices" class="btn btn-outline-secondary btn-sm mb-4"><i class="fas fa-arrow-left me-1"></i> ফিরে যান</a>
+  @if (isLoading()) {
+    <div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>
+  } @else if (!notice()) {
+    <p class="text-danger text-center">নোটিশ পাওয়া যায়নি।</p>
+  } @else {
+    @let n = notice()!;
+    <div class="notice-card p-4">
+      <h3 class="fw-bold mb-2">{{ n.title }}</h3>
+      <p class="text-muted small mb-4">{{ n.created_at | date:'longDate' }}</p>
+      <div [innerHTML]="n.description" class="mb-4"></div>
+      @if (n.link) { <a [href]="n.link" target="_blank" class="btn btn-primary me-2">বিস্তারিত দেখুন</a> }
+      @if (n.pdf) { <a [href]="n.pdf" target="_blank" class="btn btn-outline-primary">পিডিএফ ডাউনলোড</a> }
+    </div>
+  }
+</div>

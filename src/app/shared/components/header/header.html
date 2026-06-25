@@ -22,9 +22,10 @@
               <li><a class="dropdown-item rounded-3 py-2" routerLink="/login">লগইন</a></li>
               <li><a class="dropdown-item rounded-3 py-2" routerLink="/signup">সাইন আপ</a></li>
             } @else {
-              <li><a class="dropdown-item rounded-3 py-2" routerLink="/dashboard">প্রোফাইল</a></li>
+              <li><a class="dropdown-item rounded-3 py-2" routerLink="/dashboard"><i class="fas fa-tachometer-alt me-2"></i>ড্যাশবোর্ড</a></li>
+              <li><a class="dropdown-item rounded-3 py-2" routerLink="/user/profile"><i class="fas fa-user me-2"></i>প্রোফাইল</a></li>
               <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item rounded-3 py-2 text-danger" href="#" (click)="onLogout()">লগ আউট</a></li>
+              <li><a class="dropdown-item rounded-3 py-2 text-danger" href="#" (click)="onLogout()"><i class="fas fa-sign-out-alt me-2"></i>লগ আউট</a></li>
             }
           </ul>
         </div>
@@ -44,9 +45,10 @@
               <li><a class="dropdown-item" routerLink="/model-tests">মডেল টেস্ট</a></li>
             </ul>
           </li>
-          <li class="nav-item"><a class="nav-link" routerLink="/quiz-games" routerLinkActive="active">কুইজ</a></li>
           <li class="nav-item"><a class="nav-link" routerLink="/job-circular" routerLinkActive="active">প্রজ্ঞাপন</a></li>
-          <li class="nav-item"><a class="nav-link" routerLink="/news/1" routerLinkActive="active">নিউজ</a></li>
+          <li class="nav-item"><a class="nav-link" routerLink="/notices" routerLinkActive="active">নোটিশ</a></li>
+          <li class="nav-item"><a class="nav-link" routerLink="/news" routerLinkActive="active">নিউজ</a></li>
+          <li class="nav-item"><a class="nav-link" routerLink="/about-us" routerLinkActive="active">আমাদের সম্পর্কে</a></li>
         </ul>
       </div>
     </div>

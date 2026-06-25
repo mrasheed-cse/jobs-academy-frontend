@@ -1,0 +1,78 @@
+<div class="container py-5">
+  <h2 class="fw-bold mb-4">আমার প্রোফাইল</h2>
+  @if (isLoading()) {
+    <div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>
+  } @else {
+    <div class="row">
+      <div class="col-lg-3 text-center mb-4">
+        <div class="avatar-wrapper mb-3">
+          <img [src]="user()?.profile_picture || 'https://ui-avatars.com/api/?name=' + user()?.username + '&size=120&background=6366f1&color=fff'"
+            class="avatar-img" alt="Profile">
+        </div>
+        <p class="fw-bold mb-1">{{ user()?.username }}</p>
+        <p class="text-muted small">{{ user()?.phone_number }}</p>
+        <label class="btn btn-outline-primary btn-sm mt-2">
+          <i class="fas fa-camera me-1"></i> ছবি পরিবর্তন
+          <input type="file" accept="image/*" class="d-none" (change)="onFileChange($event)">
+        </label>
+      </div>
+      <div class="col-lg-9">
+        <div class="profile-card p-4">
+          <form [formGroup]="form" (ngSubmit)="onSave()">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">ব্যবহারকারীর নাম</label>
+                <input type="text" class="form-control" formControlName="username">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">ইমেইল</label>
+                <input type="email" class="form-control" formControlName="email">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">লিঙ্গ</label>
+                <select class="form-select" formControlName="gender">
+                  <option value="">নির্বাচন করুন</option>
+                  <option value="male">পুরুষ</option>
+                  <option value="female">মহিলা</option>
+                  <option value="other">অন্যান্য</option>
+                </select>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">জন্মতারিখ</label>
+                <input type="date" class="form-control" formControlName="date_of_birth">
+              </div>
+              <div class="col-12 mb-3">
+                <label class="form-label">ঠিকানা</label>
+                <input type="text" class="form-control" formControlName="address">
+              </div>
+              <div class="col-12 mb-3">
+                <label class="form-label">জীবন বৃত্তান্ত</label>
+                <textarea class="form-control" rows="3" formControlName="bio"></textarea>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">ফেসবুক</label>
+                <input type="url" class="form-control" formControlName="facebook_profile" placeholder="https://...">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">টুইটার / X</label>
+                <input type="url" class="form-control" formControlName="twitter_profile" placeholder="https://...">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">লিংকডইন</label>
+                <input type="url" class="form-control" formControlName="linkedin_profile" placeholder="https://...">
+              </div>
+            </div>
+            @if (saveSuccess()) { <div class="alert alert-success py-2">প্রোফাইল সংরক্ষিত হয়েছে।</div> }
+            @if (saveError()) { <div class="alert alert-danger py-2">{{ saveError() }}</div> }
+            <div class="d-flex gap-2 mt-2">
+              <button type="submit" class="btn btn-primary" [disabled]="isSaving()">
+                {{ isSaving() ? 'সংরক্ষণ হচ্ছে…' : 'সংরক্ষণ করুন' }}
+              </button>
+              <a routerLink="/dashboard" class="btn btn-outline-secondary">ড্যাশবোর্ড</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  }
+</div>

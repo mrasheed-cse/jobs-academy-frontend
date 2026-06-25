@@ -1,0 +1,38 @@
+<div class="container py-5">
+  <a routerLink="/job-circular" class="btn btn-outline-secondary btn-sm mb-4"><i class="fas fa-arrow-left me-1"></i> ফিরে যান</a>
+  @if (isLoading()) {
+    <div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>
+  } @else if (!job()) {
+    <p class="text-danger text-center">তথ্য পাওয়া যায়নি।</p>
+  } @else {
+    @let j = job()!;
+    <div class="job-detail-card p-4">
+      <h2 class="fw-bold mb-3">{{ j.title }}</h2>
+      <div class="row mb-4">
+        <div class="col-md-6"><p><strong>সংস্থা:</strong> {{ j.organization?.name ?? 'উল্লেখ নেই' }}</p></div>
+        <div class="col-md-6"><p><strong>বিভাগ:</strong> {{ j.department?.name ?? 'উল্লেখ নেই' }}</p></div>
+        <div class="col-md-6"><p><strong>অবস্থান:</strong> {{ j.location }}</p></div>
+        <div class="col-md-6"><p class="text-danger"><strong>শেষ তারিখ:</strong> {{ j.deadline }}</p></div>
+      </div>
+      <div class="description mb-4" [innerHTML]="j.description"></div>
+      @if (j.official_link) {
+        <a [href]="j.official_link" target="_blank" class="btn btn-primary">অফিসিয়াল বিজ্ঞপ্তি দেখুন</a>
+      }
+      @if (j.pdf) {
+        <a [href]="j.pdf" target="_blank" class="btn btn-outline-primary ms-2">পিডিএফ ডাউনলোড</a>
+      }
+      @if (j.notices.length) {
+        <div class="mt-4">
+          <h5 class="fw-bold mb-3">নোটিশ সমূহ</h5>
+          @for (notice of j.notices; track notice.id) {
+            <div class="notice-item p-3 mb-2 rounded">
+              <h6 class="fw-semibold">{{ notice.title }}</h6>
+              <p class="text-muted small">{{ notice.description }}</p>
+              @if (notice.link) { <a [href]="notice.link" target="_blank" class="btn btn-sm btn-outline-primary">বিস্তারিত</a> }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

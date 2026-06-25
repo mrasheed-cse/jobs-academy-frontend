@@ -1,0 +1,32 @@
+<div class="container py-5">
+  <h2 class="fw-bold mb-4">সর্বশেষ সংবাদ</h2>
+  @if (isLoading() && news().length === 0) {
+    <div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>
+  } @else if (news().length === 0) {
+    <p class="text-muted text-center py-5">কোনো সংবাদ পাওয়া যায়নি।</p>
+  } @else {
+    <div class="row">
+      @for (item of news(); track item.id) {
+        <div class="col-12 col-md-6 col-lg-4 mb-4">
+          <div class="news-card" (click)="openArticle(item.id)" role="button">
+            @if (item.images.length) {
+              <img [src]="item.images[0].image_url" [alt]="item.title" class="news-thumb">
+            }
+            <div class="p-3">
+              <h6 class="fw-bold mb-2">{{ item.title }}</h6>
+              <p class="text-muted small mb-2">{{ item.content | slice:0:100 }}…</p>
+              <small class="text-muted">{{ item.published_date | date:'mediumDate' }}</small>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+    @if (hasMore()) {
+      <div class="text-center mt-3">
+        <button type="button" class="btn btn-outline-primary" (click)="loadMore()" [disabled]="isLoading()">
+          {{ isLoading() ? 'লোড হচ্ছে…' : 'আরও দেখুন' }}
+        </button>
+      </div>
+    }
+  }
+</div>

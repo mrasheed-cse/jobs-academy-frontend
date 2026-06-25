@@ -1,0 +1,20 @@
+<div class="container py-5">
+  <h2 class="fw-bold mb-4">নোটিশ বোর্ড</h2>
+  @if (isLoading()) {
+    <div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>
+  } @else if (notices().length === 0) {
+    <p class="text-muted text-center py-5">কোনো নোটিশ পাওয়া যায়নি।</p>
+  } @else {
+    <div class="list-group">
+      @for (notice of notices(); track notice.id) {
+        <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center mb-2 rounded" (click)="openNotice(notice.id)">
+          <div>
+            <h6 class="fw-bold mb-1">{{ notice.title }}</h6>
+            <small class="text-muted">{{ notice.created_at | date:'mediumDate' }}</small>
+          </div>
+          <i class="fas fa-chevron-right text-muted"></i>
+        </button>
+      }
+    </div>
+  }
+</div>

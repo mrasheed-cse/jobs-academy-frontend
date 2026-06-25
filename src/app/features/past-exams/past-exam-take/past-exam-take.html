@@ -1,0 +1,60 @@
+<div class="page-bg">
+  @if (isLoading()) {
+    <div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>
+  } @else {
+    <div class="text-center pt-4 pb-2"><h2 class="exam-title">{{ examTitle() }}</h2></div>
+    <div class="container">
+      <div class="exam-panel">
+        <div class="d-flex justify-content-between border-bottom pb-2 mb-4 small text-muted">
+          <span>মোট প্রশ্ন: {{ questions().length }}</span>
+          <span class="fw-bold text-danger">সময় বাকি: {{ timeDisplay() }}</span>
+        </div>
+        <div class="row g-4">
+          @for (q of questions(); track q.questionId) {
+            <div class="col-md-6 mb-4 p-3">
+              <div class="d-flex gap-2 mb-2">
+                <span class="fw-semibold">{{ q.index + 1 }}.</span>
+                <div>
+                  @if (q.image) { <img [src]="q.image" class="img-fluid rounded mb-2" style="max-height:120px"> }
+                  @if (q.text) { <p class="fw-semibold mb-0">{{ q.text }}</p> }
+                </div>
+              </div>
+              <div class="d-grid gap-2 ms-4">
+                @for (opt of q.options; track opt.id) {
+                  <button type="button" class="option-row" [class.selected]="isSelected(q.questionId, opt.id)" (click)="selectAnswer(q.questionId, opt.id)">
+                    <span class="option-letter">{{ opt.label }}</span>
+                    @if (opt.image) { <img [src]="opt.image" style="max-height:70px"> }
+                    @else { <span>{{ opt.text }}</span> }
+                  </button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+        <div class="mt-4 text-end">
+          <button type="button" class="btn btn-primary" [disabled]="isSubmitting()" (click)="onSubmit()">
+            {{ isSubmitting() ? 'জমা হচ্ছে…' : 'জমা দিন' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+
+@if (result()) {
+  @let r = result()!;
+  <div class="modal-backdrop-custom">
+    <div class="result-modal">
+      <h4 class="text-center mb-3">ফলাফল</h4>
+      <div class="result-row"><span>মোট প্রশ্ন</span><span>{{ r.total_questions }}</span></div>
+      <div class="result-row text-success"><span>সঠিক উত্তর</span><span>{{ r.correct_answers }}</span></div>
+      <div class="result-row text-danger"><span>ভুল উত্তর</span><span>{{ r.wrong_answers }}</span></div>
+      <div class="result-row fw-bold"><span>নম্বর</span><span>{{ r.score }}</span></div>
+      <div class="result-row fw-bold text-primary"><span>শতাংশ</span><span>{{ r.percentage }}%</span></div>
+      <div class="result-row fw-bold"><span>স্ট্যাটাস</span>
+        <span [class.text-success]="r.is_passed" [class.text-danger]="!r.is_passed">{{ r.is_passed ? 'উত্তীর্ণ' : 'অনুত্তীর্ণ' }}</span>
+      </div>
+      <button type="button" class="btn btn-primary w-100 mt-3" (click)="backToDetail()">বিস্তারিত পেজে যান</button>
+    </div>
+  </div>
+}

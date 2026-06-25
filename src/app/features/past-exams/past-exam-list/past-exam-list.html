@@ -1,0 +1,27 @@
+<div class="page-bg">
+  <div class="container py-4">
+    @if (isLoading()) {
+      <div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>
+    } @else if (loadFailed()) {
+      <p class="text-danger text-center py-4">লোড করতে ব্যর্থ হয়েছে।</p>
+    } @else if (exams().length === 0) {
+      <p class="text-muted text-center py-4">কোনো পরীক্ষা পাওয়া যায়নি।</p>
+    } @else {
+      <div class="row">
+        @for (exam of exams(); track exam.id) {
+          <div class="col-12 col-md-6 col-lg-4 mb-4">
+            <div class="exam-card">
+              <div class="card-body p-3">
+                <h5 class="fw-bold mb-2">{{ exam.title }}</h5>
+                <p class="text-muted small mb-1">{{ exam.organization ?? 'সংস্থা উল্লেখ নেই' }}</p>
+                <p class="small mb-1">প্রশ্ন: {{ exam.total_questions }} | সময়: {{ exam.duration }} মিনিট</p>
+                <p class="small mb-3">পরীক্ষার তারিখ: {{ exam.exam_date }}</p>
+                <button type="button" class="btn btn-success btn-sm" (click)="openDetail(exam.id)">বিস্তারিত</button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

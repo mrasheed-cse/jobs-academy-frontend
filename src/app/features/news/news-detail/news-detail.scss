@@ -1,0 +1,6 @@
+.article-card { background:#fff; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,0.08); }
+.article-title { font-size:clamp(1.4rem, 3vw, 2rem); font-weight:800; line-height:1.3; }
+.article-img { width:100%; border-radius:8px; object-fit:cover; }
+.article-body { font-size:1.05rem; line-height:1.8; color:#374151; }
+.related-card { background:#fff; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,0.08); }
+.related-thumb { width:70px; height:55px; object-fit:cover; border-radius:6px; }

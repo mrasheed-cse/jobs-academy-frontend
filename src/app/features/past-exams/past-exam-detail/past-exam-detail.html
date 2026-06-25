@@ -1,0 +1,28 @@
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+      @if (isLoading()) {
+        <div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>
+      } @else if (!exam()) {
+        <p class="text-danger text-center py-4">পরীক্ষা পাওয়া যায়নি।</p>
+      } @else {
+        @let e = exam()!;
+        <div class="detail-card">
+          <h2 class="fw-bold mb-4">{{ e.title }}</h2>
+          <div class="row">
+            <div class="col-6 mb-3"><div class="info-box"><span class="info-label">মোট প্রশ্ন</span><span class="fw-bold">{{ e.total_questions }}</span></div></div>
+            <div class="col-6 mb-3"><div class="info-box"><span class="info-label">পাস মার্ক</span><span class="fw-bold">{{ e.pass_mark }}</span></div></div>
+            <div class="col-6 mb-3"><div class="info-box"><span class="info-label">নেগেটিভ মার্ক</span><span class="fw-bold">{{ e.negative_mark }}</span></div></div>
+            <div class="col-6 mb-3"><div class="info-box"><span class="info-label">সময় (মিনিট)</span><span class="fw-bold">{{ e.duration }}</span></div></div>
+            <div class="col-6 mb-3"><div class="info-box"><span class="info-label">সংস্থা</span><span class="fw-bold">{{ e.organization ?? 'উল্লেখ নেই' }}</span></div></div>
+            <div class="col-6 mb-3"><div class="info-box"><span class="info-label">পরীক্ষার তারিখ</span><span class="fw-bold">{{ e.exam_date }}</span></div></div>
+          </div>
+          <div class="d-flex gap-2 mt-3">
+            <button type="button" class="btn btn-primary flex-grow-1" (click)="startExam()">পরীক্ষা দিন</button>
+            <button type="button" class="btn btn-outline-secondary flex-grow-1" (click)="viewLeaderboard()">লিডারবোর্ড</button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>
