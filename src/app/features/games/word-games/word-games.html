@@ -1,0 +1,41 @@
+<div class="container py-5">
+  <h2 class="fw-bold text-center mb-2">কুইজ ও গেমস</h2>
+  <p class="text-muted text-center mb-5">শব্দ দিয়ে খেলুন, মজায় শিখুন</p>
+  <div class="row g-4 justify-content-center">
+    <div class="col-6 col-md-4 col-lg-3">
+      <div class="game-card" (click)="goToSpelling()" role="button">
+        <i class="fas fa-spell-check fa-3x text-primary mb-3 d-block"></i>
+        <h5 class="fw-bold">বানান গেম</h5>
+        <p class="text-muted small">এলোমেলো শব্দ সাজান</p>
+      </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-3">
+      <div class="game-card" (click)="goToWordGather()" role="button">
+        <i class="fas fa-puzzle-piece fa-3x text-success mb-3 d-block"></i>
+        <h5 class="fw-bold">ওয়ার্ড গ্যাদার</h5>
+        <p class="text-muted small">অক্ষর সাজিয়ে শব্দ বানান</p>
+      </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-3">
+      <div class="game-card" (click)="goToWordMixer()" role="button">
+        <i class="fas fa-random fa-3x text-warning mb-3 d-block"></i>
+        <h5 class="fw-bold">ওয়ার্ড মিক্সার</h5>
+        <p class="text-muted small">মিশ্রিত শব্দ খুঁজে বের করুন</p>
+      </div>
+    </div>
+  </div>
+  @if (puzzles().length) {
+    <div class="mt-5">
+      <h4 class="fw-bold mb-3">আজকের শব্দ চ্যালেঞ্জ</h4>
+      <div class="row">
+        @for (puzzle of puzzles().slice(0,6); track puzzle.id) {
+          <div class="col-6 col-md-4 col-lg-2 mb-3">
+            <div class="word-chip text-center p-2 rounded">
+              <span class="fw-bold">{{ puzzle.word }}</span>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

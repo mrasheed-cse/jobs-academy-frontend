@@ -1,0 +1,30 @@
+<div class="container py-5">
+  <h2 class="fw-bold text-center mb-4">বানান গেম</h2>
+  @if (isLoading()) {
+    <div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>
+  } @else if (gameOver()) {
+    <div class="text-center py-5">
+      <i class="fas fa-trophy fa-4x text-warning mb-3 d-block"></i>
+      <h3 class="fw-bold">খেলা শেষ!</h3>
+      <p class="lead">আপনার স্কোর: <strong>{{ score() }} / {{ words().length }}</strong></p>
+      <button type="button" class="btn btn-primary mt-3" (click)="restart()">আবার খেলুন</button>
+    </div>
+  } @else if (currentWord()) {
+    <div class="game-card mx-auto">
+      <div class="progress mb-4" style="height:6px">
+        <div class="progress-bar bg-primary" [style.width.%]="(currentIndex() / words().length) * 100"></div>
+      </div>
+      <p class="text-muted text-center small">{{ currentIndex() + 1 }} / {{ words().length }}</p>
+      <div class="scrambled-word text-center mb-4">{{ scrambled() }}</div>
+      @if (currentWord()!.hint) { <p class="text-center text-muted small mb-3">힌트: {{ currentWord()!.hint }}</p> }
+      <input type="text" class="form-control form-control-lg text-center mb-3" placeholder="শব্দটি লিখুন..."
+        [value]="userAnswer()" (input)="userAnswer.set($any($event.target).value)" (keyup.enter)="checkAnswer()">
+      @if (feedback()) {
+        <div class="alert text-center" [class.alert-success]="feedback() === 'correct'" [class.alert-danger]="feedback() === 'wrong'">
+          {{ feedback() === 'correct' ? '✅ সঠিক!' : '❌ ভুল! সঠিক উত্তর: ' + currentWord()!.word }}
+        </div>
+      }
+      <button type="button" class="btn btn-primary w-100" (click)="checkAnswer()" [disabled]="!userAnswer().trim() || !!feedback()">জমা দিন</button>
+    </div>
+  }
+</div>

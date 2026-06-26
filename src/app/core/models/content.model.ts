@@ -53,3 +53,57 @@ export interface NewsItem {
   auto_notification_sent: boolean;
   images: NewsImage[];
 }
+
+export interface WrittenExam {
+  id: number;
+  title: string;
+  subjects?: string[];
+  total_marks?: number;
+  duration?: number;
+  exam_date?: string;
+  description?: string;
+  organization?: string;
+  created_at?: string;
+}
+
+export interface WordPuzzle {
+  id: number;
+  word: string;
+  scrambled?: string;
+  hint?: string;
+  difficulty?: string;
+  category?: string;
+}
+
+export interface Word {
+  id: number;
+  word: string;
+  meaning?: string;
+  bengali_meaning?: string;
+  pronunciation?: string;
+  part_of_speech?: string;
+  examples?: string[];
+}
+
+export interface SubscriptionPlan {
+  id: number;
+  name: string;
+  ad_free: boolean;
+  free_model_test: boolean;
+  paid_model_test: boolean;
+  daily_previous_year_questions: number;
+  upcoming_special_model_tests: number;
+  prize_winning_special_exam: boolean;
+  daily_live_exam_room_access: number;
+  prices: Array<{ id: number; duration: string; price: number }>;
+}
+
+export interface UserSubscription {
+  id: number;
+  plan: number;
+  plan_name?: string;
+  price?: number;
+  start_date?: string;
+  end_date?: string;
+  is_active?: boolean;
+}

@@ -1,0 +1,28 @@
+<div class="container py-5">
+  <a routerLink="/written-exams" class="btn btn-outline-secondary btn-sm mb-4"><i class="fas fa-arrow-left me-1"></i> ফিরে যান</a>
+  @if (isLoading()) {
+    <div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>
+  } @else if (!exam()) {
+    <p class="text-danger text-center">পরীক্ষা পাওয়া যায়নি।</p>
+  } @else {
+    @let e = exam()!;
+    <div class="detail-card p-4">
+      <h2 class="fw-bold mb-3">{{ e.title }}</h2>
+      <div class="row mb-3">
+        @if (e.organization) { <div class="col-md-4 mb-2"><strong>সংস্থা:</strong> {{ e.organization }}</div> }
+        @if (e.exam_date) { <div class="col-md-4 mb-2"><strong>তারিখ:</strong> {{ e.exam_date }}</div> }
+        @if (e.total_marks) { <div class="col-md-4 mb-2"><strong>পূর্ণমান:</strong> {{ e.total_marks }}</div> }
+        @if (e.duration) { <div class="col-md-4 mb-2"><strong>সময়:</strong> {{ e.duration }} মিনিট</div> }
+      </div>
+      @if (e.description) { <div [innerHTML]="e.description" class="mt-3"></div> }
+      @if (e.subjects?.length) {
+        <div class="mt-4">
+          <h5 class="fw-bold mb-3">বিষয়সমূহ</h5>
+          <ul class="list-group">
+            @for (sub of e.subjects!; track sub) { <li class="list-group-item">{{ sub }}</li> }
+          </ul>
+        </div>
+      }
+    </div>
+  }
+</div>

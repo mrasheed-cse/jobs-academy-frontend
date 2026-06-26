@@ -42,5 +42,26 @@ export const routes: Routes = [
   { path: 'contact-us', loadComponent: () => import('./features/static/contact/contact').then((m) => m.Contact) },
   { path: 'privacy-policy', loadComponent: () => import('./features/static/privacy-policy/privacy-policy').then((m) => m.PrivacyPolicy) },
 
+  // --- Written exams ---
+  { path: 'written-exams', loadComponent: () => import('./features/written-exams/written-exam-list/written-exam-list').then((m) => m.WrittenExamList) },
+  { path: 'written-exams/:id', loadComponent: () => import('./features/written-exams/written-exam-detail/written-exam-detail').then((m) => m.WrittenExamDetail) },
+
+  // --- Word games ---
+  { path: 'quiz-games', loadComponent: () => import('./features/games/word-games/word-games').then((m) => m.WordGames) },
+  { path: 'quiz-games/spelling', loadComponent: () => import('./features/games/spelling-game/spelling-game').then((m) => m.SpellingGame) },
+  { path: 'quiz-games/word-gather', loadComponent: () => import('./features/games/word-gather/word-gather').then((m) => m.WordGather) },
+  { path: 'quiz-games/word-mixer', loadComponent: () => import('./features/games/word-mixer/word-mixer').then((m) => m.WordMixer) },
+
+  // --- Language center ---
+  { path: 'language', loadComponent: () => import('./features/language/language-home/language-home').then((m) => m.LanguageHome) },
+
+  // --- Subscription ---
+  { path: 'subscription', loadComponent: () => import('./features/subscription/subscription-plans/subscription-plans').then((m) => m.SubscriptionPlans) },
+
+  // --- User settings & stats ---
+  { path: 'user/performance', canActivate: [authGuard], loadComponent: () => import('./features/user/performance-stats/performance-stats').then((m) => m.PerformanceStats) },
+  { path: 'user/settings', canActivate: [authGuard], loadComponent: () => import('./features/user/settings/settings').then((m) => m.Settings) },
+  { path: 'user/delete-account', canActivate: [authGuard], loadComponent: () => import('./features/user/delete-account/delete-account').then((m) => m.DeleteAccount) },
+
   { path: '**', redirectTo: '' },
 ];

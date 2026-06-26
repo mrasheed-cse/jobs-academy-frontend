@@ -1,0 +1,34 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="delete-card p-5 text-center">
+        <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3 d-block"></i>
+        <h3 class="fw-bold text-danger mb-2">অ্যাকাউন্ট মুছুন</h3>
+        <p class="text-muted mb-4">এই পদক্ষেপটি অপরিবর্তনীয়। আপনার সমস্ত পরীক্ষার ইতিহাস, পয়েন্ট এবং তথ্য চিরতরে মুছে যাবে।</p>
+
+        @if (step() === 1) {
+          <form [formGroup]="form">
+            <div class="mb-3 text-start">
+              <label class="form-label">নিশ্চিত করতে <strong>DELETE</strong> টাইপ করুন</label>
+              <input type="text" class="form-control" formControlName="confirm" placeholder="DELETE">
+            </div>
+            @if (error()) { <div class="alert alert-danger py-2">{{ error() }}</div> }
+            <button type="button" class="btn btn-danger w-100" (click)="goToStep2()">পরবর্তী ধাপ</button>
+          </form>
+        } @else {
+          <form [formGroup]="form">
+            <div class="mb-3 text-start">
+              <label class="form-label">আপনার পাসওয়ার্ড দিন</label>
+              <input type="password" class="form-control" formControlName="password">
+            </div>
+            @if (error()) { <div class="alert alert-danger py-2">{{ error() }}</div> }
+            <button type="button" class="btn btn-danger w-100 mb-2" [disabled]="isProcessing()" (click)="deleteAccount()">
+              {{ isProcessing() ? 'মুছছে…' : 'স্থায়ীভাবে মুছুন' }}
+            </button>
+          </form>
+        }
+        <a routerLink="/user/settings" class="btn btn-outline-secondary w-100 mt-2">বাতিল করুন</a>
+      </div>
+    </div>
+  </div>
+</div>

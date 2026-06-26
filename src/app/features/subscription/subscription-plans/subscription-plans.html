@@ -1,0 +1,60 @@
+<div class="container py-5">
+  <div class="text-center mb-5">
+    <h2 class="fw-bold">সাবস্ক্রিপশন প্যাকেজ</h2>
+    <p class="text-muted">সেরা প্যাকেজটি বেছে নিন এবং আপনার প্রস্তুতি শুরু করুন</p>
+  </div>
+
+  @if (isLoading()) {
+    <div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>
+  } @else if (plans().length === 0) {
+    <p class="text-muted text-center py-5">কোনো প্যাকেজ পাওয়া যায়নি।</p>
+  } @else {
+    <div class="row justify-content-center">
+      @for (plan of plans(); track plan.id) {
+        <div class="col-md-6 col-lg-4 mb-4">
+          <div class="plan-card" [class.subscribed]="isSubscribed(plan.id)">
+            @if (isSubscribed(plan.id)) {
+              <div class="subscribed-badge">সক্রিয়</div>
+            }
+            <h4 class="fw-bold mb-3">{{ plan.name }}</h4>
+
+            <ul class="feature-list mb-4">
+              <li [class.text-success]="plan.free_model_test" [class.text-muted]="!plan.free_model_test">
+                <i class="fas" [class.fa-check]="plan.free_model_test" [class.fa-times]="!plan.free_model_test"></i>
+                ফ্রি মডেল টেস্ট
+              </li>
+              <li [class.text-success]="plan.paid_model_test" [class.text-muted]="!plan.paid_model_test">
+                <i class="fas" [class.fa-check]="plan.paid_model_test" [class.fa-times]="!plan.paid_model_test"></i>
+                পেইড মডেল টেস্ট
+              </li>
+              <li [class.text-success]="plan.ad_free" [class.text-muted]="!plan.ad_free">
+                <i class="fas" [class.fa-check]="plan.ad_free" [class.fa-times]="!plan.ad_free"></i>
+                বিজ্ঞাপনমুক্ত
+              </li>
+              <li class="text-success">
+                <i class="fas fa-check"></i> দৈনিক {{ plan.daily_previous_year_questions }} টি পুরনো প্রশ্ন
+              </li>
+              <li class="text-success">
+                <i class="fas fa-check"></i> দৈনিক {{ plan.daily_live_exam_room_access }} লাইভ এক্সাম
+              </li>
+            </ul>
+
+            @if (plan.prices.length) {
+              <select class="form-select mb-3" (change)="onPriceChange(plan.id, +$any($event.target).value)">
+                @for (price of plan.prices; track price.id) {
+                  <option [value]="price.id">{{ price.duration }} — ৳{{ price.price }}</option>
+                }
+              </select>
+            }
+
+            @if (isSubscribed(plan.id)) {
+              <button class="btn btn-success w-100" disabled>সক্রিয় সাবস্ক্রিপশন</button>
+            } @else {
+              <button class="btn btn-primary w-100" (click)="buyPlan(plan)">এখনই কিনুন</button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

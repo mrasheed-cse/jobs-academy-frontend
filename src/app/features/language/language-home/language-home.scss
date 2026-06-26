@@ -1,0 +1,7 @@
+.wotd-card { background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; border-radius:20px; .badge.bg-primary{background:rgba(255,255,255,0.25)!important;} }
+.search-bar { position:relative; }
+.search-results { max-height:250px; overflow-y:auto; border:1px solid #e2e8f0; }
+.search-item { cursor:pointer; &:hover{background:#f0f4ff;} }
+.letter-btn { min-width:36px; }
+.modal-backdrop-custom { position:fixed; inset:0; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:1050; padding:1rem; }
+.word-modal { background:#fff; border-radius:16px; width:100%; max-width:480px; max-height:80vh; overflow-y:auto; }
