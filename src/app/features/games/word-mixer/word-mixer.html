@@ -1,30 +1,120 @@
-<div class="container py-5">
-  <h2 class="fw-bold text-center mb-4">ওয়ার্ড মিক্সার</h2>
-  @if (isLoading()) {
-    <div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>
-  } @else if (gameOver()) {
-    <div class="text-center py-5">
-      <i class="fas fa-trophy fa-4x text-warning mb-3 d-block"></i>
-      <h3 class="fw-bold">খেলা শেষ!</h3>
-      <p class="lead">স্কোর: <strong>{{ score() }} / {{ words().length }}</strong></p>
-      <button type="button" class="btn btn-primary mt-3" (click)="restart()">আবার খেলুন</button>
-    </div>
-  } @else if (currentWord()) {
-    <div class="game-card mx-auto">
-      <p class="text-center text-muted small mb-2">{{ currentIndex() + 1 }} / {{ words().length }}</p>
-      <div class="mixed-word text-center mb-4">{{ mixed() }}</div>
-      @if (showHint() && currentWord()!.hint) { <p class="text-center text-muted small mb-3">힌트: {{ currentWord()!.hint }}</p> }
-      <input type="text" class="form-control form-control-lg text-center mb-3" placeholder="শব্দটি লিখুন..."
-        [ngModel]="userAnswer()" (ngModelChange)="userAnswer.set($event)" (keyup.enter)="checkAnswer()">
-      @if (feedback()) {
-        <div class="alert text-center" [class.alert-success]="feedback() === 'correct'" [class.alert-danger]="feedback() === 'wrong'">
-          {{ feedback() === 'correct' ? '✅ সঠিক!' : '❌ ভুল! সঠিক: ' + currentWord()!.word }}
+<div class="shell">
+  @if (loading()) {
+    <div class="center-screen"><div class="spinner-border text-warning mb-3" style="width:3rem;height:3rem"></div><p class="text-muted">লোড হচ্ছে...</p></div>
+  }
+  @else if (!started()) {
+    <div class="center-screen">
+      <div class="card-panel text-center">
+        <div class="icon-wrap amber mb-4"><i class="fas fa-random"></i></div>
+        <h2 class="fw-bold mb-2">ওয়ার্ড মিক্সার</h2>
+        <p class="text-muted mb-4">মিশ্রিত অক্ষর দেখে মূল শব্দ বের করুন</p>
+        <div class="info-grid mb-4">
+          <div class="info-item"><i class="fas fa-clock text-warning"></i><span>৪০ সেকেন্ড / শব্দ</span></div>
+          <div class="info-item"><i class="fas fa-star text-primary"></i><span>হিন্ট ছাড়া ৩ পয়েন্ট</span></div>
+          <div class="info-item"><i class="fas fa-lightbulb text-warning"></i><span>সর্বোচ্চ ২টি হিন্ট</span></div>
+          <div class="info-item"><i class="fas fa-book text-info"></i><span>{{ words.length }} টি শব্দ</span></div>
         </div>
-      }
-      <div class="d-flex gap-2">
-        <button type="button" class="btn btn-primary flex-grow-1" (click)="checkAnswer()" [disabled]="!userAnswer().trim() || !!feedback()">জমা দিন</button>
-        <button type="button" class="btn btn-outline-secondary" (click)="showHint.set(true)" [disabled]="showHint()">힌트</button>
-        <button type="button" class="btn btn-outline-warning" (click)="skip()">এড়িয়ে যান</button>
+        <button class="btn-primary-game amber" (click)="start()"><i class="fas fa-play me-2"></i>শুরু করুন</button>
+        <button class="btn-secondary-game ms-2" (click)="back()">ফিরে যান</button>
+      </div>
+    </div>
+  }
+  @else if (over()) {
+    <div class="center-screen">
+      <div class="card-panel text-center">
+        <div class="trophy mb-3">
+          @if (score() >= words.length * 2) { <i class="fas fa-trophy gold"></i> }
+          @else if (score() >= words.length) { <i class="fas fa-medal silver"></i> }
+          @else { <i class="fas fa-redo blue"></i> }
+        </div>
+        <h2 class="fw-bold mb-1">খেলা শেষ!</h2>
+        <p class="text-muted mb-4">চমৎকার চেষ্টা!</p>
+        <div class="stats-grid">
+          <div class="stat-cell"><div class="stat-v text-warning">{{ score() }}</div><div class="stat-l">মোট পয়েন্ট</div></div>
+          <div class="stat-cell"><div class="stat-v text-primary">{{ accuracy() }}%</div><div class="stat-l">নির্ভুলতা</div></div>
+          <div class="stat-cell"><div class="stat-v text-success">{{ best() }}</div><div class="stat-l">সেরা স্ট্রিক</div></div>
+          <div class="stat-cell"><div class="stat-v text-danger">{{ wrong().length }}</div><div class="stat-l">মিস</div></div>
+        </div>
+        @if (wrong().length) {
+          <div class="wrong-section mt-3">
+            <p class="fw-bold text-start mb-2">মিস করা শব্দ:</p>
+            <div class="chip-wrap">
+              @for (w of wrong(); track w.id) {
+                <div class="chip"><strong>{{ w.word }}</strong>@if(w.meaning){<span class="ms-1 text-muted small">{{ w.meaning }}</span>}</div>
+              }
+            </div>
+          </div>
+        }
+        <div class="btn-row mt-4">
+          <button class="btn-primary-game amber" (click)="restart()"><i class="fas fa-redo me-2"></i>আবার</button>
+          <button class="btn-secondary-game" (click)="back()">হোম</button>
+        </div>
+      </div>
+    </div>
+  }
+  @else if (word()) {
+    <div class="game-area">
+      <div class="topbar">
+        <button class="x-btn" (click)="back()"><i class="fas fa-times"></i></button>
+        <div class="prog-track"><div class="prog-fill amber" [style.width.%]="pct()"></div></div>
+        <div class="score-pill"><i class="fas fa-star text-warning"></i> {{ score() }}</div>
+      </div>
+      <div class="timer-bar">
+        <div class="timer-track"><div class="timer-fill" [class]="'bg-'+tColor()" [style.width.%]="(timeLeft()/40)*100"></div></div>
+        <span [class]="'timer-num text-'+tColor()">{{ timeLeft() }}s</span>
+      </div>
+
+      <div class="q-card">
+        <div class="meta-row">
+          @if(word()!.category){<span class="tag cat-a">{{ word()!.category }}</span>}
+          @if(word()!.difficulty){<span class="tag" [class]="'diff-'+word()!.difficulty">{{ dLabel(word()!.difficulty) }}</span>}
+          <span class="pts-tag">+{{ pts() }} পয়েন্ট</span>
+          @if(streak()>1){<span class="tag streak">🔥 {{ streak() }}</span>}
+          <span class="ctr">{{ idx()+1 }}/{{ words.length }}</span>
+        </div>
+
+        <p class="prompt">এই মিশ্রিত শব্দটি সমাধান করুন:</p>
+
+        <div class="tiles">
+          @for (ch of mixed().split(''); track $index) {
+            <span class="tile" [style.animationDelay.ms]="$index*55">{{ ch }}</span>
+          }
+        </div>
+
+        @if (hint()) {
+          <div class="hint-box"><i class="fas fa-lightbulb text-warning me-2"></i>{{ hint() }}</div>
+        }
+
+        @if (feedback()) {
+          <div class="fb" [class.ok]="feedback()==='ok'" [class.bad]="feedback()==='bad'">
+            @if(feedback()==='ok'){
+              <i class="fas fa-check-circle me-2"></i>সঠিক! +{{ pts() }} পয়েন্ট
+              @if(streak()>1){<span class="streak-tag">🔥 {{ streak() }} স্ট্রিক!</span>}
+            } @else {
+              <i class="fas fa-times-circle me-2"></i>সঠিক: <strong class="ms-1">{{ word()!.word }}</strong>
+              @if(word()!.meaning){<span class="ms-2 opacity-75">({{ word()!.meaning }})</span>}
+            }
+          </div>
+        }
+
+        @if (!feedback()) {
+          <div class="inp-row">
+            <input #inp type="text" class="ans-inp" placeholder="উত্তর লিখুন..."
+              autocomplete="off" autocorrect="off" spellcheck="false"
+              [ngModel]="answer()" (ngModelChange)="answer.set($event)"
+              (keyup.enter)="check()">
+            <button class="sub-btn" (click)="check()" [disabled]="!answer().trim()">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
+          <div class="act-row">
+            <button class="act hint" (click)="useHint()" [disabled]="hintLvl()>=2">
+              <i class="fas fa-lightbulb"></i>
+              {{ hintLvl()===0 ? 'হিন্ট ১' : hintLvl()===1 ? 'হিন্ট ২' : 'শেষ' }}
+            </button>
+            <button class="act skip" (click)="skip()"><i class="fas fa-forward"></i> এড়িয়ে</button>
+          </div>
+        }
       </div>
     </div>
   }

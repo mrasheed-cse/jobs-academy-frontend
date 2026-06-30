@@ -1,41 +1,32 @@
+<div class="games-hero">
+  <div class="container text-center py-5">
+    <h1 class="hero-title">শব্দ গেমস</h1>
+    <p class="hero-sub">মজার গেম খেলে শব্দভান্ডার বাড়ান — চাকরির পরীক্ষায় কাজে আসবে</p>
+    @if (!isLoading()) {
+      <span class="badge-count">{{ puzzleCount() }}+ শব্দ উপলব্ধ</span>
+    }
+  </div>
+</div>
 <div class="container py-5">
-  <h2 class="fw-bold text-center mb-2">কুইজ ও গেমস</h2>
-  <p class="text-muted text-center mb-5">শব্দ দিয়ে খেলুন, মজায় শিখুন</p>
   <div class="row g-4 justify-content-center">
-    <div class="col-6 col-md-4 col-lg-3">
-      <div class="game-card" (click)="goToSpelling()" role="button">
-        <i class="fas fa-spell-check fa-3x text-primary mb-3 d-block"></i>
-        <h5 class="fw-bold">বানান গেম</h5>
-        <p class="text-muted small">এলোমেলো শব্দ সাজান</p>
+    @for (game of games; track game.id) {
+      <div class="col-md-6 col-lg-4">
+        <div class="game-card" (click)="go(game.route)" [style.--accent]="game.color">
+          <div class="game-icon" [style.background]="game.bg"><i [class]="game.icon" [style.color]="game.color"></i></div>
+          <h3 class="game-title">{{ game.title }}</h3>
+          <p class="game-en">{{ game.titleEn }}</p>
+          <p class="game-desc">{{ game.desc }}</p>
+          <div class="game-cta">খেলুন <i class="fas fa-arrow-right ms-1"></i></div>
+        </div>
       </div>
-    </div>
-    <div class="col-6 col-md-4 col-lg-3">
-      <div class="game-card" (click)="goToWordGather()" role="button">
-        <i class="fas fa-puzzle-piece fa-3x text-success mb-3 d-block"></i>
-        <h5 class="fw-bold">ওয়ার্ড গ্যাদার</h5>
-        <p class="text-muted small">অক্ষর সাজিয়ে শব্দ বানান</p>
-      </div>
-    </div>
-    <div class="col-6 col-md-4 col-lg-3">
-      <div class="game-card" (click)="goToWordMixer()" role="button">
-        <i class="fas fa-random fa-3x text-warning mb-3 d-block"></i>
-        <h5 class="fw-bold">ওয়ার্ড মিক্সার</h5>
-        <p class="text-muted small">মিশ্রিত শব্দ খুঁজে বের করুন</p>
-      </div>
+    }
+  </div>
+  <div class="tips p-4 rounded-4 mt-5">
+    <h5 class="fw-bold mb-3"><i class="fas fa-lightbulb text-warning me-2"></i>কীভাবে খেলবেন?</h5>
+    <div class="row g-3">
+      <div class="col-md-4"><div class="tip"><span class="tip-n">১</span><p><strong>বানান গেম:</strong> এলোমেলো অক্ষর দেখে মূল শব্দটি টাইপ করুন।</p></div></div>
+      <div class="col-md-4"><div class="tip"><span class="tip-n">২</span><p><strong>ওয়ার্ড গ্যাদার:</strong> অক্ষর ট্যাপ করে শব্দ তৈরি করুন।</p></div></div>
+      <div class="col-md-4"><div class="tip"><span class="tip-n">৩</span><p><strong>ওয়ার্ড মিক্সার:</strong> মিশ্রিত শব্দ থেকে সঠিক শব্দ লিখুন।</p></div></div>
     </div>
   </div>
-  @if (puzzles().length) {
-    <div class="mt-5">
-      <h4 class="fw-bold mb-3">আজকের শব্দ চ্যালেঞ্জ</h4>
-      <div class="row">
-        @for (puzzle of puzzles().slice(0,6); track puzzle.id) {
-          <div class="col-6 col-md-4 col-lg-2 mb-3">
-            <div class="word-chip text-center p-2 rounded">
-              <span class="fw-bold">{{ puzzle.word }}</span>
-            </div>
-          </div>
-        }
-      </div>
-    </div>
-  }
 </div>
