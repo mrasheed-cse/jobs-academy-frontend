@@ -75,14 +75,124 @@ export interface WordPuzzle {
   category?: string;
 }
 
-export interface Word {
+// --- Language Center: dictionary models, matching the real backend
+// serializers exactly (verified by direct testing against the live
+// endpoints' actual response shapes, not assumed from naming) ---
+
+export interface DictLanguage {
   id: number;
-  word: string;
-  meaning?: string;
-  bengali_meaning?: string;
-  pronunciation?: string;
-  part_of_speech?: string;
+  name: string;
+  code: string;
+  description: string;
+}
+
+export interface DictPartOfSpeech {
+  id: number;
+  name: string;
+}
+
+export interface DictWordForm {
+  id: number;
+  form: string;
+  label: string;
+}
+
+export interface DictBanglaMeaning {
+  id: number;
+  meaning: string;
+  note: string;
+}
+
+export interface DictExampleTranslation {
+  id: number;
+  language: DictLanguage;
+  translated_text: string;
+}
+
+export interface DictExampleSentence {
+  id: number;
+  sentence: string;
+  translations: DictExampleTranslation[];
+}
+
+export interface DictDefinitionTranslation {
+  id: number;
+  language: DictLanguage;
+  translated_text: string;
+}
+
+export interface DictDefinition {
+  id: number;
+  definition_text: string;
+  translations: DictDefinitionTranslation[];
+}
+
+export interface DictSense {
+  id: number;
+  short_definition: string;
+  usage_note: string;
+  synonyms: string[];
+  antonyms: string[];
+  bangla_meanings: DictBanglaMeaning[];
+  definitions: DictDefinition[];
+  examples: DictExampleSentence[];
+}
+
+// Shape returned by GET /api/word-of-the-day/, GET /api/words/{id}/
+// (WordSerializer) - the full nested representation.
+export interface DictWord {
+  id: number;
+  text: string;
+  phonetic_uk: string;
+  phonetic_us: string;
+  language: DictLanguage;
+  part_of_speech: DictPartOfSpeech | null;
+  forms: DictWordForm[];
+  senses: DictSense[];
+}
+
+// Shape returned by GET /api/words/az/ (WordAZSerializer, grouped by
+// first letter) - flat, part_of_speech is a plain string here.
+export interface DictWordAZEntry {
+  id: number;
+  text: string;
+  phonetic_uk: string;
+  phonetic_us: string;
+  part_of_speech: string | null;
+}
+
+// Shape returned by GET /api/words/search/ (WordListSerializer).
+export interface DictWordSearchResult {
+  id: number;
+  text: string;
+  part_of_speech: DictPartOfSpeech | null;
+}
+
+// Input shape for POST /api/language/{id}/words/create/
+export interface DictWordCreateSense {
+  short_definition: string;
+  usage_note?: string;
+  bangla_meanings?: string[];
+  definition_text?: string;
   examples?: string[];
+  examples_bn?: string[];
+  synonyms?: string[];
+  antonyms?: string[];
+}
+
+export interface DictWordCreateRequest {
+  word: string;
+  pos: string;
+  phonetic_uk?: string;
+  phonetic_us?: string;
+  forms?: Array<{ form: string; label: string }>;
+  senses: DictWordCreateSense[];
+}
+
+export interface DictExcelUploadResult {
+  language: string;
+  created_senses: number;
+  errors: Array<{ row: number; error: string }>;
 }
 
 export interface SubscriptionPlan {

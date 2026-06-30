@@ -1,0 +1,59 @@
+.btn-back {
+  width: 40px; height: 40px; border-radius: 50%; background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08); display: flex; align-items: center; justify-content: center;
+  color: #64748b; text-decoration: none; flex-shrink: 0; transition: all .15s;
+  &:hover { background: #f0f4ff; color: var(--primary); }
+}
+
+.lang-card {
+  background: #fff; border-radius: 14px; box-shadow: 0 2px 8px rgba(0,0,0,.06);
+}
+.lang-pill {
+  border: 2px solid #e2e8f0; background: #fff; color: #475569; padding: 7px 18px;
+  border-radius: 50px; font-weight: 600; font-size: .88rem; cursor: pointer; transition: all .15s;
+  &:hover { border-color: var(--primary); }
+  &.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+}
+
+.nav-tabs .nav-link {
+  border: none; color: #64748b; font-weight: 600; padding: 10px 20px; border-radius: 0;
+  &.active { color: var(--primary); border-bottom: 3px solid var(--primary); background: transparent; }
+}
+
+.form-card {
+  background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,.06);
+}
+
+.sense-card {
+  background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px;
+}
+.btn-remove-sense {
+  background: #fee2e2; color: #dc2626; border: none; width: 32px; height: 32px;
+  border-radius: 8px; cursor: pointer; transition: all .15s;
+  &:hover { background: #fecaca; }
+}
+.btn-add-sense {
+  background: #ede9fe; color: #6d28d9; border: 2px dashed #c4b5fd; border-radius: 10px;
+  padding: 10px 20px; font-weight: 600; font-size: .9rem; cursor: pointer; width: 100%; transition: all .15s;
+  &:hover { background: #ddd6fe; }
+}
+
+.btn-submit {
+  background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+  color: #fff; border: none; padding: 12px 32px; border-radius: 12px; font-weight: 700;
+  font-size: 1rem; cursor: pointer; transition: all .2s;
+  &:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(99,102,241,.3); }
+  &:disabled { opacity: .6; cursor: not-allowed; }
+}
+
+.format-help {
+  background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 12px; padding: 16px;
+}
+.col-table table { font-size: .82rem; }
+.col-table code { background: #e0e7ff; color: #4338ca; padding: 1px 6px; border-radius: 4px; }
+
+.file-drop-label {
+  display: block; border: 2px dashed #cbd5e1; border-radius: 14px; padding: 2.5rem 1rem;
+  text-align: center; cursor: pointer; transition: all .15s; color: #64748b;
+  &:hover { border-color: var(--primary); background: #f8fafc; }
+}

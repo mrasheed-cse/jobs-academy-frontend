@@ -5,3 +5,24 @@
 .letter-btn { min-width:36px; }
 .modal-backdrop-custom { position:fixed; inset:0; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:1050; padding:1rem; }
 .word-modal { background:#fff; border-radius:16px; width:100%; max-width:480px; max-height:80vh; overflow-y:auto; }
+
+.letter-group { scroll-margin-top: 80px; }
+.letter-heading {
+  font-weight: 800;
+  color: var(--primary);
+  border-bottom: 2px solid #ede9fe;
+  padding-bottom: 4px;
+  margin-bottom: 10px;
+}
+.word-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.word-chip {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  &:hover { background: #ede9fe; border-color: #c4b5fd; color: #6d28d9; }
+}
+.sense-block:first-child { border-top: none !important; padding-top: 0 !important; }

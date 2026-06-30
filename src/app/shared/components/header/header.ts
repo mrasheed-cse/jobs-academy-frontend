@@ -14,6 +14,11 @@ export class Header {
 
   readonly currentUser = this.authService.currentUser;
 
+  readonly canManageDictionary = () => {
+    const role = this.currentUser()?.role;
+    return role === 'admin' || role === 'teacher';
+  };
+
   onLogout(): void {
     this.authService.logout();
     this.router.navigate(['/']);

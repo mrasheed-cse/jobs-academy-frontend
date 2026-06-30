@@ -1,0 +1,226 @@
+<div class="container py-5">
+  <div class="d-flex align-items-center gap-3 mb-4">
+    <a routerLink="/language" class="btn-back"><i class="fas fa-arrow-left"></i></a>
+    <div>
+      <h2 class="fw-bold mb-0">ডিকশনারি পরিচালনা</h2>
+      <p class="text-muted small mb-0">নতুন শব্দ যোগ করুন অথবা এক্সেল ফাইল দিয়ে বাল্ক আপলোড করুন</p>
+    </div>
+  </div>
+
+  <!-- Language selector -->
+  <div class="lang-card p-3 mb-4">
+    <label class="form-label fw-semibold mb-2">ভাষা নির্বাচন করুন</label>
+    @if (languagesLoading()) {
+      <div class="text-muted small"><i class="fas fa-spinner fa-spin me-1"></i> লোড হচ্ছে...</div>
+    } @else if (languagesError()) {
+      <div class="text-danger small">ভাষার তালিকা লোড করতে ব্যর্থ হয়েছে।</div>
+    } @else if (languages().length === 0) {
+      <div class="text-muted small">কোনো ভাষা পাওয়া যায়নি।</div>
+    } @else {
+      <div class="d-flex flex-wrap gap-2">
+        @for (lang of languages(); track lang.id) {
+          <button type="button" class="lang-pill" [class.active]="selectedLanguageId() === lang.id"
+            (click)="selectLanguage(lang.id)">
+            {{ lang.name }} <span class="opacity-75">({{ lang.code }})</span>
+          </button>
+        }
+      </div>
+    }
+  </div>
+
+  @if (selectedLanguageId()) {
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-4">
+      <li class="nav-item">
+        <button class="nav-link" [class.active]="activeTab() === 'single'" (click)="setTab('single')">
+          <i class="fas fa-pen me-1"></i> একটি শব্দ যোগ করুন
+        </button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" [class.active]="activeTab() === 'bulk'" (click)="setTab('bulk')">
+          <i class="fas fa-file-excel me-1"></i> বাল্ক আপলোড (এক্সেল)
+        </button>
+      </li>
+    </ul>
+
+    <!-- Single word form -->
+    @if (activeTab() === 'single') {
+      <form [formGroup]="wordForm" (ngSubmit)="submitWord()" class="form-card p-4">
+        <div class="row g-3 mb-3">
+          <div class="col-md-4">
+            <label class="form-label">শব্দ *</label>
+            <input type="text" class="form-control" formControlName="word" placeholder="e.g. ubiquitous">
+            @if (fieldErrors()['word']) { <small class="text-danger">{{ fieldErrors()['word'] }}</small> }
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">পদ (Part of Speech) *</label>
+            <input type="text" class="form-control" formControlName="pos" placeholder="noun, verb, adjective...">
+            @if (fieldErrors()['pos']) { <small class="text-danger">{{ fieldErrors()['pos'] }}</small> }
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">উচ্চারণ (UK)</label>
+            <input type="text" class="form-control" formControlName="phonetic_uk" placeholder="/wɜːd/">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">উচ্চারণ (US)</label>
+            <input type="text" class="form-control" formControlName="phonetic_us" placeholder="/wɝːd/">
+          </div>
+        </div>
+
+        <hr class="my-4">
+
+        <div formArrayName="senses">
+          @for (sense of senses.controls; track $index; let i = $index) {
+            <div [formGroupName]="i" class="sense-card p-3 mb-3">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-bold mb-0">অর্থ #{{ i + 1 }}</h6>
+                @if (senses.length > 1) {
+                  <button type="button" class="btn-remove-sense" (click)="removeSense(i)">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                }
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">সংক্ষিপ্ত সংজ্ঞা (ইংরেজি) *</label>
+                <input type="text" class="form-control" formControlName="short_definition"
+                  placeholder="e.g. present, appearing, or found everywhere">
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">বিস্তারিত সংজ্ঞা (ঐচ্ছিক)</label>
+                <textarea class="form-control" rows="2" formControlName="definition_text"
+                  placeholder="না দিলে সংক্ষিপ্ত সংজ্ঞাই ব্যবহার হবে"></textarea>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">বাংলা অর্থ <span class="text-muted small">(কমা দিয়ে আলাদা করুন)</span></label>
+                <input type="text" class="form-control" formControlName="bangla_meanings"
+                  placeholder="সর্বত্র বিদ্যমান, সর্বব্যাপী">
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">উদাহরণ বাক্য <span class="text-muted small">(প্রতি লাইনে একটি)</span></label>
+                  <textarea class="form-control" rows="3" formControlName="examples"
+                    placeholder="Mobile phones are now ubiquitous."></textarea>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">বাংলা অনুবাদ <span class="text-muted small">(একই ক্রমে)</span></label>
+                  <textarea class="form-control" rows="3" formControlName="examples_bn"
+                    placeholder="মোবাইল ফোন এখন সর্বত্র বিদ্যমান।"></textarea>
+                </div>
+              </div>
+
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">সমার্থক শব্দ <span class="text-muted small">(কমা দিয়ে)</span></label>
+                  <input type="text" class="form-control" formControlName="synonyms" placeholder="omnipresent, universal">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">বিপরীত শব্দ <span class="text-muted small">(কমা দিয়ে)</span></label>
+                  <input type="text" class="form-control" formControlName="antonyms" placeholder="rare, scarce">
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+
+        <button type="button" class="btn-add-sense mb-4" (click)="addSense()">
+          <i class="fas fa-plus me-1"></i> আরেকটি অর্থ যোগ করুন
+        </button>
+
+        @if (wordSubmitSuccess()) {
+          <div class="alert alert-success">{{ wordSubmitSuccess() }}</div>
+        }
+        @if (wordSubmitError()) {
+          <div class="alert alert-danger">{{ wordSubmitError() }}</div>
+        }
+
+        <button type="submit" class="btn-submit" [disabled]="isSubmittingWord()">
+          @if (isSubmittingWord()) {
+            <i class="fas fa-spinner fa-spin me-2"></i> যোগ করা হচ্ছে...
+          } @else {
+            <i class="fas fa-check me-2"></i> শব্দ যোগ করুন
+          }
+        </button>
+      </form>
+    }
+
+    <!-- Bulk upload -->
+    @if (activeTab() === 'bulk') {
+      <div class="form-card p-4">
+        <div class="format-help mb-4">
+          <h6 class="fw-bold mb-2"><i class="fas fa-info-circle text-primary me-1"></i> ফাইল ফরম্যাট</h6>
+          <p class="text-muted small mb-2">
+            শুধুমাত্র <code>.xlsx</code> বা <code>.xls</code> ফাইল গ্রহণযোগ্য। প্রতিটি সারি একটি অর্থ (sense) প্রতিনিধিত্ব করবে। প্রয়োজনীয় কলামগুলো:
+          </p>
+          <div class="col-table">
+            <table class="table table-sm table-bordered mb-0">
+              <thead>
+                <tr><th>কলাম</th><th>বিবরণ</th><th>উদাহরণ</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>word</code></td><td>শব্দ (আবশ্যক)</td><td>ubiquitous</td></tr>
+                <tr><td><code>pos</code></td><td>পদ (আবশ্যক)</td><td>adjective</td></tr>
+                <tr><td><code>short_definition</code></td><td>সংজ্ঞা (আবশ্যক)</td><td>present everywhere</td></tr>
+                <tr><td><code>bangla_meanings</code></td><td>সেমিকোলন (;) দিয়ে আলাদা</td><td>সর্বত্র বিদ্যমান; সর্বব্যাপী</td></tr>
+                <tr><td><code>examples</code></td><td>কমা দিয়ে আলাদা</td><td>It is everywhere, Very common</td></tr>
+                <tr><td><code>example_bn</code></td><td>একই ক্রমে বাংলা অনুবাদ</td><td>এটি সর্বত্র</td></tr>
+                <tr><td><code>forms</code></td><td>সেমিকোলনে আলাদা, form:label</td><td>running:present participle</td></tr>
+                <tr><td><code>synonyms</code></td><td>কমা দিয়ে আলাদা</td><td>omnipresent, universal</td></tr>
+                <tr><td><code>antonyms</code></td><td>কমা দিয়ে আলাদা</td><td>rare, scarce</td></tr>
+                <tr><td><code>phonetic_uk</code> / <code>phonetic_us</code></td><td>ঐচ্ছিক</td><td>/juːˈbɪkwɪtəs/</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="file-drop mb-4">
+          <input type="file" id="excel-file" accept=".xlsx,.xls" class="d-none" (change)="onFileSelected($event)">
+          <label for="excel-file" class="file-drop-label">
+            <i class="fas fa-file-excel fa-2x text-success mb-2 d-block"></i>
+            @if (selectedFile()) {
+              <span class="fw-semibold">{{ selectedFile()!.name }}</span>
+            } @else {
+              <span>ফাইল নির্বাচন করতে এখানে ক্লিক করুন</span>
+            }
+          </label>
+        </div>
+
+        @if (uploadResult()) {
+          @let r = uploadResult()!;
+          <div class="alert alert-success">
+            <p class="mb-1"><strong>{{ r.language }}</strong> ভাষায় <strong>{{ r.created_senses }}</strong> টি নতুন অর্থ যোগ হয়েছে।</p>
+            @if (r.errors.length) {
+              <details class="mt-2">
+                <summary class="text-danger small">{{ r.errors.length }} টি সারিতে সমস্যা হয়েছে (ক্লিক করুন)</summary>
+                <ul class="small mt-2 mb-0">
+                  @for (e of r.errors; track e.row) {
+                    <li>সারি {{ e.row }}: {{ e.error }}</li>
+                  }
+                </ul>
+              </details>
+            }
+          </div>
+        }
+        @if (uploadError()) {
+          <div class="alert alert-danger">{{ uploadError() }}</div>
+        }
+
+        <button type="button" class="btn-submit" [disabled]="isUploading() || !selectedFile()" (click)="uploadExcel()">
+          @if (isUploading()) {
+            <i class="fas fa-spinner fa-spin me-2"></i> আপলোড হচ্ছে...
+          } @else {
+            <i class="fas fa-upload me-2"></i> আপলোড করুন
+          }
+        </button>
+      </div>
+    }
+  } @else if (!languagesLoading() && languages().length > 0) {
+    <div class="text-center text-muted py-5">
+      <i class="fas fa-language fa-3x mb-3 d-block"></i>
+      <p>শুরু করতে উপরে থেকে একটি ভাষা নির্বাচন করুন।</p>
+    </div>
+  }
+</div>

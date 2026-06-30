@@ -5,7 +5,12 @@ import { environment } from '../../../environments/environment';
 import {
   WrittenExam,
   WordPuzzle,
-  Word,
+  DictLanguage,
+  DictWord,
+  DictWordAZEntry,
+  DictWordSearchResult,
+  DictWordCreateRequest,
+  DictExcelUploadResult,
   SubscriptionPlan,
   UserSubscription,
 } from '../models/content.model';
@@ -30,21 +35,54 @@ export class ContentService {
     return this.http.get<WordPuzzle[]>(`${this.baseUrl}/api/word-puzzles/`);
   }
 
-  // --- Language center ---
-  getWordOfTheDay(): Observable<Word> {
-    return this.http.get<Word>(`${this.baseUrl}/api/word-of-the-day/`);
+  // --- Language center (read) ---
+
+  // GET /api/word-of-the-day/ uses WordSerializer - full nested shape.
+  // 404 with no body when no words exist yet; callers should handle that.
+  getWordOfTheDay(): Observable<DictWord> {
+    return this.http.get<DictWord>(`${this.baseUrl}/api/word-of-the-day/`);
   }
 
-  getWordsAZ(): Observable<Record<string, Word[]>> {
-    return this.http.get<Record<string, Word[]>>(`${this.baseUrl}/api/words/az/`);
+  // GET /api/words/az/ uses WordAZSerializer, grouped by first letter -
+  // flat shape, NOT the same as DictWord (no senses, part_of_speech is
+  // a plain string). Confirmed via direct backend code inspection.
+  getWordsAZ(): Observable<Record<string, DictWordAZEntry[]>> {
+    return this.http.get<Record<string, DictWordAZEntry[]>>(`${this.baseUrl}/api/words/az/`);
   }
 
-  getWordDetail(id: number): Observable<Word> {
-    return this.http.get<Word>(`${this.baseUrl}/api/words/${id}/`);
+  // GET /api/words/{id}/ uses WordSerializer - same full nested shape
+  // as word-of-the-day.
+  getWordDetail(id: number): Observable<DictWord> {
+    return this.http.get<DictWord>(`${this.baseUrl}/api/words/${id}/`);
   }
 
-  searchWords(query: string): Observable<Word[]> {
-    return this.http.get<Word[]>(`${this.baseUrl}/api/words/search/`, { params: { q: query } });
+  // GET /api/words/search/ uses WordListSerializer - flat, no senses.
+  searchWords(query: string): Observable<DictWordSearchResult[]> {
+    return this.http.get<DictWordSearchResult[]>(`${this.baseUrl}/api/words/search/`, {
+      params: { q: query },
+    });
+  }
+
+  // --- Language center (admin/teacher write — requires IsTeacherOrAdmin) ---
+
+  getLanguages(): Observable<DictLanguage[]> {
+    return this.http.get<DictLanguage[]>(`${this.baseUrl}/api/languages/`);
+  }
+
+  createWord(languageId: number, payload: DictWordCreateRequest): Observable<DictWord> {
+    return this.http.post<DictWord>(
+      `${this.baseUrl}/api/language/${languageId}/words/create/`,
+      payload,
+    );
+  }
+
+  uploadDictionaryExcel(languageId: number, file: File): Observable<DictExcelUploadResult> {
+    const form = new FormData();
+    form.append('file', file);
+    return this.http.post<DictExcelUploadResult>(
+      `${this.baseUrl}/api/language/${languageId}/words/upload/`,
+      form,
+    );
   }
 
   // --- Subscription ---

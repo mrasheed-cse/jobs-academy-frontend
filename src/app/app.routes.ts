@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard, guestGuard } from './core/guards/auth.guard';
+import { dictionaryAdminGuard } from './core/guards/dictionary-admin.guard';
 
 export const routes: Routes = [
   // --- Auth ---
@@ -54,6 +55,7 @@ export const routes: Routes = [
 
   // --- Language center ---
   { path: 'language', loadComponent: () => import('./features/language/language-home/language-home').then((m) => m.LanguageHome) },
+  { path: 'language/manage', canActivate: [dictionaryAdminGuard], loadComponent: () => import('./features/language/dictionary-manage/dictionary-manage').then((m) => m.DictionaryManage) },
 
   // --- Subscription ---
   { path: 'subscription', loadComponent: () => import('./features/subscription/subscription-plans/subscription-plans').then((m) => m.SubscriptionPlans) },

@@ -24,6 +24,9 @@
             } @else {
               <li><a class="dropdown-item rounded-3 py-2" routerLink="/dashboard"><i class="fas fa-tachometer-alt me-2"></i>ড্যাশবোর্ড</a></li>
               <li><a class="dropdown-item rounded-3 py-2" routerLink="/user/profile"><i class="fas fa-user me-2"></i>প্রোফাইল</a></li>
+              @if (canManageDictionary()) {
+                <li><a class="dropdown-item rounded-3 py-2" routerLink="/language/manage"><i class="fas fa-book me-2"></i>ডিকশনারি পরিচালনা</a></li>
+              }
               <li><hr class="dropdown-divider"></li>
               <li><a class="dropdown-item rounded-3 py-2 text-danger" href="#" (click)="onLogout()"><i class="fas fa-sign-out-alt me-2"></i>লগ আউট</a></li>
             }
