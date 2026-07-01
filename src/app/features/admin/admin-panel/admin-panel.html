@@ -1,0 +1,27 @@
+<div class="container py-5">
+  <h2 class="fw-bold mb-1">অ্যাডমিন প্যানেল</h2>
+  <p class="text-muted mb-5">স্বাগতম, {{ currentUser()?.username }}। কী করতে চান?</p>
+  <div class="row g-4">
+    <div class="col-md-6 col-lg-4">
+      <a routerLink="/admin/news" class="panel-card">
+        <div class="icon-wrap news"><i class="fas fa-newspaper"></i></div>
+        <h5 class="fw-bold mt-3 mb-1">সংবাদ পরিচালনা</h5>
+        <p class="text-muted small mb-0">নতুন সংবাদ প্রকাশ, সম্পাদনা ও মুছুন</p>
+      </a>
+    </div>
+    <div class="col-md-6 col-lg-4">
+      <a routerLink="/admin/jobs" class="panel-card">
+        <div class="icon-wrap jobs"><i class="fas fa-briefcase"></i></div>
+        <h5 class="fw-bold mt-3 mb-1">চাকরির বিজ্ঞপ্তি</h5>
+        <p class="text-muted small mb-0">চাকরির বিজ্ঞপ্তি প্রকাশ, সম্পাদনা ও মুছুন</p>
+      </a>
+    </div>
+    <div class="col-md-6 col-lg-4">
+      <a routerLink="/language/manage" class="panel-card">
+        <div class="icon-wrap dict"><i class="fas fa-book"></i></div>
+        <h5 class="fw-bold mt-3 mb-1">ডিকশনারি</h5>
+        <p class="text-muted small mb-0">নতুন শব্দ যোগ করুন বা এক্সেল আপলোড করুন</p>
+      </a>
+    </div>
+  </div>
+</div>

@@ -25,4 +25,26 @@ export class JobsService {
   getNotice(id: number): Observable<Notice> {
     return this.http.get<Notice>(`${this.baseUrl}/api/notices/${id}/`);
   }
+
+  // --- Admin write operations (require teacher/admin role) ---
+
+  createJob(data: FormData): Observable<GovernmentJob> {
+    return this.http.post<GovernmentJob>(`${this.baseUrl}/api/govt-jobs/`, data);
+  }
+
+  updateJob(id: number, data: FormData): Observable<GovernmentJob> {
+    return this.http.patch<GovernmentJob>(`${this.baseUrl}/api/govt-jobs/${id}/`, data);
+  }
+
+  deleteJob(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/api/govt-jobs/${id}/`);
+  }
+
+  createNotice(data: Partial<Notice>): Observable<Notice> {
+    return this.http.post<Notice>(`${this.baseUrl}/api/notices/`, data);
+  }
+
+  deleteNotice(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/api/notices/${id}/`);
+  }
 }

@@ -38,6 +38,11 @@ export const routes: Routes = [
   { path: 'news/details/:id', loadComponent: () => import('./features/news/news-detail/news-detail').then((m) => m.NewsDetail) },
   { path: 'news/:categoryId', loadComponent: () => import('./features/news/news-list/news-list').then((m) => m.NewsList) },
 
+  // --- Admin panel (teacher/admin only) ---
+  { path: 'admin', canActivate: [dictionaryAdminGuard], loadComponent: () => import('./features/admin/admin-panel/admin-panel').then((m) => m.AdminPanel) },
+  { path: 'admin/news', canActivate: [dictionaryAdminGuard], loadComponent: () => import('./features/admin/news-manage/news-manage').then((m) => m.NewsManage) },
+  { path: 'admin/jobs', canActivate: [dictionaryAdminGuard], loadComponent: () => import('./features/admin/job-manage/job-manage').then((m) => m.JobManage) },
+
   // --- Static pages ---
   { path: 'about-us', loadComponent: () => import('./features/static/about/about').then((m) => m.About) },
   { path: 'contact-us', loadComponent: () => import('./features/static/contact/contact').then((m) => m.Contact) },

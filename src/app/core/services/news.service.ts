@@ -41,4 +41,22 @@ export class NewsService {
   getCategories(): Observable<NewsCategory[]> {
     return this.http.get<NewsCategory[]>(`${this.baseUrl}/api/news-categories/`);
   }
+
+  // --- Admin write operations (require teacher/admin role) ---
+
+  createNews(data: FormData): Observable<NewsItem> {
+    return this.http.post<NewsItem>(`${this.baseUrl}/api/news/`, data);
+  }
+
+  updateNews(id: number, data: FormData): Observable<NewsItem> {
+    return this.http.patch<NewsItem>(`${this.baseUrl}/api/news/${id}/`, data);
+  }
+
+  deleteNews(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/api/news/${id}/`);
+  }
+
+  createCategory(name: string): Observable<NewsCategory> {
+    return this.http.post<NewsCategory>(`${this.baseUrl}/api/news-categories/`, { name });
+  }
 }

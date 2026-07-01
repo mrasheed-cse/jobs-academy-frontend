@@ -1,0 +1,126 @@
+<div class="container py-5">
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+      <h2 class="fw-bold mb-0">চাকরির বিজ্ঞপ্তি পরিচালনা</h2>
+      <p class="text-muted small mb-0">নতুন বিজ্ঞপ্তি প্রকাশ করুন বা বিদ্যমান বিজ্ঞপ্তি সম্পাদনা করুন</p>
+    </div>
+    <div class="d-flex gap-2">
+      <a routerLink="/admin" class="btn btn-outline-secondary btn-sm">অ্যাডমিন প্যানেল</a>
+      <button type="button" class="btn btn-primary btn-sm" (click)="openCreate()">
+        <i class="fas fa-plus me-1"></i> নতুন বিজ্ঞপ্তি
+      </button>
+    </div>
+  </div>
+
+  @if (successMsg()) { <div class="alert alert-success">{{ successMsg() }}</div> }
+  @if (errorMsg()) { <div class="alert alert-danger">{{ errorMsg() }}</div> }
+
+  @if (showForm()) {
+    <div class="form-card p-4 mb-4">
+      <h5 class="fw-bold mb-4">{{ editingId() ? 'বিজ্ঞপ্তি সম্পাদনা' : 'নতুন বিজ্ঞপ্তি' }}</h5>
+      <form [formGroup]="form" (ngSubmit)="save()">
+        <div class="row g-3 mb-3">
+          <div class="col-12">
+            <label class="form-label">পদের শিরোনাম *</label>
+            <input type="text" class="form-control" formControlName="title" placeholder="e.g. Senior Software Engineer">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">সংস্থা *</label>
+            <select class="form-select" formControlName="organization_id">
+              <option [value]="null">— সংস্থা নির্বাচন করুন —</option>
+              @for (org of organizations(); track org.id) {
+                <option [value]="org.id">{{ org.name }}</option>
+              }
+            </select>
+            @if (organizations().length === 0) {
+              <small class="text-muted">সংস্থার তালিকা লোড হচ্ছে...</small>
+            }
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">বিভাগ</label>
+            <select class="form-select" formControlName="department_id">
+              <option [value]="null">— বিভাগ নির্বাচন করুন —</option>
+              @for (dept of departments(); track dept.id) {
+                <option [value]="dept.id">{{ dept.name }}</option>
+              }
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">অবস্থান *</label>
+            <input type="text" class="form-control" formControlName="location" placeholder="ঢাকা, বাংলাদেশ">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">আবেদনের শেষ তারিখ *</label>
+            <input type="date" class="form-control" formControlName="deadline">
+          </div>
+          <div class="col-12">
+            <label class="form-label">বিস্তারিত বিবরণ</label>
+            <textarea class="form-control" rows="5" formControlName="description" placeholder="চাকরির বিস্তারিত বিবরণ, যোগ্যতা ইত্যাদি"></textarea>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">অফিসিয়াল লিংক</label>
+            <input type="url" class="form-control" formControlName="official_link" placeholder="https://...">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">পিডিএফ বিজ্ঞপ্তি</label>
+            <input type="file" class="form-control" accept=".pdf" (change)="onPdfSelected($event)">
+            @if (selectedPdf()) { <small class="text-muted">{{ selectedPdf()!.name }}</small> }
+          </div>
+        </div>
+        <div class="form-check mb-4">
+          <input type="checkbox" class="form-check-input" id="send_notif" formControlName="send_notification">
+          <label class="form-check-label" for="send_notif">পুশ নোটিফিকেশন পাঠান</label>
+        </div>
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary" [disabled]="isSaving()">
+            {{ isSaving() ? 'সংরক্ষণ হচ্ছে...' : (editingId() ? 'আপডেট করুন' : 'প্রকাশ করুন') }}
+          </button>
+          <button type="button" class="btn btn-outline-secondary" (click)="cancelForm()">বাতিল</button>
+        </div>
+      </form>
+    </div>
+  }
+
+  @if (isLoading()) {
+    <div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>
+  } @else if (jobs().length === 0) {
+    <div class="empty-state text-center py-5">
+      <i class="fas fa-briefcase fa-3x text-muted mb-3 d-block"></i>
+      <p class="text-muted">কোনো বিজ্ঞপ্তি নেই। নতুন বিজ্ঞপ্তি যোগ করুন।</p>
+    </div>
+  } @else {
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>শিরোনাম</th>
+            <th>সংস্থা</th>
+            <th>অবস্থান</th>
+            <th>শেষ তারিখ</th>
+            <th class="text-end">অ্যাকশন</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (job of jobs(); track job.id) {
+            <tr>
+              <td class="fw-semibold">{{ job.title }}</td>
+              <td><small>{{ job.organization?.name ?? '—' }}</small></td>
+              <td><small class="text-muted">{{ job.location }}</small></td>
+              <td><span class="text-danger small">{{ job.deadline }}</span></td>
+              <td class="text-end">
+                <button type="button" class="btn btn-sm btn-outline-primary me-1" (click)="openEdit(job)">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-danger"
+                  [disabled]="isDeleting() === job.id" (click)="deleteJob(job.id)">
+                  @if (isDeleting() === job.id) { <i class="fas fa-spinner fa-spin"></i> }
+                  @else { <i class="fas fa-trash"></i> }
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
