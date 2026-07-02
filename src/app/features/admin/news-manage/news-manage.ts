@@ -1,9 +1,10 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, inject, signal, ElementRef, ViewChild } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { NewsService } from '../../../core/services/news.service';
 import { NewsItem, NewsCategory } from '../../../core/models/content.model';
+import { environment } from '../../../../environments/environment';
 
 declare const Quill: any;
 
@@ -13,13 +14,14 @@ declare const Quill: any;
   templateUrl: './news-manage.html',
   styleUrl: './news-manage.scss',
 })
-export class NewsManage implements OnInit, AfterViewInit, OnDestroy {
+export class NewsManage implements OnInit, OnDestroy {
   private readonly newsService = inject(NewsService);
+  private readonly http = inject(HttpClient);
   private readonly fb = inject(FormBuilder);
-  @ViewChild('editorContainer') editorContainer?: ElementRef;
+  private readonly baseUrl = environment.apiBaseUrl;
 
+  @ViewChild('editorContainer') editorContainer?: ElementRef;
   private quill: any = null;
-  private quillLoaded = false;
 
   readonly newsList = signal<NewsItem[]>([]);
   readonly categories = signal<NewsCategory[]>([]);
@@ -32,6 +34,7 @@ export class NewsManage implements OnInit, AfterViewInit, OnDestroy {
   readonly errorMsg = signal<string | null>(null);
   readonly uploadedImages = signal<File[]>([]);
   readonly imagePreviewUrls = signal<string[]>([]);
+  readonly isUploadingImage = signal(false);
 
   readonly form = this.fb.group({
     title: ['', Validators.required],
@@ -42,58 +45,90 @@ export class NewsManage implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadData();
-    this.loadQuill();
+    this.ensureQuillLoaded();
   }
 
-  ngAfterViewInit(): void {}
+  ngOnDestroy(): void { this.quill = null; }
 
-  ngOnDestroy(): void {
-    if (this.quill) this.quill = null;
-  }
-
-  private loadQuill(): void {
-    if ((window as any).Quill) { this.quillLoaded = true; return; }
+  private ensureQuillLoaded(): void {
+    if ((window as any).Quill) return;
     const link = document.createElement('link');
     link.rel = 'stylesheet';
     link.href = 'https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.min.css';
     document.head.appendChild(link);
     const script = document.createElement('script');
     script.src = 'https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js';
-    script.onload = () => { this.quillLoaded = true; };
     document.head.appendChild(script);
   }
 
   private initEditor(content = ''): void {
-    if (!this.editorContainer) return;
-    const el = this.editorContainer.nativeElement;
-    el.innerHTML = '';
-    const container = document.createElement('div');
-    el.appendChild(container);
-
     const waitForQuill = () => {
-      if (!(window as any).Quill) { setTimeout(waitForQuill, 100); return; }
+      if (!(window as any).Quill || !this.editorContainer) {
+        setTimeout(waitForQuill, 100);
+        return;
+      }
+      const el = this.editorContainer.nativeElement;
+      el.innerHTML = '';
+      const container = document.createElement('div');
+      el.appendChild(container);
+
       this.quill = new (window as any).Quill(container, {
         theme: 'snow',
         placeholder: 'সংবাদের বিস্তারিত বিষয়বস্তু লিখুন...',
         modules: {
-          toolbar: [
-            [{ header: [1, 2, 3, false] }],
-            ['bold', 'italic', 'underline'],
-            [{ list: 'ordered' }, { list: 'bullet' }],
-            ['blockquote', 'link'],
-            [{ align: [] }],
-            ['clean'],
-          ],
+          toolbar: {
+            container: [
+              [{ header: [1, 2, 3, false] }],
+              ['bold', 'italic', 'underline'],
+              [{ list: 'ordered' }, { list: 'bullet' }],
+              ['blockquote', 'link', 'image'],
+              [{ align: [] }],
+              ['clean'],
+            ],
+            handlers: {
+              image: () => this.handleImageInsert(),
+            },
+          },
         },
       });
+
       if (content) this.quill.root.innerHTML = content;
     };
     waitForQuill();
   }
 
+  // Quill image handler — opens file picker, uploads to server,
+  // inserts the real /media/ URL so it persists across sessions.
+  private handleImageInsert(): void {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = () => {
+      const file = input.files?.[0];
+      if (!file || !this.quill) return;
+      this.isUploadingImage.set(true);
+      const fd = new FormData();
+      fd.append('image', file);
+      this.http.post<{ url: string }>(`${this.baseUrl}/api/news/upload-image/`, fd).subscribe({
+        next: (res) => {
+          this.isUploadingImage.set(false);
+          const range = this.quill.getSelection(true);
+          this.quill.insertEmbed(range.index, 'image', res.url);
+          this.quill.setSelection(range.index + 1);
+        },
+        error: () => {
+          this.isUploadingImage.set(false);
+          this.errorMsg.set('ছবি আপলোড ব্যর্থ হয়েছে। আবার চেষ্টা করুন।');
+        },
+      });
+    };
+    input.click();
+  }
+
   private getEditorContent(): string {
     if (!this.quill) return '';
-    return this.quill.root.innerHTML === '<p><br></p>' ? '' : this.quill.root.innerHTML;
+    const html = this.quill.root.innerHTML;
+    return html === '<p><br></p>' ? '' : html;
   }
 
   private loadData(): void {
@@ -113,49 +148,31 @@ export class NewsManage implements OnInit, AfterViewInit, OnDestroy {
     this.successMsg.set(null);
     this.errorMsg.set(null);
     this.showForm.set(true);
-    setTimeout(() => this.initEditor(), 100);
+    setTimeout(() => this.initEditor(), 150);
   }
 
   openEdit(item: NewsItem): void {
-    this.form.patchValue({
-      title: item.title,
-      category: item.category ?? null,
-      send_notification: false,
-    });
+    this.form.patchValue({ title: item.title, category: item.category ?? null, send_notification: false });
     this.uploadedImages.set([]);
     this.imagePreviewUrls.set([]);
     this.editingId.set(item.id);
     this.successMsg.set(null);
     this.errorMsg.set(null);
     this.showForm.set(true);
-    setTimeout(() => this.initEditor(item.content), 100);
+    setTimeout(() => this.initEditor(item.content), 150);
   }
 
-  cancelForm(): void {
-    this.showForm.set(false);
-    this.editingId.set(null);
-    if (this.quill) this.quill = null;
-  }
+  cancelForm(): void { this.showForm.set(false); this.editingId.set(null); this.quill = null; }
 
-  onImagesSelected(event: Event): void {
+  onCoverImageSelected(event: Event): void {
     const files = Array.from((event.target as HTMLInputElement).files ?? []);
     this.uploadedImages.set(files);
-    const urls = files.map((f) => URL.createObjectURL(f));
-    this.imagePreviewUrls.set(urls);
+    this.imagePreviewUrls.set(files.map((f) => URL.createObjectURL(f)));
   }
 
-  removeImage(index: number): void {
+  removeCoverImage(index: number): void {
     this.uploadedImages.update((imgs) => imgs.filter((_, i) => i !== index));
     this.imagePreviewUrls.update((urls) => urls.filter((_, i) => i !== index));
-  }
-
-  insertImagePlaceholder(index: number): void {
-    if (!this.quill) return;
-    const range = this.quill.getSelection(true);
-    this.quill.insertText(range.index, `\n`, 'user');
-    this.quill.insertEmbed(range.index + 1, 'image', this.imagePreviewUrls()[index]);
-    this.quill.insertText(range.index + 2, `\n`, 'user');
-    this.quill.setSelection(range.index + 3);
   }
 
   save(): void {
@@ -176,6 +193,7 @@ export class NewsManage implements OnInit, AfterViewInit, OnDestroy {
     if (v.send_notification && v.notification_delay_hours) {
       fd.append('notification_delay_hours', String(v.notification_delay_hours));
     }
+    // Cover images (attached to article separately from inline images)
     this.uploadedImages().forEach((f) => fd.append('uploaded_images', f));
 
     const op = this.editingId()

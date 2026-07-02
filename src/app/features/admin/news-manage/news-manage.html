@@ -17,7 +17,6 @@
   @if (successMsg()) { <div class="alert alert-success">{{ successMsg() }}</div> }
   @if (errorMsg()) { <div class="alert alert-danger">{{ errorMsg() }}</div> }
 
-  <!-- Create / Edit Form -->
   @if (showForm()) {
     <div class="editor-layout">
       <!-- Left: Editor -->
@@ -27,16 +26,12 @@
             <i class="fas fa-newspaper me-2 text-primary"></i>
             {{ editingId() ? 'সংবাদ সম্পাদনা' : 'নতুন সংবাদ লিখুন' }}
           </h5>
-
           <form [formGroup]="form">
-            <!-- Title -->
             <div class="mb-4">
               <label class="form-label fw-semibold">শিরোনাম *</label>
               <input type="text" class="form-control form-control-lg title-input"
                 formControlName="title" placeholder="সংবাদের আকর্ষণীয় শিরোনাম লিখুন">
             </div>
-
-            <!-- Category -->
             <div class="mb-4">
               <label class="form-label fw-semibold">বিভাগ</label>
               <select class="form-select" formControlName="category">
@@ -46,51 +41,47 @@
                 }
               </select>
             </div>
-
-            <!-- Rich Text Editor -->
-            <div class="mb-4">
+            <div class="mb-2">
               <label class="form-label fw-semibold">বিষয়বস্তু *</label>
+              @if (isUploadingImage()) {
+                <div class="upload-indicator mb-2">
+                  <i class="fas fa-spinner fa-spin me-2"></i> ছবি আপলোড হচ্ছে...
+                </div>
+              }
               <div class="editor-wrapper">
                 <div #editorContainer class="editor-container"></div>
               </div>
-              <small class="text-muted">টুলবার ব্যবহার করে টেক্সট ফরম্যাট করুন। ছবি নিচে থেকে যোগ করুন।</small>
+              <small class="text-muted">
+                <i class="fas fa-info-circle me-1"></i>
+                টুলবারে <strong>🖼</strong> (ছবি) বাটনে ক্লিক করে সরাসরি আর্টিকেলের মধ্যে ছবি যোগ করুন।
+                ছবি সার্ভারে আপলোড হবে এবং স্থায়ীভাবে থাকবে।
+              </small>
             </div>
           </form>
         </div>
       </div>
 
-      <!-- Right: Sidebar controls -->
+      <!-- Right: Sidebar -->
       <div class="editor-sidebar">
-        <!-- Image upload -->
+        <!-- Cover images -->
         <div class="sidebar-card p-3 mb-3">
-          <h6 class="fw-bold mb-3"><i class="fas fa-images me-2 text-success"></i>ছবি যোগ করুন</h6>
-          <label class="file-pick-btn w-100 mb-3">
+          <h6 class="fw-bold mb-1"><i class="fas fa-image me-2 text-primary"></i>কভার ছবি</h6>
+          <p class="text-muted small mb-3">আর্টিকেলের শুরুতে প্রদর্শিত হবে</p>
+          <label class="file-pick-btn w-100 mb-2">
             <i class="fas fa-upload me-2"></i> ছবি নির্বাচন করুন
-            <input type="file" accept="image/*" multiple class="d-none" (change)="onImagesSelected($event)">
+            <input type="file" accept="image/*" multiple class="d-none" (change)="onCoverImageSelected($event)">
           </label>
-
           @if (imagePreviewUrls().length) {
-            <div class="image-list">
+            <div class="mt-2">
               @for (url of imagePreviewUrls(); track $index) {
-                <div class="image-item mb-2">
-                  <img [src]="url" class="preview-img">
-                  <div class="image-actions mt-1 d-flex gap-1">
-                    <button type="button" class="btn btn-xs btn-primary flex-grow-1"
-                      (click)="insertImagePlaceholder($index)">
-                      <i class="fas fa-level-down-alt me-1"></i> কার্সরে যোগ করুন
-                    </button>
-                    <button type="button" class="btn btn-xs btn-outline-danger"
-                      (click)="removeImage($index)">
-                      <i class="fas fa-times"></i>
-                    </button>
-                  </div>
+                <div class="cover-preview-item mb-2">
+                  <img [src]="url" class="cover-preview-img">
+                  <button type="button" class="btn-remove-cover" (click)="removeCoverImage($index)">
+                    <i class="fas fa-times"></i>
+                  </button>
                 </div>
               }
             </div>
-            <small class="text-muted d-block mt-2">
-              <i class="fas fa-info-circle me-1"></i>
-              এডিটরে কার্সর রাখুন তারপর "কার্সরে যোগ করুন" ক্লিক করুন
-            </small>
           }
         </div>
 
@@ -105,7 +96,8 @@
             @if (form.value.send_notification) {
               <div class="mt-2">
                 <label class="form-label small">কত ঘণ্টা পর পাঠাবেন</label>
-                <input type="number" class="form-control form-control-sm" formControlName="notification_delay_hours" min="1" placeholder="ঘণ্টা">
+                <input type="number" class="form-control form-control-sm"
+                  formControlName="notification_delay_hours" min="1" placeholder="ঘণ্টা">
               </div>
             }
           </form>
@@ -114,7 +106,8 @@
         <!-- Publish -->
         <div class="sidebar-card p-3">
           <h6 class="fw-bold mb-3"><i class="fas fa-paper-plane me-2 text-primary"></i>প্রকাশ</h6>
-          <button type="button" class="btn btn-primary w-100 mb-2" [disabled]="isSaving()" (click)="save()">
+          <button type="button" class="btn btn-primary w-100 mb-2"
+            [disabled]="isSaving() || isUploadingImage()" (click)="save()">
             @if (isSaving()) { <i class="fas fa-spinner fa-spin me-2"></i>সংরক্ষণ হচ্ছে... }
             @else { <i class="fas fa-check me-2"></i>{{ editingId() ? 'আপডেট করুন' : 'প্রকাশ করুন' }} }
           </button>
