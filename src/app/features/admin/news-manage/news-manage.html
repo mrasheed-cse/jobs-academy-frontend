@@ -6,9 +6,11 @@
     </div>
     <div class="d-flex gap-2">
       <a routerLink="/admin" class="btn btn-outline-secondary btn-sm">অ্যাডমিন প্যানেল</a>
-      <button type="button" class="btn btn-primary btn-sm" (click)="openCreate()">
-        <i class="fas fa-plus me-1"></i> নতুন সংবাদ
-      </button>
+      @if (!showForm()) {
+        <button type="button" class="btn btn-primary btn-sm" (click)="openCreate()">
+          <i class="fas fa-plus me-1"></i> নতুন সংবাদ
+        </button>
+      }
     </div>
   </div>
 
@@ -17,95 +19,152 @@
 
   <!-- Create / Edit Form -->
   @if (showForm()) {
-    <div class="form-card p-4 mb-4">
-      <h5 class="fw-bold mb-4">{{ editingId() ? 'সংবাদ সম্পাদনা' : 'নতুন সংবাদ' }}</h5>
-      <form [formGroup]="form" (ngSubmit)="save()">
-        <div class="mb-3">
-          <label class="form-label">শিরোনাম *</label>
-          <input type="text" class="form-control" formControlName="title" placeholder="সংবাদের শিরোনাম">
+    <div class="editor-layout">
+      <!-- Left: Editor -->
+      <div class="editor-main">
+        <div class="form-card p-4">
+          <h5 class="fw-bold mb-4 border-bottom pb-3">
+            <i class="fas fa-newspaper me-2 text-primary"></i>
+            {{ editingId() ? 'সংবাদ সম্পাদনা' : 'নতুন সংবাদ লিখুন' }}
+          </h5>
+
+          <form [formGroup]="form">
+            <!-- Title -->
+            <div class="mb-4">
+              <label class="form-label fw-semibold">শিরোনাম *</label>
+              <input type="text" class="form-control form-control-lg title-input"
+                formControlName="title" placeholder="সংবাদের আকর্ষণীয় শিরোনাম লিখুন">
+            </div>
+
+            <!-- Category -->
+            <div class="mb-4">
+              <label class="form-label fw-semibold">বিভাগ</label>
+              <select class="form-select" formControlName="category">
+                <option [value]="null">— বিভাগ নির্বাচন করুন —</option>
+                @for (cat of categories(); track cat.id) {
+                  <option [value]="cat.id">{{ cat.name }}</option>
+                }
+              </select>
+            </div>
+
+            <!-- Rich Text Editor -->
+            <div class="mb-4">
+              <label class="form-label fw-semibold">বিষয়বস্তু *</label>
+              <div class="editor-wrapper">
+                <div #editorContainer class="editor-container"></div>
+              </div>
+              <small class="text-muted">টুলবার ব্যবহার করে টেক্সট ফরম্যাট করুন। ছবি নিচে থেকে যোগ করুন।</small>
+            </div>
+          </form>
         </div>
-        <div class="mb-3">
-          <label class="form-label">বিষয়বস্তু *</label>
-          <textarea class="form-control" rows="8" formControlName="content" placeholder="সংবাদের বিস্তারিত বিষয়বস্তু"></textarea>
-        </div>
-        <div class="row g-3 mb-3">
-          <div class="col-md-6">
-            <label class="form-label">বিভাগ</label>
-            <select class="form-select" formControlName="category">
-              <option [value]="null">— বিভাগ নির্বাচন করুন —</option>
-              @for (cat of categories(); track cat.id) {
-                <option [value]="cat.id">{{ cat.name }}</option>
+      </div>
+
+      <!-- Right: Sidebar controls -->
+      <div class="editor-sidebar">
+        <!-- Image upload -->
+        <div class="sidebar-card p-3 mb-3">
+          <h6 class="fw-bold mb-3"><i class="fas fa-images me-2 text-success"></i>ছবি যোগ করুন</h6>
+          <label class="file-pick-btn w-100 mb-3">
+            <i class="fas fa-upload me-2"></i> ছবি নির্বাচন করুন
+            <input type="file" accept="image/*" multiple class="d-none" (change)="onImagesSelected($event)">
+          </label>
+
+          @if (imagePreviewUrls().length) {
+            <div class="image-list">
+              @for (url of imagePreviewUrls(); track $index) {
+                <div class="image-item mb-2">
+                  <img [src]="url" class="preview-img">
+                  <div class="image-actions mt-1 d-flex gap-1">
+                    <button type="button" class="btn btn-xs btn-primary flex-grow-1"
+                      (click)="insertImagePlaceholder($index)">
+                      <i class="fas fa-level-down-alt me-1"></i> কার্সরে যোগ করুন
+                    </button>
+                    <button type="button" class="btn btn-xs btn-outline-danger"
+                      (click)="removeImage($index)">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                </div>
               }
-            </select>
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">ছবি (একাধিক)</label>
-            <input type="file" class="form-control" accept="image/*" multiple (change)="onImagesSelected($event)">
-            @if (selectedImages().length) {
-              <small class="text-muted">{{ selectedImages().length }} টি ছবি নির্বাচিত</small>
+            </div>
+            <small class="text-muted d-block mt-2">
+              <i class="fas fa-info-circle me-1"></i>
+              এডিটরে কার্সর রাখুন তারপর "কার্সরে যোগ করুন" ক্লিক করুন
+            </small>
+          }
+        </div>
+
+        <!-- Notification -->
+        <div class="sidebar-card p-3 mb-3">
+          <h6 class="fw-bold mb-3"><i class="fas fa-bell me-2 text-warning"></i>নোটিফিকেশন</h6>
+          <form [formGroup]="form">
+            <div class="form-check mb-2">
+              <input type="checkbox" class="form-check-input" id="send_notif" formControlName="send_notification">
+              <label class="form-check-label small" for="send_notif">পুশ নোটিফিকেশন পাঠান</label>
+            </div>
+            @if (form.value.send_notification) {
+              <div class="mt-2">
+                <label class="form-label small">কত ঘণ্টা পর পাঠাবেন</label>
+                <input type="number" class="form-control form-control-sm" formControlName="notification_delay_hours" min="1" placeholder="ঘণ্টা">
+              </div>
             }
-          </div>
+          </form>
         </div>
-        <div class="form-check mb-4">
-          <input type="checkbox" class="form-check-input" id="send_notif" formControlName="send_notification">
-          <label class="form-check-label" for="send_notif">পুশ নোটিফিকেশন পাঠান</label>
-        </div>
-        <div class="d-flex gap-2">
-          <button type="submit" class="btn btn-primary" [disabled]="isSaving()">
-            {{ isSaving() ? 'সংরক্ষণ হচ্ছে...' : (editingId() ? 'আপডেট করুন' : 'প্রকাশ করুন') }}
+
+        <!-- Publish -->
+        <div class="sidebar-card p-3">
+          <h6 class="fw-bold mb-3"><i class="fas fa-paper-plane me-2 text-primary"></i>প্রকাশ</h6>
+          <button type="button" class="btn btn-primary w-100 mb-2" [disabled]="isSaving()" (click)="save()">
+            @if (isSaving()) { <i class="fas fa-spinner fa-spin me-2"></i>সংরক্ষণ হচ্ছে... }
+            @else { <i class="fas fa-check me-2"></i>{{ editingId() ? 'আপডেট করুন' : 'প্রকাশ করুন' }} }
           </button>
-          <button type="button" class="btn btn-outline-secondary" (click)="cancelForm()">বাতিল</button>
+          <button type="button" class="btn btn-outline-secondary w-100" (click)="cancelForm()">বাতিল</button>
         </div>
-      </form>
+      </div>
     </div>
   }
 
   <!-- News List -->
-  @if (isLoading()) {
-    <div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>
-  } @else if (newsList().length === 0) {
-    <div class="empty-state text-center py-5">
-      <i class="fas fa-newspaper fa-3x text-muted mb-3 d-block"></i>
-      <p class="text-muted">কোনো সংবাদ নেই। নতুন সংবাদ যোগ করুন।</p>
-    </div>
-  } @else {
-    <div class="table-responsive">
-      <table class="table table-hover align-middle">
-        <thead class="table-light">
-          <tr>
-            <th>শিরোনাম</th>
-            <th>বিভাগ</th>
-            <th>তারিখ</th>
-            <th class="text-end">অ্যাকশন</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (item of newsList(); track item.id) {
-            <tr>
-              <td>
-                <div class="d-flex align-items-center gap-2">
-                  @if (item.images.length) {
-                    <img [src]="item.images[0].image_url" class="news-thumb" [alt]="item.title">
-                  }
-                  <span class="fw-semibold">{{ item.title }}</span>
+  @if (!showForm()) {
+    @if (isLoading()) {
+      <div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>
+    } @else if (newsList().length === 0) {
+      <div class="empty-state text-center py-5">
+        <i class="fas fa-newspaper fa-3x text-muted mb-3 d-block"></i>
+        <p class="text-muted">কোনো সংবাদ নেই।</p>
+        <button type="button" class="btn btn-primary" (click)="openCreate()">প্রথম সংবাদ লিখুন</button>
+      </div>
+    } @else {
+      <div class="row g-3">
+        @for (item of newsList(); track item.id) {
+          <div class="col-12">
+            <div class="news-list-card d-flex gap-3 align-items-center p-3">
+              @if (item.images.length) {
+                <img [src]="item.images[0].image_url" class="news-thumb" [alt]="item.title">
+              } @else {
+                <div class="news-thumb-placeholder"><i class="fas fa-newspaper"></i></div>
+              }
+              <div class="flex-grow-1 min-w-0">
+                <h6 class="fw-bold mb-1 text-truncate">{{ item.title }}</h6>
+                <div class="d-flex gap-2 align-items-center flex-wrap">
+                  <span class="badge bg-light text-dark">{{ categoryName(item.category) }}</span>
+                  <small class="text-muted">{{ item.published_date }}</small>
                 </div>
-              </td>
-              <td><span class="badge bg-light text-dark">{{ categoryName(item.category) }}</span></td>
-              <td><small class="text-muted">{{ item.published_date }}</small></td>
-              <td class="text-end">
-                <button type="button" class="btn btn-sm btn-outline-primary me-1" (click)="openEdit(item)">
-                  <i class="fas fa-edit"></i>
+              </div>
+              <div class="d-flex gap-2 flex-shrink-0">
+                <button type="button" class="btn btn-sm btn-outline-primary" (click)="openEdit(item)">
+                  <i class="fas fa-edit"></i> সম্পাদনা
                 </button>
                 <button type="button" class="btn btn-sm btn-outline-danger"
                   [disabled]="isDeleting() === item.id" (click)="deleteNews(item.id)">
                   @if (isDeleting() === item.id) { <i class="fas fa-spinner fa-spin"></i> }
                   @else { <i class="fas fa-trash"></i> }
                 </button>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
   }
 </div>
