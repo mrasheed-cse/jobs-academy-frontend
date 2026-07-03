@@ -39,33 +39,127 @@ export class IllustrationService {
   }
 
   private detectScene(sentence: string, word: string): string {
+    // Search both the full sentence and the defined word itself
     const s = (sentence + ' ' + word).toLowerCase();
+
+    // Word-level exact match first (highest priority — the word being defined IS the topic)
+    const wordMap: Record<string, string> = {
+      // Light / sparkle / glint family
+      glint:'sparkle', sparkle:'sparkle', shimmer:'sparkle', glimmer:'sparkle',
+      gleam:'sparkle', twinkle:'sparkle', flicker:'sparkle', flash:'sparkle',
+      glitter:'sparkle', glow:'sparkle', luminous:'sparkle', radiant:'sparkle',
+      dazzle:'sparkle', blaze:'sparkle', beam:'sparkle', ray:'sparkle',
+      // Eye / face / emotion
+      eye:'eye', eyes:'eye', gaze:'eye', stare:'eye', glance:'eye', blink:'eye',
+      wink:'eye', sight:'eye', vision:'eye', look:'eye', peer:'eye', squint:'eye',
+      smile:'love', laugh:'love', cry:'love', weep:'love', tears:'love',
+      // Mountain / achievement
+      apex:'mountain', peak:'mountain', summit:'mountain', climb:'mountain',
+      ascend:'mountain', pinnacle:'mountain', zenith:'mountain', acme:'mountain',
+      achieve:'mountain', triumph:'mountain', victory:'mountain', excel:'mountain',
+      // Reading / study
+      read:'reading', book:'reading', study:'reading', learn:'reading',
+      knowledge:'reading', scholar:'reading', educate:'reading', library:'reading',
+      chapter:'reading', page:'reading', author:'reading', write:'work',
+      // Growth / nature
+      grow:'growth', bloom:'growth', flourish:'growth', thrive:'growth',
+      blossom:'growth', sprout:'growth', plant:'growth', seed:'growth',
+      // Running / sport
+      run:'running', sprint:'running', race:'running', dash:'running',
+      jog:'running', gallop:'running', hustle:'running', swift:'running',
+      // Sky / flight
+      fly:'sky', soar:'sky', glide:'sky', bird:'sky', wing:'sky',
+      flutter:'sky', hover:'sky', drift:'sky',
+      // Water
+      flow:'ocean', stream:'ocean', pour:'ocean', gush:'ocean', surge:'ocean',
+      flood:'ocean', drown:'ocean', ripple:'ocean', splash:'ocean',
+      // Love / connection
+      love:'love', adore:'love', cherish:'love', embrace:'love',
+      affection:'love', compassion:'love', warmth:'love', tender:'love',
+      // Night
+      night:'night', dark:'night', shadow:'night', dusk:'night',
+      gloom:'night', obscure:'night', dim:'night', murky:'night',
+      // Thinking
+      think:'thinking', ponder:'thinking', contemplate:'thinking', reflect:'thinking',
+      wonder:'thinking', imagine:'thinking', conceive:'thinking', deliberate:'thinking',
+      // Music
+      music:'music', melody:'music', rhythm:'music', harmony:'music',
+      sing:'music', hum:'music', tune:'music', chord:'music',
+      // Food
+      eat:'food', taste:'food', flavor:'food', savor:'food',
+      devour:'food', feast:'food', hunger:'food', appetite:'food',
+      // Journey / travel
+      travel:'journey', journey:'journey', wander:'journey', roam:'journey',
+      voyage:'journey', trek:'journey', expedition:'journey', migrate:'journey',
+      // Money
+      money:'money', wealth:'money', rich:'money', profit:'money',
+      prosper:'money', affluent:'money', luxurious:'money', opulent:'money',
+      // Conflict
+      anger:'conflict', rage:'conflict', fury:'conflict', wrath:'conflict',
+      hostile:'conflict', aggressive:'conflict', belligerent:'conflict',
+      // Peace
+      calm:'peace', serene:'peace', tranquil:'peace', peaceful:'peace',
+      placid:'peace', gentle:'peace', soothe:'peace', compose:'peace',
+      // Change
+      change:'transformation', transform:'transformation', evolve:'transformation',
+      adapt:'transformation', alter:'transformation', shift:'transformation',
+    };
+
+    if (wordMap[word.toLowerCase()]) return wordMap[word.toLowerCase()];
+
+    // Sentence-level keyword scan
     const scenes: [string[], string][] = [
-      [['climb','apex','peak','summit','top','reach','achieve','success','career','mountain'], 'mountain'],
-      [['read','book','study','learn','library','knowledge','school','education'], 'reading'],
-      [['grow','plant','tree','flower','garden','seed','bloom','nature'], 'growth'],
-      [['run','race','sprint','fast','speed','athlete','marathon'], 'running'],
-      [['fly','bird','sky','air','cloud','soar','wing','eagle'], 'sky'],
-      [['water','ocean','sea','river','wave','swim','flow','rain'], 'ocean'],
-      [['love','heart','family','friend','together','embrace','care'], 'love'],
-      [['night','dark','moon','star','sleep','dream','shadow','alone'], 'night'],
-      [['sun','light','bright','dawn','morning','shine','hope','glow'], 'sunrise'],
-      [['work','office','job','business','desk','profession','employ'], 'work'],
-      [['think','idea','mind','brain','clever','smart','thought'], 'thinking'],
-      [['music','song','dance','art','paint','creative','concert','rhythm'], 'music'],
-      [['city','urban','street','building','town','crowd','traffic'], 'city'],
-      [['food','eat','cook','meal','restaurant','kitchen','taste'], 'food'],
-      [['travel','journey','adventure','explore','road','path'], 'journey'],
-      [['money','wealth','profit','rich','economy','finance','invest'], 'money'],
-      [['anger','fight','conflict','war','battle','struggle'], 'conflict'],
-      [['peace','calm','relax','meditate','quiet','serene','breath'], 'peace'],
-      [['build','create','construct','make','craft','design','engineer'], 'construction'],
-      [['change','transform','evolve','new','revolution','different'], 'transformation'],
+      [['glint','shimmer','sparkle','glimmer','gleam','twinkle','flicker','flash','glitter',
+        'dazzle','luminous','radiant','beam','ray','glow','shine','bright','light','sun',
+        'dawn','morning','hope'], 'sparkle'],
+      [['eye','eyes','gaze','stare','glance','blink','wink','sight','vision','look','peer',
+        'pupil','iris','retina','blind','see','watch','observe','witness'], 'eye'],
+      [['climb','apex','peak','summit','top','reach','achieve','success','career','mountain',
+        'ascend','pinnacle','zenith','acme','triumph','victory','conquer','excel','attain',
+        'accomplish','surpass','overcome'], 'mountain'],
+      [['read','book','study','learn','library','knowledge','school','education','scholar',
+        'educate','chapter','page','author','literature','academic','university','student',
+        'lesson','lecture','curriculum','intellectual'], 'reading'],
+      [['grow','plant','tree','flower','garden','seed','bloom','nature','flourish','thrive',
+        'blossom','sprout','vegetation','forest','leaf','branch','root','organic'], 'growth'],
+      [['run','race','sprint','fast','speed','athlete','marathon','dash','jog','gallop',
+        'chase','hurry','swift','rapid','quick','brisk','agile','nimble','energetic'], 'running'],
+      [['fly','bird','sky','air','cloud','soar','wing','eagle','flutter','hover','drift',
+        'glide','aviation','pilot','altitude','ascend','kite','freedom','float'], 'sky'],
+      [['water','ocean','sea','river','wave','swim','flow','rain','stream','pour','flood',
+        'lake','pool','ripple','splash','current','tide','aquatic','marine','naval'], 'ocean'],
+      [['love','heart','family','friend','together','embrace','care','adore','cherish',
+        'affection','compassion','warmth','tender','bond','relationship','unity'], 'love'],
+      [['night','dark','moon','star','sleep','dream','shadow','alone','dusk','gloom',
+        'obscure','dim','murky','midnight','nocturnal','twilight','sunset','quiet'], 'night'],
+      [['think','idea','mind','brain','clever','smart','thought','ponder','contemplate',
+        'reflect','wonder','imagine','conceive','deliberate','analyze','reason'], 'thinking'],
+      [['music','song','dance','art','paint','creative','concert','rhythm','melody',
+        'harmony','sing','hum','tune','chord','instrument','beat','tempo'], 'music'],
+      [['city','urban','street','building','town','crowd','traffic','metropolitan',
+        'downtown','skyline','skyscraper','architecture','infrastructure'], 'city'],
+      [['food','eat','cook','meal','restaurant','kitchen','taste','flavor','savor',
+        'devour','feast','hunger','appetite','cuisine','delicious','nourish'], 'food'],
+      [['travel','journey','adventure','explore','road','path','wander','roam',
+        'voyage','trek','expedition','migrate','destination','trip','tour'], 'journey'],
+      [['money','wealth','profit','rich','economy','finance','invest','prosper',
+        'affluent','luxurious','opulent','fund','bank','coin','currency'], 'money'],
+      [['anger','fight','conflict','war','battle','struggle','rage','fury','wrath',
+        'hostile','aggressive','belligerent','dispute','clash','opposition'], 'conflict'],
+      [['peace','calm','relax','meditate','quiet','serene','breath','tranquil',
+        'placid','gentle','soothe','compose','harmony','still','restful'], 'peace'],
+      [['build','create','construct','make','craft','design','engineer','develop',
+        'fabricate','assemble','erect','form','produce','manufacture'], 'construction'],
+      [['change','transform','evolve','new','revolution','different','adapt','alter',
+        'shift','convert','modify','reform','innovate','metamorphose'], 'transformation'],
+      [['work','office','job','business','desk','profession','employ','career',
+        'occupation','vocation','task','labor','industry','productive','diligent'], 'work'],
     ];
+
     for (const [words, scene] of scenes) {
       if (words.some(w => s.includes(w))) return scene;
     }
-    return 'abstract';
+    return 'sparkle'; // better fallback than abstract — most unknown words have some visual quality
   }
 
   private generate(sentence: string, word: string, meaning: string): string {
@@ -92,7 +186,9 @@ export class IllustrationService {
       case 'peace':          return this.peace(vals);
       case 'construction':   return this.construction(vals);
       case 'transformation': return this.transformation(vals);
-      default:               return this.abstract(vals);
+      case 'sparkle':        return this.sparkle(vals);
+      case 'eye':            return this.eye(vals);
+      default:               return this.sparkle(vals);
     }
   }
 
@@ -688,4 +784,122 @@ ${orbitDots}`, bg);
 </g>
 ${dots}`, bg);
   }
+  private sparkle(n: number[]): string {
+    // Represents: light, glint, shimmer, flash, shine, glow, dazzle, gleam
+    const bg = this.hsl(220 + n[0]*30, 25 + n[1]*15, 10 + n[2]*8);
+    const c1 = this.hsl(48 + n[3]*20, 90, 72);
+    const c2 = this.hsl(190 + n[4]*40, 80, 68);
+    const c3 = this.hsl(280 + n[5]*40, 70, 72);
+    const cx = 160 + n[6]*80, cy = 90 + n[7]*40;
+    const r1 = 18 + n[8]*12;
+
+    // Central light burst
+    const rays = [0,1,2,3,4,5,6,7,8,9,10,11].map(i => {
+      const a = i * 30 + n[i]*15;
+      const len = 22 + n[i]*30;
+      const rad = a * Math.PI / 180;
+      const x2 = cx + Math.round(Math.cos(rad) * (r1 + len));
+      const y2 = cy + Math.round(Math.sin(rad) * (r1 + len));
+      const col = i % 3 === 0 ? c1 : i % 3 === 1 ? c2 : c3;
+      return `<line x1="${cx}" y1="${cy}" x2="${x2}" y2="${y2}" stroke="${col}" stroke-width="${1+n[i]*1.5}" stroke-linecap="round" opacity=".8">
+        <animate attributeName="opacity" values="0;.9;0" dur="${0.8+n[i]*0.6}s" begin="${n[(i+3)%12]*1.2}s" repeatCount="indefinite"/>
+        <animate attributeName="stroke-width" values="${1+n[i]*1.5};${3+n[i]*2};${1+n[i]*1.5}" dur="${0.8+n[i]*0.6}s" begin="${n[(i+3)%12]*1.2}s" repeatCount="indefinite"/>
+      </line>`;
+    }).join('');
+
+    // Floating sparkle particles
+    const sparks = [0,1,2,3,4,5,6,7].map(i => {
+      const sx = 30 + n[i+12]*340, sy = 20 + n[i+20]*180;
+      const col = [c1,c2,c3][i%3];
+      const d = 1.2 + n[i+12]*1.5;
+      const size = 2 + n[i+20]*4;
+      return `<g>
+        <animateTransform attributeName="transform" type="translate" values="0,0;0,-${8+n[i]*10};0,0" dur="${d}s" begin="${n[i+4]*2}s" repeatCount="indefinite"/>
+        <polygon points="${sx},${sy-size} ${sx+size*0.4},${sy-size*0.4} ${sx+size},${sy} ${sx+size*0.4},${sy+size*0.4} ${sx},${sy+size} ${sx-size*0.4},${sy+size*0.4} ${sx-size},${sy} ${sx-size*0.4},${sy-size*0.4}" fill="${col}">
+          <animate attributeName="opacity" values="0;1;0" dur="${d}s" begin="${n[i+4]*2}s" repeatCount="indefinite"/>
+          <animateTransform attributeName="transform" type="rotate" values="0 ${sx} ${sy};45 ${sx} ${sy};0 ${sx} ${sy}" dur="${d}s" begin="${n[i+4]*2}s" repeatCount="indefinite" additive="sum"/>
+        </polygon>
+      </g>`;
+    }).join('');
+
+    // Central glowing orb
+    return this.wrap(`
+<circle cx="${cx}" cy="${cy}" r="${r1+20}" fill="${c1}" opacity=".06"/>
+<circle cx="${cx}" cy="${cy}" r="${r1+10}" fill="${c1}" opacity=".1"/>
+<circle cx="${cx}" cy="${cy}" r="${r1}" fill="${c1}" opacity=".18">
+  <animate attributeName="r" values="${r1};${r1+6};${r1}" dur="${1.5+n[9]}s" repeatCount="indefinite"/>
+  <animate attributeName="opacity" values=".12;.25;.12" dur="${1.5+n[9]}s" repeatCount="indefinite"/>
+</circle>
+${rays}
+<circle cx="${cx}" cy="${cy}" r="${6+n[10]*5}" fill="${c1}">
+  <animate attributeName="r" values="${6+n[10]*5};${10+n[10]*7};${6+n[10]*5}" dur="${1.2+n[11]}s" repeatCount="indefinite"/>
+  <animate attributeName="opacity" values=".8;1;.8" dur="${1.2+n[11]}s" repeatCount="indefinite"/>
+</circle>
+<circle cx="${cx+2}" cy="${cy-3}" r="${3+n[10]*2}" fill="white" opacity=".7"/>
+${sparks}`, bg);
+  }
+
+  private eye(n: number[]): string {
+    // Represents: eye, gaze, stare, glance, vision, look, sight, glint-in-eye
+    const bg = this.hsl(210 + n[0]*20, 20 + n[1]*15, 92 + n[2]*5);
+    const ec = this.hsl(210 + n[3]*30, 55 + n[4]*20, 45 + n[5]*15); // eye color
+    const pc = this.hsl(n[6]*30, 0, 15 + n[7]*10); // pupil
+    const sc = this.hsl(48 + n[8]*20, 90, 65); // sparkle / glint color
+    const cx = 200, cy = 108;
+    const ew = 110 + n[9]*40; // eye width
+    const eh = 50 + n[10]*20; // eye height
+    const iris = 28 + n[11]*10;
+    const pupil = 14 + n[11]*5;
+    const d = 3 + n[12]*2;
+
+    // Iris detail lines
+    const irisLines = [0,1,2,3,4,5,6,7].map(i => {
+      const a = i * 45 * Math.PI / 180;
+      return `<line x1="${cx}" y1="${cy}" x2="${cx + Math.round(Math.cos(a)*iris)}" y2="${cy + Math.round(Math.sin(a)*iris)}" stroke="${this.hsl(210+n[3]*30,45+n[4]*15,55+n[5]*10)}" stroke-width="1.2" opacity=".5"/>`;
+    }).join('');
+
+    return this.wrap(`
+<!-- Eye white / sclera -->
+<ellipse cx="${cx}" cy="${cy}" rx="${ew}" ry="${eh}" fill="white" stroke="${this.hsl(210+n[3]*20,20,70)}" stroke-width="1.5"/>
+
+<!-- Upper and lower lashes curve -->
+<path d="M${cx-ew},${cy} Q${cx},${cy-eh*1.6} ${cx+ew},${cy}" fill="none" stroke="${this.hsl(n[6]*30,10,22)}" stroke-width="3" stroke-linecap="round"/>
+<path d="M${cx-ew},${cy} Q${cx},${cy+eh*1.6} ${cx+ew},${cy}" fill="none" stroke="${this.hsl(n[6]*30,10,22)}" stroke-width="3" stroke-linecap="round"/>
+
+<!-- Iris -->
+<circle cx="${cx}" cy="${cy}" r="${iris}" fill="${ec}"/>
+${irisLines}
+<circle cx="${cx}" cy="${cy}" r="${iris}" fill="none" stroke="${this.hsl(210+n[3]*30,60+n[4]*15,35+n[5]*10)}" stroke-width="1.5"/>
+
+<!-- Pupil -->
+<circle cx="${cx}" cy="${cy}" r="${pupil}" fill="${pc}">
+  <animate attributeName="r" values="${pupil};${pupil*0.7};${pupil}" dur="${d}s" repeatCount="indefinite"/>
+</circle>
+
+<!-- Glint / light reflection (the key visual element) -->
+<circle cx="${cx - iris*0.3}" cy="${cy - iris*0.35}" r="${5+n[13]*4}" fill="white" opacity=".9">
+  <animate attributeName="opacity" values=".6;1;.6" dur="${1.5+n[14]}s" repeatCount="indefinite"/>
+  <animate attributeName="r" values="${5+n[13]*4};${7+n[13]*5};${5+n[13]*4}" dur="${1.5+n[14]}s" repeatCount="indefinite"/>
+</circle>
+<circle cx="${cx - iris*0.3 + 4}" cy="${cy - iris*0.35 + 3}" r="${2+n[15]*2}" fill="white" opacity=".6"/>
+
+<!-- Sparkle star on glint -->
+<g>
+  <animateTransform attributeName="transform" type="rotate" values="0 ${cx-iris*0.3} ${cy-iris*0.35};360 ${cx-iris*0.3} ${cy-iris*0.35}" dur="${2+n[16]}s" repeatCount="indefinite"/>
+  <line x1="${cx-iris*0.3-8}" y1="${cy-iris*0.35}" x2="${cx-iris*0.3+8}" y2="${cy-iris*0.35}" stroke="${sc}" stroke-width="1.5" stroke-linecap="round" opacity=".8"/>
+  <line x1="${cx-iris*0.3}" y1="${cy-iris*0.35-8}" x2="${cx-iris*0.3}" y2="${cy-iris*0.35+8}" stroke="${sc}" stroke-width="1.5" stroke-linecap="round" opacity=".8"/>
+  <line x1="${cx-iris*0.3-5}" y1="${cy-iris*0.35-5}" x2="${cx-iris*0.3+5}" y2="${cy-iris*0.35+5}" stroke="${sc}" stroke-width="1" stroke-linecap="round" opacity=".6"/>
+  <line x1="${cx-iris*0.3+5}" y1="${cy-iris*0.35-5}" x2="${cx-iris*0.3-5}" y2="${cy-iris*0.35+5}" stroke="${sc}" stroke-width="1" stroke-linecap="round" opacity=".6"/>
+</g>
+
+<!-- Eyelashes top -->
+${[0,1,2,3,4].map(i => {
+  const lx = cx - ew*0.7 + i*(ew*0.35);
+  const angle = -70 + i*15;
+  const llen = 14 + n[i+17]*8;
+  const rad = angle * Math.PI / 180;
+  return `<line x1="${lx}" y1="${cy-eh}" x2="${lx+Math.round(Math.cos(rad)*llen)}" y2="${cy-eh+Math.round(Math.sin(rad)*llen)}" stroke="${this.hsl(n[6]*30,10,18)}" stroke-width="2" stroke-linecap="round"/>`;
+}).join('')}`, bg);
+  }
+
 }
