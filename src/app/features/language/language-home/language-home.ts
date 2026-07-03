@@ -68,14 +68,28 @@ export class LanguageHome implements OnInit {
   }
 
   private generateIllustrations(word: DictWord): void {
+    // Pre-generate all image URLs synchronously — no API calls needed
+    // Pollinations.ai URLs are used directly as <img src>, browser fetches lazily
     const meaning = word.senses?.[0]?.bangla_meanings?.[0]?.meaning ?? word.senses?.[0]?.short_definition ?? '';
     word.senses.forEach((sense) => {
       sense.examples.forEach((ex) => {
-        this.illustrationService.generateForSentence(
-          ex.sentence, word.text, meaning, `ex-${ex.id}`
-        );
+        this.illustrationService.generate(ex.sentence, word.text, meaning, `ex-${ex.id}`);
       });
     });
+  }
+
+  getImageUrl(exId: number, sentence: string, word: string, meaning: string): string {
+    return this.illustrationService.generate(sentence, word, meaning, `ex-${exId}`);
+  }
+
+  onImageLoad(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    img.closest('.illus-placeholder')?.classList.add('loaded');
+  }
+
+  onImageError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    img.closest('.illus-placeholder')?.classList.add('errored');
   }
 
   safeSvg(svg: string): SafeHtml {
