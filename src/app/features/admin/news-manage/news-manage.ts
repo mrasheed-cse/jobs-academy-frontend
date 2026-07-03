@@ -52,13 +52,27 @@ export class NewsManage implements OnInit, OnDestroy {
 
   private ensureQuillLoaded(): void {
     if ((window as any).Quill) return;
+
+    // CSS must load before JS for Snow theme icons to render
     const link = document.createElement('link');
     link.rel = 'stylesheet';
     link.href = 'https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.min.css';
     document.head.appendChild(link);
-    const script = document.createElement('script');
-    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js';
-    document.head.appendChild(script);
+
+    // Wait for CSS then load JS
+    link.onload = () => {
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js';
+      document.head.appendChild(script);
+    };
+
+    // Fallback if onload doesn't fire (already cached)
+    setTimeout(() => {
+      if ((window as any).Quill) return;
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js';
+      document.head.appendChild(script);
+    }, 500);
   }
 
   private initEditor(content = ''): void {
@@ -67,32 +81,52 @@ export class NewsManage implements OnInit, OnDestroy {
         setTimeout(waitForQuill, 100);
         return;
       }
-      const el = this.editorContainer.nativeElement;
-      el.innerHTML = '';
-      const container = document.createElement('div');
-      el.appendChild(container);
+      // Small extra delay ensures Quill's internal modules are fully registered
+      setTimeout(() => {
+        if (!this.editorContainer) return;
+        const el = this.editorContainer.nativeElement;
+        el.innerHTML = '';
+        const container = document.createElement('div');
+        el.appendChild(container);
 
-      this.quill = new (window as any).Quill(container, {
-        theme: 'snow',
-        placeholder: 'সংবাদের বিস্তারিত বিষয়বস্তু লিখুন...',
-        modules: {
-          toolbar: {
-            container: [
-              [{ header: [1, 2, 3, false] }],
-              ['bold', 'italic', 'underline'],
-              [{ list: 'ordered' }, { list: 'bullet' }],
-              ['blockquote', 'link', 'image'],
-              [{ align: [] }],
-              ['clean'],
-            ],
-            handlers: {
-              image: () => this.handleImageInsert(),
+        const Q = (window as any).Quill;
+
+        // Ensure image icon is registered (sometimes missing in CDN builds)
+        const icons = Q.import('ui/icons');
+        if (!icons['image']) {
+          icons['image'] = `<svg viewbox="0 0 18 18"><rect class="ql-stroke" height="10" width="12" x="3" y="4"/><circle class="ql-fill" cx="6" cy="7" r="1"/><polyline class="ql-even ql-fill" points="5 12 5 11 7 9 8 10 11 7 13 12 5 12"/></svg>`;
+        }
+
+        this.quill = new Q(container, {
+          theme: 'snow',
+          placeholder: 'সংবাদের বিস্তারিত বিষয়বস্তু লিখুন...',
+          modules: {
+            toolbar: {
+              container: [
+                [{ header: [1, 2, 3, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ color: [] }, { background: [] }],
+                [{ list: 'ordered' }, { list: 'bullet' }],
+                ['blockquote', 'link'],
+                [{ align: [] }],
+                ['image'],
+                ['clean'],
+              ],
+              handlers: {
+                image: () => this.handleImageInsert(),
+              },
             },
           },
-        },
-      });
+        });
 
-      if (content) this.quill.root.innerHTML = content;
+        // Bind the image button click manually as a fallback
+        const toolbar = this.quill.getModule('toolbar');
+        if (toolbar) {
+          toolbar.addHandler('image', () => this.handleImageInsert());
+        }
+
+        if (content) this.quill.root.innerHTML = content;
+      }, 50);
     };
     waitForQuill();
   }
@@ -168,6 +202,31 @@ export class NewsManage implements OnInit, OnDestroy {
     const files = Array.from((event.target as HTMLInputElement).files ?? []);
     this.uploadedImages.set(files);
     this.imagePreviewUrls.set(files.map((f) => URL.createObjectURL(f)));
+  }
+
+  // Sidebar fallback: pick image → upload → insert at current cursor position
+  onInlineImageSelected(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    // Reset the input so the same file can be selected again
+    (event.target as HTMLInputElement).value = '';
+    this.isUploadingImage.set(true);
+    const fd = new FormData();
+    fd.append('image', file);
+    this.http.post<{ url: string }>(`${this.baseUrl}/api/news/upload-image/`, fd).subscribe({
+      next: (res) => {
+        this.isUploadingImage.set(false);
+        if (!this.quill) { this.errorMsg.set('এডিটর লোড হয়নি।'); return; }
+        const range = this.quill.getSelection(true) ?? { index: this.quill.getLength() - 1 };
+        this.quill.insertEmbed(range.index, 'image', res.url);
+        this.quill.insertText(range.index + 1, '\n');
+        this.quill.setSelection(range.index + 2);
+      },
+      error: () => {
+        this.isUploadingImage.set(false);
+        this.errorMsg.set('ছবি আপলোড ব্যর্থ হয়েছে।');
+      },
+    });
   }
 
   removeCoverImage(index: number): void {
