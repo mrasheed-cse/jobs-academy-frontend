@@ -61,19 +61,10 @@ export class LanguageHome implements OnInit {
     this.contentService.getWordDetail(id).subscribe({ next: (w) => this.selectedWord.set(w) });
   }
 
-  getImageUrl(exId: number, sentence: string, word: string, meaning: string): string {
-    return this.illustrationService.getUrl(sentence, word, meaning, `ex-${exId}`);
+  getIllustrationSvg(sentence: string, word: string, meaning: string, exId: number): string {
+    return this.illustrationService.getSvg(sentence, word, meaning, `ex-${exId}`);
   }
 
-  onImageLoad(event: Event): void {
-    const img = event.target as HTMLImageElement;
-    img.closest('.illus-placeholder')?.classList.add('loaded');
-  }
-
-  onImageError(event: Event): void {
-    const img = event.target as HTMLImageElement;
-    img.closest('.illus-placeholder')?.classList.add('errored');
-  }
 
   safeSvg(svg: string): SafeHtml {
     return this.sanitizer.bypassSecurityTrustHtml(svg);
