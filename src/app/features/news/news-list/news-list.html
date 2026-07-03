@@ -1,32 +1,76 @@
-<div class="container py-5">
-  <h2 class="fw-bold mb-4">সর্বশেষ সংবাদ</h2>
-  @if (isLoading() && news().length === 0) {
-    <div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>
-  } @else if (news().length === 0) {
-    <p class="text-muted text-center py-5">কোনো সংবাদ পাওয়া যায়নি।</p>
-  } @else {
-    <div class="row">
-      @for (item of news(); track item.id) {
-        <div class="col-12 col-md-6 col-lg-4 mb-4">
-          <div class="news-card" (click)="openArticle(item.id)" role="button">
-            @if (item.images.length) {
-              <img [src]="item.images[0].image_url" [alt]="item.title" class="news-thumb">
-            }
-            <div class="p-3">
-              <h6 class="fw-bold mb-2">{{ item.title }}</h6>
-              <p class="text-muted small mb-2">{{ item.content | slice:0:100 }}…</p>
-              <small class="text-muted">{{ item.published_date | date:'mediumDate' }}</small>
+<div class="news-page">
+  <div class="container py-5">
+    <div class="page-header mb-5">
+      <h1 class="page-title">সর্বশেষ সংবাদ</h1>
+      <div class="title-line"></div>
+    </div>
+
+    @if (isLoading() && news().length === 0) {
+      <div class="text-center py-5">
+        <div class="spinner-border text-primary" role="status" style="width:3rem;height:3rem"></div>
+      </div>
+    } @else if (news().length === 0) {
+      <div class="text-center py-5 text-muted">
+        <i class="fas fa-newspaper fa-3x mb-3 d-block opacity-25"></i>
+        <p>কোনো সংবাদ পাওয়া যায়নি।</p>
+      </div>
+    } @else {
+      <!-- Featured first article -->
+      @if (news()[0]) {
+        @let featured = news()[0];
+        <div class="featured-card mb-5" (click)="openArticle(featured.id)" role="button">
+          @if (featured.images.length) {
+            <div class="featured-img-wrap">
+              <img [src]="featured.images[0].image_url" [alt]="featured.title" class="featured-img">
+            </div>
+          }
+          <div class="featured-body">
+            <div class="featured-category">সর্বশেষ</div>
+            <h2 class="featured-title">{{ featured.title }}</h2>
+            <p class="featured-excerpt">{{ featured.content | stripHtml | slice:0:200 }}…</p>
+            <div class="featured-meta">
+              <i class="fas fa-calendar-alt me-1"></i>
+              {{ featured.published_date | date:'MMMM d, y' }}
             </div>
           </div>
         </div>
       }
-    </div>
-    @if (hasMore()) {
-      <div class="text-center mt-3">
-        <button type="button" class="btn btn-outline-primary" (click)="loadMore()" [disabled]="isLoading()">
-          {{ isLoading() ? 'লোড হচ্ছে…' : 'আরও দেখুন' }}
-        </button>
+
+      <!-- Rest of the articles -->
+      <div class="row g-4">
+        @for (item of news().slice(1); track item.id) {
+          <div class="col-md-6 col-lg-4">
+            <div class="news-card" (click)="openArticle(item.id)" role="button">
+              <div class="news-card-img-wrap">
+                @if (item.images.length) {
+                  <img [src]="item.images[0].image_url" [alt]="item.title" class="news-card-img">
+                } @else {
+                  <div class="news-card-img-placeholder">
+                    <i class="fas fa-newspaper"></i>
+                  </div>
+                }
+              </div>
+              <div class="news-card-body">
+                <h5 class="news-card-title">{{ item.title }}</h5>
+                <p class="news-card-excerpt">{{ item.content | stripHtml | slice:0:120 }}…</p>
+                <div class="news-card-meta">
+                  <i class="fas fa-calendar-alt me-1"></i>
+                  {{ item.published_date | date:'mediumDate' }}
+                </div>
+              </div>
+            </div>
+          </div>
+        }
       </div>
+
+      @if (hasMore()) {
+        <div class="text-center mt-5">
+          <button type="button" class="btn-load-more" (click)="loadMore()" [disabled]="isLoading()">
+            @if (isLoading()) { <i class="fas fa-spinner fa-spin me-2"></i>লোড হচ্ছে… }
+            @else { <i class="fas fa-arrow-down me-2"></i>আরও সংবাদ দেখুন }
+          </button>
+        </div>
+      }
     }
-  }
+  </div>
 </div>

@@ -1,70 +1,77 @@
 <div class="article-page">
   <div class="container py-4">
-    <a routerLink="/news" class="back-link mb-4 d-inline-flex align-items-center gap-2">
+    <a routerLink="/news" class="back-link mb-4">
       <i class="fas fa-arrow-left"></i> সংবাদ তালিকা
     </a>
 
     @if (isLoading()) {
-      <div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>
+      <div class="text-center py-5">
+        <div class="spinner-border text-primary" role="status" style="width:3rem;height:3rem"></div>
+      </div>
     } @else if (!article()) {
-      <p class="text-danger text-center">সংবাদ পাওয়া যায়নি।</p>
+      <p class="text-danger text-center mt-4">সংবাদ পাওয়া যায়নি।</p>
     } @else {
       @let a = article()!;
-      <div class="row">
-        <!-- Main article -->
+      <div class="row g-4">
+
+        <!-- Main article column -->
         <div class="col-lg-8">
           <article class="article-card">
-            <!-- Category tag -->
-            @if (a.category) {
-              <div class="article-category mb-3">সংবাদ</div>
-            }
 
-            <!-- Headline -->
-            <h1 class="article-headline">{{ a.title }}</h1>
-
-            <!-- Meta -->
-            <div class="article-meta d-flex align-items-center gap-3 flex-wrap mb-4">
-              <span class="meta-item"><i class="fas fa-calendar-alt me-1"></i>{{ a.published_date | date:'MMMM d, y' }}</span>
-              @if (a.author) { <span class="meta-divider">•</span> }
+            <!-- Header: category + headline + meta -->
+            <div class="article-header">
+              <div class="article-category-tag">সংবাদ</div>
+              <h1 class="article-headline">{{ a.title }}</h1>
+              <div class="article-meta-bar">
+                <span class="meta-date">
+                  <i class="fas fa-calendar-alt"></i>
+                  {{ a.published_date | date:'MMMM d, y' }}
+                </span>
+              </div>
             </div>
 
-            <hr class="article-divider">
-
-            <!-- Featured image (first image) -->
+            <!-- Featured image -->
             @if (a.images.length) {
-              <figure class="featured-image">
-                <img [src]="a.images[0].image_url" [alt]="a.title" class="featured-img">
-              </figure>
+              <div class="featured-image-wrap">
+                <img [src]="a.images[0].image_url" [alt]="a.title" class="featured-image">
+              </div>
             }
 
-            <!-- Article body — renders HTML from rich text editor -->
-            <div class="article-body" [innerHTML]="a.content"></div>
+            <!-- Article body: HTML from Quill editor, rendered with full typography -->
+            <div class="article-body-wrap">
+              <div class="article-body" [innerHTML]="a.content"></div>
+            </div>
 
-            <!-- Remaining images in a gallery at the bottom -->
+            <!-- Additional images gallery -->
             @if (a.images.length > 1) {
-              <div class="image-gallery mt-4">
-                <h6 class="gallery-title">আরও ছবি</h6>
+              <div class="gallery-section">
+                <div class="gallery-heading">আরও ছবি</div>
                 <div class="gallery-grid">
                   @for (img of a.images.slice(1); track img.id) {
-                    <figure class="gallery-item">
-                      <img [src]="img.image_url" [alt]="a.title" class="gallery-img">
-                    </figure>
+                    <img [src]="img.image_url" [alt]="a.title" class="gallery-img">
                   }
                 </div>
               </div>
             }
 
-            <!-- Share row -->
-            <div class="share-row mt-5 pt-4 border-top d-flex align-items-center gap-3 flex-wrap">
-              <span class="fw-semibold text-muted small">শেয়ার করুন:</span>
-              <a [href]="'https://www.facebook.com/sharer/sharer.php?u=' + currentUrl()" target="_blank" class="share-btn facebook">
+            <!-- Share bar -->
+            <div class="share-bar">
+              <span class="share-label">শেয়ার করুন</span>
+              <a [href]="'https://www.facebook.com/sharer/sharer.php?u=' + currentUrl()"
+                target="_blank" rel="noopener" class="share-btn fb" title="Facebook">
                 <i class="fab fa-facebook-f"></i>
               </a>
-              <a [href]="'https://twitter.com/intent/tweet?url=' + currentUrl() + '&text=' + a.title" target="_blank" class="share-btn twitter">
+              <a [href]="'https://twitter.com/intent/tweet?url=' + currentUrl() + '&text=' + a.title"
+                target="_blank" rel="noopener" class="share-btn tw" title="Twitter">
                 <i class="fab fa-twitter"></i>
               </a>
-              <a [href]="'https://wa.me/?text=' + a.title + ' ' + currentUrl()" target="_blank" class="share-btn whatsapp">
+              <a [href]="'https://wa.me/?text=' + a.title + ' ' + currentUrl()"
+                target="_blank" rel="noopener" class="share-btn wa" title="WhatsApp">
                 <i class="fab fa-whatsapp"></i>
+              </a>
+              <a [href]="'https://www.linkedin.com/sharing/share-offsite/?url=' + currentUrl()"
+                target="_blank" rel="noopener" class="share-btn li" title="LinkedIn">
+                <i class="fab fa-linkedin-in"></i>
               </a>
             </div>
           </article>
@@ -74,8 +81,8 @@
         <div class="col-lg-4">
           <div class="sidebar-sticky">
             @if (related().length) {
-              <div class="related-card p-3 mb-4">
-                <h5 class="related-title">সম্পর্কিত সংবাদ</h5>
+              <div class="related-box">
+                <div class="related-heading">সম্পর্কিত সংবাদ</div>
                 @for (item of related(); track item.id) {
                   <a [routerLink]="['/news', 'details', item.id]" class="related-item">
                     @if (item.images.length) {
@@ -83,9 +90,9 @@
                     } @else {
                       <div class="related-thumb-placeholder"><i class="fas fa-newspaper"></i></div>
                     }
-                    <div class="related-text">
-                      <p class="related-headline">{{ item.title }}</p>
-                      <small class="text-muted">{{ item.published_date | date:'mediumDate' }}</small>
+                    <div class="related-info">
+                      <p class="related-title">{{ item.title }}</p>
+                      <span class="related-date">{{ item.published_date | date:'mediumDate' }}</span>
                     </div>
                   </a>
                 }
@@ -93,6 +100,7 @@
             }
           </div>
         </div>
+
       </div>
     }
   </div>

@@ -3,8 +3,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { SlicePipe, DatePipe } from '@angular/common';
 import { NewsService } from '../../../core/services/news.service';
 import { NewsItem } from '../../../core/models/content.model';
+import { StripHtmlPipe } from '../../../core/pipes/strip-html.pipe';
 
-@Component({ selector: 'app-news-list', imports: [SlicePipe, DatePipe], templateUrl: './news-list.html', styleUrl: './news-list.scss' })
+@Component({ selector: 'app-news-list', imports: [SlicePipe, DatePipe, StripHtmlPipe], templateUrl: './news-list.html', styleUrl: './news-list.scss' })
 export class NewsList implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly newsService = inject(NewsService);

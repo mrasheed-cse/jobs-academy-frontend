@@ -3,10 +3,11 @@ import { RouterLink } from '@angular/router';
 import { SlicePipe } from '@angular/common';
 import { NewsService } from '../../core/services/news.service';
 import { NewsItem } from '../../core/models/content.model';
+import { StripHtmlPipe } from '../../core/pipes/strip-html.pipe';
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, SlicePipe],
+  imports: [RouterLink, SlicePipe, StripHtmlPipe],
   templateUrl: './home.html',
   styleUrl: './home.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

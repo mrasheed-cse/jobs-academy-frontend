@@ -59,7 +59,7 @@
                     }
                     <div [class]="item.images.length ? 'col-md-7' : 'col-12 text-center'">
                       <h4 class="fw-bold mb-3">{{ item.title }}</h4>
-                      <p class="text-secondary">{{ item.content | slice:0:200 }}{{ item.content.length > 200 ? '…' : '' }}</p>
+                      <p class="text-secondary">{{ item.content | stripHtml | slice:0:200 }}{{ (item.content | stripHtml).length > 200 ? '…' : '' }}</p>
                       <a [routerLink]="['/news', item.id]" class="btn-custom">আরও পড়ুন <i class="fas fa-arrow-right"></i></a>
                     </div>
                   </div>
