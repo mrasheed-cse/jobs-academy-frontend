@@ -51,11 +51,11 @@
 
 .featured-title {
   font-size: 1.6rem;
-  font-weight: 800;
-  line-height: 1.3;
+  font-weight: 700;
+  line-height: 1.35;
   color: #1a1a2e;
   margin-bottom: 1rem;
-  font-family: Georgia, serif;
+  font-family: 'Hind Siliguri', 'Noto Sans Bengali', sans-serif;
 }
 
 .featured-excerpt {
@@ -103,10 +103,11 @@
 .news-card-title {
   font-size: 1rem;
   font-weight: 700;
-  line-height: 1.45;
+  line-height: 1.5;
   color: #1a1a2e;
   margin-bottom: .6rem;
   transition: color .2s;
+  font-family: 'Noto Sans Bengali', 'Hind Siliguri', sans-serif;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;

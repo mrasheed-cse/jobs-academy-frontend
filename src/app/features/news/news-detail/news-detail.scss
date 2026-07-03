@@ -1,5 +1,9 @@
 /* ─── Page shell ─── */
-.article-page { background: #f4f5f7; min-height: 100vh; padding-bottom: 4rem; }
+.article-page {
+  background: #f0f2f5;
+  min-height: 100vh;
+  padding-bottom: 4rem;
+}
 
 .back-link {
   display: inline-flex; align-items: center; gap: 8px;
@@ -11,208 +15,219 @@
 /* ─── Article card ─── */
 .article-card {
   background: #fff;
-  border-radius: 0;
-  padding: 0;
-  box-shadow: 0 2px 24px rgba(0,0,0,.07);
-
-  @media (min-width: 768px) { border-radius: 4px; }
+  box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 4px 24px rgba(0,0,0,.04);
+  border-radius: 8px;
+  overflow: hidden;
 }
 
-/* ─── Category & headline section ─── */
-.article-header { padding: 2rem 2rem 1.5rem; border-bottom: 1px solid #f0f0f0; }
+/* ─── Header ─── */
+.article-header {
+  padding: 2rem 2.5rem 1.75rem;
+}
 
 .article-category-tag {
   display: inline-block;
-  background: #1a1a2e;
+  background: var(--primary);
   color: #fff;
   font-size: .68rem;
-  font-weight: 800;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: .12em;
   padding: 4px 14px;
   border-radius: 3px;
   margin-bottom: 1.25rem;
+  font-family: 'Inter', sans-serif;
 }
 
 .article-headline {
-  font-family: 'Georgia', 'Times New Roman', serif;
-  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  /* Hind Siliguri for Bengali headlines — clean, modern, highly legible */
+  font-family: 'Hind Siliguri', 'Noto Sans Bengali', sans-serif;
+  font-size: clamp(1.5rem, 3.5vw, 2rem);
   font-weight: 700;
-  line-height: 1.22;
+  line-height: 1.35;
   color: #0f172a;
   margin: 0 0 1.25rem;
-  letter-spacing: -.01em;
+  letter-spacing: 0;
 }
 
 .article-meta-bar {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-  font-size: .82rem;
-  color: #64748b;
-  padding-top: .5rem;
-  border-top: 2px solid #f0f0f0;
+  display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+  font-size: .82rem; color: #94a3b8;
+  padding-top: 1rem;
+  border-top: 1px solid #f1f5f9;
+  font-family: 'Inter', sans-serif;
 }
 
-.meta-date { display: flex; align-items: center; gap: 5px; font-weight: 600; }
-.meta-divider { color: #cbd5e1; font-size: 1rem; }
+.meta-date { display: flex; align-items: center; gap: 6px; font-weight: 600; }
 
 /* ─── Featured image ─── */
 .featured-image-wrap {
   width: 100%;
-  max-height: 520px;
+  max-height: 500px;
   overflow: hidden;
+  background: #f8fafc;
 }
 
 .featured-image {
   width: 100%;
-  max-height: 520px;
+  max-height: 500px;
   object-fit: cover;
   display: block;
+  transition: transform .4s;
 }
 
 /* ─── Article body ─── */
-.article-body-wrap { padding: 2rem 2rem; }
+.article-body-wrap {
+  padding: 2.25rem 2.5rem 1.5rem;
+}
 
 .article-body {
-  font-family: 'Georgia', 'Times New Roman', serif;
-  font-size: 1.1rem;
-  line-height: 2;
+  /*
+   * Noto Sans Bengali is specifically designed for Bengali script —
+   * proper glyph shapes, correct matra positioning, optimized spacing.
+   * Much better than Georgia (designed for Latin) rendering Bengali
+   * as a fallback system font.
+   *
+   * Font stack priority:
+   * 1. Noto Sans Bengali — best Bengali rendering
+   * 2. Hind Siliguri — good fallback, already loaded
+   * 3. system-ui — OS Bengali font as last resort
+   */
+  font-family: 'Noto Sans Bengali', 'Hind Siliguri', system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.95;
   color: #1e293b;
-  max-width: 720px;
+  max-width: 780px;
+
+  /* First paragraph intro style */
+  & > p:first-child {
+    font-size: 1.08rem;
+    color: #334155;
+    line-height: 2;
+    font-weight: 500;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid #f1f5f9;
+    margin-bottom: 1.5rem;
+  }
 
   p {
-    margin-bottom: 1.5rem;
-    &:first-child::first-letter {
-      float: left;
-      font-size: 3.5rem;
-      line-height: .8;
-      margin: .05em .12em 0 0;
-      font-weight: 700;
-      color: var(--primary);
-    }
+    margin-bottom: 1.35rem;
+    text-align: justify;
+    word-spacing: 0.02em;
   }
 
   h1 {
-    font-size: 1.75rem;
-    font-weight: 800;
-    margin: 2.5rem 0 1rem;
+    font-family: 'Hind Siliguri', 'Noto Sans Bengali', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
     color: #0f172a;
-    font-family: Georgia, serif;
-    clear: both;
+    margin: 2rem 0 .85rem;
+    line-height: 1.4;
   }
 
   h2 {
-    font-size: 1.4rem;
+    font-family: 'Hind Siliguri', 'Noto Sans Bengali', sans-serif;
+    font-size: 1.25rem;
     font-weight: 700;
-    margin: 2rem 0 .75rem;
     color: #0f172a;
+    margin: 1.75rem 0 .75rem;
     padding-bottom: .5rem;
     border-bottom: 2px solid #e2e8f0;
-    clear: both;
+    line-height: 1.4;
   }
 
   h3 {
-    font-size: 1.15rem;
+    font-family: 'Hind Siliguri', 'Noto Sans Bengali', sans-serif;
+    font-size: 1.1rem;
     font-weight: 700;
-    margin: 1.5rem 0 .5rem;
     color: #1e293b;
-    clear: both;
+    margin: 1.5rem 0 .5rem;
+    line-height: 1.4;
   }
 
-  strong { color: #0f172a; font-weight: 700; }
+  strong {
+    font-weight: 700;
+    color: #0f172a;
+  }
+
   em { font-style: italic; color: #475569; }
 
   a {
     color: var(--primary);
     text-decoration: underline;
     text-underline-offset: 3px;
+    font-weight: 500;
     &:hover { color: #4338ca; }
   }
 
   ul, ol {
-    padding-left: 1.75rem;
-    margin-bottom: 1.5rem;
+    padding-left: 1.5rem;
+    margin-bottom: 1.35rem;
     li {
-      margin-bottom: .6rem;
-      line-height: 1.8;
+      margin-bottom: .55rem;
+      line-height: 1.9;
     }
   }
 
   blockquote {
-    margin: 2rem 0;
-    padding: 1.25rem 1.5rem 1.25rem 1.75rem;
-    border-left: 5px solid var(--primary);
-    background: #f8fafc;
+    margin: 1.75rem 0;
+    padding: 1.25rem 1.5rem;
+    border-left: 4px solid var(--primary);
+    background: linear-gradient(135deg, #f8faff, #f0f4ff);
     border-radius: 0 8px 8px 0;
-    font-style: italic;
     font-size: 1.05rem;
-    color: #475569;
-    line-height: 1.8;
-
-    &::before {
-      content: '"';
-      font-size: 3rem;
-      color: var(--primary);
-      opacity: .3;
-      line-height: 0;
-      vertical-align: -.4em;
-      margin-right: .1em;
-    }
+    font-weight: 500;
+    color: #334155;
+    line-height: 1.9;
+    font-style: normal;
   }
 
   img {
     max-width: 100%;
     height: auto;
     border-radius: 10px;
-    margin: 2rem auto;
+    margin: 1.75rem auto;
     display: block;
-    box-shadow: 0 8px 32px rgba(0,0,0,.12);
-    clear: both;
+    box-shadow: 0 4px 20px rgba(0,0,0,.1);
   }
 
   hr {
     border: none;
-    border-top: 2px solid #e2e8f0;
-    margin: 2.5rem 0;
+    border-top: 1px solid #e2e8f0;
+    margin: 2rem 0;
   }
+
+  /* Inline colored text from Quill color picker */
+  span[style*="color"] { }
 }
 
-/* ─── Image gallery ─── */
-.gallery-section { padding: 0 2rem 2rem; }
+/* ─── Gallery ─── */
+.gallery-section { padding: 0 2.5rem 2rem; }
 .gallery-heading {
-  font-size: .75rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: .1em;
-  color: #94a3b8;
-  margin-bottom: 1rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid #f0f0f0;
+  font-size: .72rem; font-weight: 800; text-transform: uppercase;
+  letter-spacing: .1em; color: #94a3b8; margin-bottom: 1rem;
+  padding-top: 1.5rem; border-top: 1px solid #f1f5f9;
+  font-family: 'Inter', sans-serif;
 }
-.gallery-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 10px;
-}
+.gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
 .gallery-img {
   width: 100%; height: 140px; object-fit: cover; border-radius: 8px;
-  transition: transform .2s, box-shadow .2s;
-  cursor: pointer;
+  transition: transform .2s, box-shadow .2s; cursor: pointer;
   &:hover { transform: scale(1.03); box-shadow: 0 6px 20px rgba(0,0,0,.14); }
 }
 
 /* ─── Share bar ─── */
 .share-bar {
-  padding: 1.25rem 2rem;
-  border-top: 1px solid #f0f0f0;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
+  padding: 1.25rem 2.5rem;
+  border-top: 1px solid #f1f5f9;
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
 }
-.share-label { font-size: .8rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .06em; }
+.share-label {
+  font-size: .75rem; font-weight: 700; color: #94a3b8;
+  text-transform: uppercase; letter-spacing: .08em;
+  font-family: 'Inter', sans-serif;
+}
 .share-btn {
   width: 36px; height: 36px; border-radius: 50%;
   display: inline-flex; align-items: center; justify-content: center;
@@ -225,55 +240,50 @@
   &.li { background: #0a66c2; }
 }
 
-/* ─── Sidebar ─── */
+/* ─── Related sidebar ─── */
 .sidebar-sticky { position: sticky; top: 80px; }
 
 .related-box {
   background: #fff;
-  border-radius: 4px;
-  box-shadow: 0 2px 16px rgba(0,0,0,.06);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.04);
   overflow: hidden;
 }
 
 .related-heading {
-  font-size: .72rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: .1em;
-  color: #fff;
-  background: #1a1a2e;
-  padding: 10px 16px;
+  font-size: .72rem; font-weight: 800; text-transform: uppercase;
+  letter-spacing: .1em; color: #fff; background: #0f172a;
+  padding: 12px 16px; font-family: 'Inter', sans-serif;
 }
 
 .related-item {
-  display: flex;
-  gap: 12px;
-  padding: 12px 16px;
-  text-decoration: none;
-  border-bottom: 1px solid #f8f8f8;
-  transition: background .15s;
-  align-items: flex-start;
-
+  display: flex; gap: 12px; padding: 12px 16px; text-decoration: none;
+  border-bottom: 1px solid #f8f8f8; transition: background .15s; align-items: flex-start;
   &:last-child { border-bottom: none; }
   &:hover { background: #f8fafc; }
   &:hover .related-title { color: var(--primary); }
 }
 
-.related-thumb { width: 70px; height: 56px; object-fit: cover; border-radius: 6px; flex-shrink: 0; }
+.related-thumb { width: 72px; height: 58px; object-fit: cover; border-radius: 6px; flex-shrink: 0; }
 .related-thumb-placeholder {
-  width: 70px; height: 56px;
-  background: #f1f5f9; border-radius: 6px;
-  display: flex; align-items: center; justify-content: center;
-  color: #cbd5e1; font-size: 1.25rem; flex-shrink: 0;
+  width: 72px; height: 58px; background: #f1f5f9; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center; color: #cbd5e1; font-size: 1.25rem; flex-shrink: 0;
 }
 .related-info { flex: 1; min-width: 0; }
 .related-title {
-  font-size: .83rem; font-weight: 700; color: #1e293b;
-  line-height: 1.4; margin: 0 0 4px;
-  transition: color .15s;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  font-family: 'Noto Sans Bengali', 'Hind Siliguri', sans-serif;
+  font-size: .85rem; font-weight: 600; color: #1e293b;
+  line-height: 1.5; margin: 0 0 4px; transition: color .15s;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
 }
-.related-date { font-size: .72rem; color: #94a3b8; }
+.related-date { font-size: .72rem; color: #94a3b8; font-family: 'Inter', sans-serif; }
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .article-header { padding: 1.5rem 1.25rem 1.25rem; }
+  .article-body-wrap { padding: 1.5rem 1.25rem; }
+  .gallery-section { padding: 0 1.25rem 1.5rem; }
+  .share-bar { padding: 1rem 1.25rem; }
+  .article-headline { font-size: 1.4rem; }
+  .article-body { font-size: .95rem; }
+}
