@@ -39,128 +39,162 @@ export class IllustrationService {
   }
 
   private detectScene(sentence: string, word: string): string {
-    // Search both the full sentence and the defined word itself
+    const w = word.toLowerCase().trim();
     const s = (sentence + ' ' + word).toLowerCase();
 
-    // Word-level exact match first (highest priority — the word being defined IS the topic)
-    const wordMap: Record<string, string> = {
-      // Light / sparkle / glint family
-      glint:'sparkle', sparkle:'sparkle', shimmer:'sparkle', glimmer:'sparkle',
-      gleam:'sparkle', twinkle:'sparkle', flicker:'sparkle', flash:'sparkle',
-      glitter:'sparkle', glow:'sparkle', luminous:'sparkle', radiant:'sparkle',
-      dazzle:'sparkle', blaze:'sparkle', beam:'sparkle', ray:'sparkle',
-      // Eye / face / emotion
-      eye:'eye', eyes:'eye', gaze:'eye', stare:'eye', glance:'eye', blink:'eye',
-      wink:'eye', sight:'eye', vision:'eye', look:'eye', peer:'eye', squint:'eye',
-      smile:'love', laugh:'love', cry:'love', weep:'love', tears:'love',
-      // Mountain / achievement
-      apex:'mountain', peak:'mountain', summit:'mountain', climb:'mountain',
-      ascend:'mountain', pinnacle:'mountain', zenith:'mountain', acme:'mountain',
-      achieve:'mountain', triumph:'mountain', victory:'mountain', excel:'mountain',
-      // Reading / study
-      read:'reading', book:'reading', study:'reading', learn:'reading',
-      knowledge:'reading', scholar:'reading', educate:'reading', library:'reading',
-      chapter:'reading', page:'reading', author:'reading', write:'work',
-      // Growth / nature
-      grow:'growth', bloom:'growth', flourish:'growth', thrive:'growth',
-      blossom:'growth', sprout:'growth', plant:'growth', seed:'growth',
-      // Running / sport
-      run:'running', sprint:'running', race:'running', dash:'running',
-      jog:'running', gallop:'running', hustle:'running', swift:'running',
-      // Sky / flight
-      fly:'sky', soar:'sky', glide:'sky', bird:'sky', wing:'sky',
-      flutter:'sky', hover:'sky', drift:'sky',
-      // Water
-      flow:'ocean', stream:'ocean', pour:'ocean', gush:'ocean', surge:'ocean',
-      flood:'ocean', drown:'ocean', ripple:'ocean', splash:'ocean',
-      // Love / connection
-      love:'love', adore:'love', cherish:'love', embrace:'love',
-      affection:'love', compassion:'love', warmth:'love', tender:'love',
-      // Night
-      night:'night', dark:'night', shadow:'night', dusk:'night',
-      gloom:'night', obscure:'night', dim:'night', murky:'night',
-      // Thinking
-      think:'thinking', ponder:'thinking', contemplate:'thinking', reflect:'thinking',
-      wonder:'thinking', imagine:'thinking', conceive:'thinking', deliberate:'thinking',
-      // Music
-      music:'music', melody:'music', rhythm:'music', harmony:'music',
-      sing:'music', hum:'music', tune:'music', chord:'music',
-      // Food
-      eat:'food', taste:'food', flavor:'food', savor:'food',
-      devour:'food', feast:'food', hunger:'food', appetite:'food',
-      // Journey / travel
-      travel:'journey', journey:'journey', wander:'journey', roam:'journey',
-      voyage:'journey', trek:'journey', expedition:'journey', migrate:'journey',
-      // Money
-      money:'money', wealth:'money', rich:'money', profit:'money',
-      prosper:'money', affluent:'money', luxurious:'money', opulent:'money',
-      // Conflict
-      anger:'conflict', rage:'conflict', fury:'conflict', wrath:'conflict',
-      hostile:'conflict', aggressive:'conflict', belligerent:'conflict',
-      // Peace
-      calm:'peace', serene:'peace', tranquil:'peace', peaceful:'peace',
-      placid:'peace', gentle:'peace', soothe:'peace', compose:'peace',
-      // Change
-      change:'transformation', transform:'transformation', evolve:'transformation',
-      adapt:'transformation', alter:'transformation', shift:'transformation',
+    // ── SCENE LOOKUP TABLE ──────────────────────────────────────────────────────
+    // Maps every word stem/synonym to a scene.
+    // Checked against the defined word first (highest priority), then sentence.
+    const lookup: Record<string, string> = {
+      // RUNNING / speed / haste
+      run:'running',running:'running',ran:'running',sprint:'running',sprinted:'running',
+      haste:'running',hasty:'running',hurry:'running',hurried:'running',rush:'running',
+      rushed:'running',race:'running',raced:'running',dash:'running',dashed:'running',
+      speed:'running',speedy:'running',swift:'running',swiftly:'running',quick:'running',
+      quickly:'running',fast:'running',rapid:'running',rapidly:'running',flee:'running',
+      fled:'running',escape:'running',chase:'running',jog:'running',gallop:'running',
+      scurry:'running',scurried:'running',hasten:'running',scramble:'running',bolt:'running',
+      // MOUNTAIN / achievement
+      apex:'mountain',peak:'mountain',summit:'mountain',climb:'mountain',climbed:'mountain',
+      ascend:'mountain',ascent:'mountain',pinnacle:'mountain',zenith:'mountain',acme:'mountain',
+      achieve:'mountain',achieved:'mountain',achievement:'mountain',triumph:'mountain',
+      victory:'mountain',conquer:'mountain',conquered:'mountain',excel:'mountain',attain:'mountain',
+      accomplish:'mountain',surpass:'mountain',overcome:'mountain',top:'mountain',highest:'mountain',
+      // READING / knowledge
+      read:'reading',reading:'reading',reads:'reading',book:'reading',books:'reading',
+      study:'reading',studied:'reading',learn:'reading',learned:'reading',library:'reading',
+      knowledge:'reading',scholar:'reading',educate:'reading',education:'reading',
+      chapter:'reading',page:'reading',author:'reading',literature:'reading',academic:'reading',
+      university:'reading',student:'reading',lesson:'reading',lecture:'reading',research:'reading',
+      // GROWTH / nature
+      grow:'growth',grew:'growth',grown:'growth',growth:'growth',bloom:'growth',bloomed:'growth',
+      flourish:'growth',thrive:'growth',blossom:'growth',sprout:'growth',plant:'growth',
+      seed:'growth',flower:'growth',garden:'growth',tree:'growth',nature:'growth',
+      forest:'growth',leaf:'growth',root:'growth',branch:'growth',organic:'growth',
+      // SKY / flying
+      fly:'sky',flew:'sky',flight:'sky',soar:'sky',soared:'sky',bird:'sky',wing:'sky',
+      flutter:'sky',hover:'sky',drift:'sky',glide:'sky',eagle:'sky',cloud:'sky',air:'sky',
+      sky:'sky',aviation:'sky',pilot:'sky',float:'sky',kite:'sky',
+      // OCEAN / water
+      water:'ocean',ocean:'ocean',sea:'ocean',river:'ocean',wave:'ocean',swim:'ocean',
+      flow:'ocean',flowed:'ocean',rain:'ocean',stream:'ocean',pour:'ocean',flood:'ocean',
+      lake:'ocean',pool:'ocean',ripple:'ocean',splash:'ocean',tide:'ocean',marine:'ocean',
+      drown:'ocean',drowned:'ocean',surge:'ocean',gush:'ocean',
+      // LOVE / connection
+      love:'love',loved:'love',heart:'love',family:'love',friend:'love',together:'love',
+      embrace:'love',embraced:'love',care:'love',adore:'love',cherish:'love',affection:'love',
+      compassion:'love',warmth:'love',tender:'love',bond:'love',relationship:'love',
+      unity:'love',smile:'love',laugh:'love',joy:'love',happy:'love',happiness:'love',
+      // NIGHT / darkness
+      night:'night',dark:'night',darkness:'night',moon:'night',star:'night',sleep:'night',
+      dream:'night',shadow:'night',alone:'night',dusk:'night',gloom:'night',dim:'night',
+      murky:'night',midnight:'night',twilight:'night',silence:'night',lonely:'night',solitude:'night',
+      // SUNRISE / hope / light
+      sunrise:'sunrise',sun:'sunrise',morning:'sunrise',dawn:'sunrise',hope:'sunrise',
+      bright:'sunrise',brightness:'sunrise',shine:'sunrise',shone:'sunrise',daylight:'sunrise',
+      illuminate:'sunrise',illuminated:'sunrise',
+      // SPARKLE / glint / flash
+      glint:'sparkle',shimmer:'sparkle',sparkle:'sparkle',glimmer:'sparkle',gleam:'sparkle',
+      twinkle:'sparkle',flicker:'sparkle',flash:'sparkle',glitter:'sparkle',glow:'sparkle',
+      luminous:'sparkle',radiant:'sparkle',dazzle:'sparkle',blaze:'sparkle',beam:'sparkle',
+      // EYE / vision / gaze
+      eye:'eye',eyes:'eye',gaze:'eye',stare:'eye',stared:'eye',glance:'eye',glanced:'eye',
+      blink:'eye',wink:'eye',sight:'eye',vision:'eye',look:'eye',looked:'eye',peer:'eye',
+      squint:'eye',squinted:'eye',watch:'eye',watched:'eye',observe:'eye',witness:'eye',
+      // THINKING / mind
+      think:'thinking',thinking:'thinking',thought:'thinking',ponder:'thinking',
+      contemplate:'thinking',reflect:'thinking',wonder:'thinking',imagine:'thinking',
+      conceive:'thinking',deliberate:'thinking',analyze:'thinking',reason:'thinking',
+      idea:'thinking',mind:'thinking',brain:'thinking',clever:'thinking',smart:'thinking',
+      intelligent:'thinking',wisdom:'thinking',wise:'thinking',
+      // MUSIC / art
+      music:'music',song:'music',sing:'music',sang:'music',dance:'music',danced:'music',
+      melody:'music',rhythm:'music',harmony:'music',hum:'music',tune:'music',chord:'music',
+      art:'music',paint:'music',painted:'music',creative:'music',concert:'music',
+      // CITY / urban
+      city:'city',urban:'city',street:'city',building:'city',town:'city',crowd:'city',
+      traffic:'city',metropolitan:'city',downtown:'city',skyline:'city',skyscraper:'city',
+      // FOOD / eating
+      eat:'food',ate:'food',eaten:'food',food:'food',meal:'food',cook:'food',cooked:'food',
+      taste:'food',flavor:'food',savor:'food',devour:'food',feast:'food',hunger:'food',
+      restaurant:'food',kitchen:'food',delicious:'food',nourish:'food',
+      // JOURNEY / travel
+      travel:'journey',travelled:'journey',journey:'journey',wander:'journey',wandered:'journey',
+      roam:'journey',roamed:'journey',voyage:'journey',trek:'journey',trekked:'journey',
+      explore:'journey',explored:'journey',adventure:'journey',road:'journey',path:'journey',
+      destination:'journey',migrate:'journey',trip:'journey',tour:'journey',
+      // MONEY / wealth
+      money:'money',wealth:'money',rich:'money',profit:'money',prosper:'money',
+      affluent:'money',luxurious:'money',opulent:'money',fund:'money',bank:'money',
+      coin:'money',currency:'money',invest:'money',economy:'money',finance:'money',
+      // CONFLICT / anger
+      anger:'conflict',angry:'conflict',rage:'conflict',fight:'conflict',fought:'conflict',
+      conflict:'conflict',war:'conflict',battle:'conflict',struggle:'conflict',fury:'conflict',
+      wrath:'conflict',hostile:'conflict',aggressive:'conflict',argue:'conflict',argued:'conflict',
+      // PEACE / calm
+      peace:'peace',calm:'peace',relax:'peace',relaxed:'peace',
+      meditate:'peace',serene:'peace',tranquil:'peace',gentle:'peace',
+      soothe:'peace',compose:'peace',composed:'peace',restful:'peace',
+      // CONSTRUCTION / building
+      build:'construction',built:'construction',construct:'construction',
+      constructed:'construction',make:'construction',made:'construction',craft:'construction',
+      design:'construction',engineer:'construction',create:'construction',created:'construction',
+      fabricate:'construction',assemble:'construction',produce:'construction',
+      // TRANSFORMATION / change
+      change:'transformation',changed:'transformation',transform:'transformation',
+      transformed:'transformation',evolve:'transformation',evolved:'transformation',
+      adapt:'transformation',adapted:'transformation',alter:'transformation',shift:'transformation',
+      convert:'transformation',modify:'transformation',reform:'transformation',
+      // WORK / profession
+      work:'work',worked:'work',working:'work',office:'work',job:'work',profession:'work',
+      employ:'work',employee:'work',career:'work',occupation:'work',task:'work',
+      labor:'work',industry:'work',productive:'work',diligent:'work',
     };
 
-    if (wordMap[word.toLowerCase()]) return wordMap[word.toLowerCase()];
+    // 1. Exact match on the defined word
+    if (lookup[w]) return lookup[w];
 
-    // Sentence-level keyword scan
-    const scenes: [string[], string][] = [
-      [['glint','shimmer','sparkle','glimmer','gleam','twinkle','flicker','flash','glitter',
-        'dazzle','luminous','radiant','beam','ray','glow','shine','bright','light','sun',
-        'dawn','morning','hope'], 'sparkle'],
-      [['eye','eyes','gaze','stare','glance','blink','wink','sight','vision','look','peer',
-        'pupil','iris','retina','blind','see','watch','observe','witness'], 'eye'],
-      [['climb','apex','peak','summit','top','reach','achieve','success','career','mountain',
-        'ascend','pinnacle','zenith','acme','triumph','victory','conquer','excel','attain',
-        'accomplish','surpass','overcome'], 'mountain'],
-      [['read','book','study','learn','library','knowledge','school','education','scholar',
-        'educate','chapter','page','author','literature','academic','university','student',
-        'lesson','lecture','curriculum','intellectual'], 'reading'],
-      [['grow','plant','tree','flower','garden','seed','bloom','nature','flourish','thrive',
-        'blossom','sprout','vegetation','forest','leaf','branch','root','organic'], 'growth'],
-      [['run','race','sprint','fast','speed','athlete','marathon','dash','jog','gallop',
-        'chase','hurry','swift','rapid','quick','brisk','agile','nimble','energetic'], 'running'],
-      [['fly','bird','sky','air','cloud','soar','wing','eagle','flutter','hover','drift',
-        'glide','aviation','pilot','altitude','ascend','kite','freedom','float'], 'sky'],
-      [['water','ocean','sea','river','wave','swim','flow','rain','stream','pour','flood',
-        'lake','pool','ripple','splash','current','tide','aquatic','marine','naval'], 'ocean'],
-      [['love','heart','family','friend','together','embrace','care','adore','cherish',
-        'affection','compassion','warmth','tender','bond','relationship','unity'], 'love'],
-      [['night','dark','moon','star','sleep','dream','shadow','alone','dusk','gloom',
-        'obscure','dim','murky','midnight','nocturnal','twilight','sunset','quiet'], 'night'],
-      [['think','idea','mind','brain','clever','smart','thought','ponder','contemplate',
-        'reflect','wonder','imagine','conceive','deliberate','analyze','reason'], 'thinking'],
-      [['music','song','dance','art','paint','creative','concert','rhythm','melody',
-        'harmony','sing','hum','tune','chord','instrument','beat','tempo'], 'music'],
-      [['city','urban','street','building','town','crowd','traffic','metropolitan',
-        'downtown','skyline','skyscraper','architecture','infrastructure'], 'city'],
-      [['food','eat','cook','meal','restaurant','kitchen','taste','flavor','savor',
-        'devour','feast','hunger','appetite','cuisine','delicious','nourish'], 'food'],
-      [['travel','journey','adventure','explore','road','path','wander','roam',
-        'voyage','trek','expedition','migrate','destination','trip','tour'], 'journey'],
-      [['money','wealth','profit','rich','economy','finance','invest','prosper',
-        'affluent','luxurious','opulent','fund','bank','coin','currency'], 'money'],
-      [['anger','fight','conflict','war','battle','struggle','rage','fury','wrath',
-        'hostile','aggressive','belligerent','dispute','clash','opposition'], 'conflict'],
-      [['peace','calm','relax','meditate','quiet','serene','breath','tranquil',
-        'placid','gentle','soothe','compose','harmony','still','restful'], 'peace'],
-      [['build','create','construct','make','craft','design','engineer','develop',
-        'fabricate','assemble','erect','form','produce','manufacture'], 'construction'],
-      [['change','transform','evolve','new','revolution','different','adapt','alter',
-        'shift','convert','modify','reform','innovate','metamorphose'], 'transformation'],
-      [['work','office','job','business','desk','profession','employ','career',
-        'occupation','vocation','task','labor','industry','productive','diligent'], 'work'],
-    ];
-
-    for (const [words, scene] of scenes) {
-      if (words.some(w => s.includes(w))) return scene;
+    // 2. Check each word in the sentence individually
+    const sentenceWords = s.replace(/[^a-z\s]/g, ' ').split(/\s+/).filter(Boolean);
+    for (const sw of sentenceWords) {
+      if (lookup[sw]) return lookup[sw];
+      // Also check without common suffixes
+      const stem = sw.replace(/(ing|ed|ly|er|est|tion|ness|ment|ful|less|ive|ous|al)$/, '');
+      if (stem.length > 3 && lookup[stem]) return lookup[stem];
     }
-    return 'sparkle'; // better fallback than abstract — most unknown words have some visual quality
+
+    // 3. Substring scan for compound/partial matches
+    const patterns: [RegExp, string][] = [
+      [/hast|hurr|rush|quick|swift|rapid|speed|fast|dash/, 'running'],
+      [/climb|peak|summit|achiev|triumph|success|excel/, 'mountain'],
+      [/read|book|stud|learn|librar|school|educ|knowl/, 'reading'],
+      [/grow|plant|flower|bloom|garden|nature|tree/, 'growth'],
+      [/fly|bird|sky|cloud|soar|wing|air|float/, 'sky'],
+      [/water|ocean|sea|river|wave|swim|rain|flood/, 'ocean'],
+      [/love|heart|famil|friend|care|warm|smil|laugh|happ/, 'love'],
+      [/night|dark|moon|star|sleep|dream|shadow/, 'night'],
+      [/sun|morn|dawn|light|bright|shine|hope|glow/, 'sunrise'],
+      [/eye|gaze|star|glance|sight|vision|look|watch/, 'eye'],
+      [/glint|spark|shimmer|glimmer|gleam|twinkle|flash|dazzle/, 'sparkle'],
+      [/think|ponder|mind|brain|idea|clever|smart|wise/, 'thinking'],
+      [/music|song|sing|danc|melody|rhythm|art|paint/, 'music'],
+      [/city|urban|street|build|town|crowd|traffic/, 'city'],
+      [/eat|food|meal|cook|taste|feast|hunger|restaur/, 'food'],
+      [/travel|journ|wander|road|path|explor|adventur/, 'journey'],
+      [/money|wealth|rich|profit|bank|coin|financ/, 'money'],
+      [/anger|fight|conflict|war|battl|struggl|rage/, 'conflict'],
+      [/peace|calm|relax|meditat|serenе|tranquil/, 'peace'],
+      [/build|construct|craft|design|creat|engineer/, 'construction'],
+      [/change|transform|evolv|adapt|alter|reform/, 'transformation'],
+      [/work|office|job|employ|career|task|labor/, 'work'],
+    ];
+    for (const [rx, scene] of patterns) {
+      if (rx.test(s)) return scene;
+    }
+
+    return 'running'; // final fallback — most action sentences involve movement
   }
+
 
   private generate(sentence: string, word: string, meaning: string): string {
     const vals = this.hash(sentence + word + meaning);
