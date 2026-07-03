@@ -58,28 +58,11 @@ export class LanguageHome implements OnInit {
   openWord(id: number): void {
     this.activeSenseIndex.set(0);
     this.isSpeaking.set(null);
-    this.contentService.getWordDetail(id).subscribe({
-      next: (w) => {
-        this.selectedWord.set(w);
-        // Generate illustrations for all example sentences
-        this.generateIllustrations(w);
-      }
-    });
-  }
-
-  private generateIllustrations(word: DictWord): void {
-    // Pre-generate all image URLs synchronously — no API calls needed
-    // Pollinations.ai URLs are used directly as <img src>, browser fetches lazily
-    const meaning = word.senses?.[0]?.bangla_meanings?.[0]?.meaning ?? word.senses?.[0]?.short_definition ?? '';
-    word.senses.forEach((sense) => {
-      sense.examples.forEach((ex) => {
-        this.illustrationService.generate(ex.sentence, word.text, meaning, `ex-${ex.id}`);
-      });
-    });
+    this.contentService.getWordDetail(id).subscribe({ next: (w) => this.selectedWord.set(w) });
   }
 
   getImageUrl(exId: number, sentence: string, word: string, meaning: string): string {
-    return this.illustrationService.generate(sentence, word, meaning, `ex-${exId}`);
+    return this.illustrationService.getUrl(sentence, word, meaning, `ex-${exId}`);
   }
 
   onImageLoad(event: Event): void {
