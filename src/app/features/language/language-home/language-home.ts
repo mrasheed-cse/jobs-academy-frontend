@@ -79,10 +79,6 @@ export class LanguageHome implements OnInit {
     });
   }
 
-  exIllustration(exId: number) {
-    return this.illustrationService.getIllustration(`ex-${exId}`);
-  }
-
   safeSvg(svg: string): SafeHtml {
     return this.sanitizer.bypassSecurityTrustHtml(svg);
   }

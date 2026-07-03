@@ -1,99 +1,62 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
+import { firstValueFrom } from 'rxjs';
 
 export interface SentenceIllustration {
-  sentenceId: number;
   svg: string;
   status: 'loading' | 'ready' | 'error';
 }
 
 @Injectable({ providedIn: 'root' })
 export class IllustrationService {
+  private readonly http = inject(HttpClient);
+  private readonly baseUrl = environment.apiBaseUrl;
   private readonly cache = new Map<string, string>();
+
+  // Single signal map — Angular tracks reads reactively in templates
   readonly illustrations = signal<Map<string, SentenceIllustration>>(new Map());
 
   async generateForSentence(
     sentence: string,
     word: string,
     meaning: string,
-    sentenceKey: string,
+    key: string,
   ): Promise<void> {
-    // Return cached result immediately
-    if (this.cache.has(sentenceKey)) {
-      this.updateIllustration(sentenceKey, {
-        sentenceId: 0,
-        svg: this.cache.get(sentenceKey)!,
-        status: 'ready',
-      });
+    // Already cached
+    if (this.cache.has(key)) {
+      this.set(key, { svg: this.cache.get(key)!, status: 'ready' });
       return;
     }
 
-    // Set loading state
-    this.updateIllustration(sentenceKey, {
-      sentenceId: 0,
-      svg: '',
-      status: 'loading',
-    });
+    // Already in flight or done
+    const current = this.illustrations().get(key);
+    if (current && current.status !== 'error') return;
 
-    const prompt = `Create a beautiful, minimalist SVG illustration that visually represents this English sentence:
-
-"${sentence}"
-
-Key word: "${word}" (meaning: "${meaning}")
-
-Requirements:
-- SVG viewBox="0 0 400 220", width="400" height="220"
-- Clean, modern, flat design style (like a high-quality editorial illustration)
-- Use a harmonious color palette of 3-4 colors — soft, professional tones
-- Include simple but expressive figures, objects, or abstract shapes that convey the meaning
-- Add a subtle CSS animation (e.g. gentle float, pulse, path draw, or fade) using <style> inside the SVG
-- The animation should be smooth and loop continuously
-- NO text labels inside the SVG
-- Make it feel like a premium dictionary illustration
-- The visual should directly and clearly represent the sentence meaning
-
-Respond with ONLY the raw SVG code, starting with <svg and ending with </svg>. No explanation, no markdown, no backticks.`;
+    this.set(key, { svg: '', status: 'loading' });
 
     try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-6',
-          max_tokens: 1000,
-          messages: [{ role: 'user', content: prompt }],
-        }),
-      });
+      const res = await firstValueFrom(
+        this.http.post<{ svg?: string; detail?: string }>(
+          `${this.baseUrl}/api/illustration/`,
+          { sentence, word, meaning },
+        )
+      );
 
-      const data = await response.json();
-      const raw: string = data?.content?.[0]?.text ?? '';
-
-      // Extract SVG from response
-      const svgMatch = raw.match(/<svg[\s\S]*<\/svg>/i);
-      const svg = svgMatch ? svgMatch[0] : '';
-
-      if (svg) {
-        this.cache.set(sentenceKey, svg);
-        this.updateIllustration(sentenceKey, { sentenceId: 0, svg, status: 'ready' });
+      if (res.svg) {
+        this.cache.set(key, res.svg);
+        this.set(key, { svg: res.svg, status: 'ready' });
       } else {
-        this.updateIllustration(sentenceKey, { sentenceId: 0, svg: '', status: 'error' });
+        this.set(key, { svg: '', status: 'error' });
       }
     } catch {
-      this.updateIllustration(sentenceKey, { sentenceId: 0, svg: '', status: 'error' });
+      this.set(key, { svg: '', status: 'error' });
     }
   }
 
-  private updateIllustration(key: string, val: SentenceIllustration): void {
-    const map = new Map(this.illustrations());
-    map.set(key, val);
-    this.illustrations.set(map);
-  }
-
-  getIllustration(key: string): SentenceIllustration | undefined {
-    return this.illustrations().get(key);
-  }
-
-  clearCache(): void {
-    this.cache.clear();
-    this.illustrations.set(new Map());
+  private set(key: string, val: SentenceIllustration): void {
+    const next = new Map(this.illustrations());
+    next.set(key, val);
+    this.illustrations.set(next);
   }
 }
