@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ContentService } from '../../../core/services/content.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { IllustrationService } from '../../../core/services/illustration.service';
 import { DictWord, DictWordAZEntry, DictWordSearchResult, DictSense } from '../../../core/models/content.model';
 
 @Component({
@@ -14,6 +15,7 @@ import { DictWord, DictWordAZEntry, DictWordSearchResult, DictSense } from '../.
 export class LanguageHome implements OnInit {
   private readonly contentService = inject(ContentService);
   private readonly authService = inject(AuthService);
+  readonly illustrationService = inject(IllustrationService);
 
   readonly wotd = signal<DictWord | null>(null);
   readonly wordsByLetter = signal<Record<string, DictWordAZEntry[]>>({});
@@ -54,7 +56,29 @@ export class LanguageHome implements OnInit {
   openWord(id: number): void {
     this.activeSenseIndex.set(0);
     this.isSpeaking.set(null);
-    this.contentService.getWordDetail(id).subscribe({ next: (w) => this.selectedWord.set(w) });
+    this.contentService.getWordDetail(id).subscribe({
+      next: (w) => {
+        this.selectedWord.set(w);
+        // Generate illustrations for all example sentences
+        this.generateIllustrations(w);
+      }
+    });
+  }
+
+  private generateIllustrations(word: DictWord): void {
+    const meaning = word.senses?.[0]?.bangla_meanings?.[0]?.meaning ?? word.senses?.[0]?.short_definition ?? '';
+    word.senses.forEach((sense) => {
+      sense.examples.forEach((ex) => {
+        const key = `ex-${ex.id}`;
+        this.illustrationService.generateForSentence(
+          ex.sentence, word.text, meaning, key
+        );
+      });
+    });
+  }
+
+  exIllustration(exId: number) {
+    return this.illustrationService.getIllustration(`ex-${exId}`);
   }
 
   closeWord(): void { this.selectedWord.set(null); this.stopSpeech(); }
