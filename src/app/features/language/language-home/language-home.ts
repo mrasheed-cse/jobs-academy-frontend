@@ -71,9 +71,8 @@ export class LanguageHome implements OnInit {
     const meaning = word.senses?.[0]?.bangla_meanings?.[0]?.meaning ?? word.senses?.[0]?.short_definition ?? '';
     word.senses.forEach((sense) => {
       sense.examples.forEach((ex) => {
-        const key = `ex-${ex.id}`;
         this.illustrationService.generateForSentence(
-          ex.sentence, word.text, meaning, key
+          ex.sentence, word.text, meaning, `ex-${ex.id}`
         );
       });
     });
