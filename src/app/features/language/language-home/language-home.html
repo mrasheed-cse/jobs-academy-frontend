@@ -1,115 +1,237 @@
-<div class="container py-5">
-  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-    <h2 class="fw-bold mb-0">ভাষা কেন্দ্র</h2>
-    @if (canManageDictionary()) {
-      <a routerLink="/language/manage" class="btn btn-primary btn-sm">
-        <i class="fas fa-plus me-1"></i> শব্দ যোগ করুন
-      </a>
-    }
-  </div>
+<div class="lang-page">
+  <div class="container py-5">
 
-  <!-- Word of the Day -->
-  @if (wotd()) {
-    @let w = wotd()!;
-    <div class="wotd-card p-4 mb-5">
-      <div class="d-flex justify-content-between align-items-start">
-        <div>
-          <span class="badge bg-primary mb-2">আজকের শব্দ</span>
-          <h3 class="fw-bold mb-1">{{ w.text }}</h3>
-          @if (w.phonetic_uk) { <p class="text-muted small mb-1">উচ্চারণ: {{ w.phonetic_uk }}</p> }
-          @if (w.part_of_speech) { <span class="badge bg-light text-dark">{{ w.part_of_speech.name }}</span> }
-        </div>
-        <i class="fas fa-star fa-2x text-warning"></i>
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-5 flex-wrap gap-2">
+      <div>
+        <h2 class="fw-bold mb-1">ভাষা কেন্দ্র</h2>
+        <p class="text-muted small mb-0">শব্দ শিখুন, উচ্চারণ শুনুন, উদাহরণ দেখুন</p>
       </div>
-      @if (w.senses.length) {
-        <p class="mt-3 mb-1"><strong>অর্থ:</strong> {{ w.senses[0].short_definition }}</p>
-        @if (firstMeaning(w)) { <p class="mb-0"><strong>বাংলা অর্থ:</strong> {{ firstMeaning(w) }}</p> }
+      @if (canManageDictionary()) {
+        <a routerLink="/language/manage" class="btn btn-primary btn-sm">
+          <i class="fas fa-plus me-1"></i> শব্দ যোগ করুন
+        </a>
       }
     </div>
-  }
 
-  <!-- Search -->
-  <div class="search-bar mb-5">
-    <div class="input-group">
-      <input type="text" class="form-control form-control-lg" placeholder="শব্দ খুঁজুন..."
-        [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" (keyup.enter)="search()">
-      <button class="btn btn-primary" type="button" (click)="search()" [disabled]="isSearching()">
-        <i class="fas fa-search"></i>
-      </button>
-    </div>
-    @if (searchResults().length) {
-      <div class="search-results mt-2 bg-white rounded shadow p-2">
-        @for (word of searchResults(); track word.id) {
-          <div class="search-item p-2 rounded" (click)="openWord(word.id)" role="button">
-            <strong>{{ word.text }}</strong>
-            @if (word.part_of_speech) { <span class="text-muted ms-2 small">{{ word.part_of_speech.name }}</span> }
-          </div>
-        }
-      </div>
-    }
-  </div>
-
-  <!-- A-Z Word Browser -->
-  <h4 class="fw-bold mb-3">শব্দভান্ডার (A-Z)</h4>
-  <div class="letter-tabs d-flex flex-wrap gap-1 mb-4">
-    @for (letter of letters; track letter) {
-      @if (wordsForLetter(letter).length) {
-        <button type="button" class="btn btn-sm btn-outline-primary letter-btn"
-          (click)="openWord(wordsForLetter(letter)[0].id)">{{ letter }}</button>
-      } @else {
-        <button type="button" class="btn btn-sm btn-light letter-btn disabled">{{ letter }}</button>
-      }
-    }
-  </div>
-
-  @for (letter of letters; track letter) {
-    @if (wordsForLetter(letter).length) {
-      <div class="letter-group mb-4">
-        <h6 class="letter-heading">{{ letter }}</h6>
-        <div class="word-chips">
-          @for (entry of wordsForLetter(letter); track entry.id) {
-            <button type="button" class="word-chip" (click)="openWord(entry.id)">{{ entry.text }}</button>
+    <!-- Word of the Day -->
+    @if (wotd()) {
+      @let w = wotd()!;
+      <div class="wotd-card mb-5" (click)="openWord(w.id)" role="button">
+        <div class="wotd-left">
+          <span class="wotd-badge">✨ আজকের শব্দ</span>
+          <h2 class="wotd-word">{{ w.text }}</h2>
+          @if (w.phonetic_uk) { <span class="wotd-phonetic">{{ w.phonetic_uk }}</span> }
+          @if (w.part_of_speech) {
+            <span class="wotd-pos">{{ w.part_of_speech.name }}</span>
           }
+        </div>
+        <div class="wotd-right">
+          @if (w.senses.length) {
+            <p class="wotd-def">{{ w.senses[0].short_definition }}</p>
+            @if (firstMeaning(w)) {
+              <p class="wotd-bn">{{ firstMeaning(w) }}</p>
+            }
+          }
+          <span class="wotd-cta">বিস্তারিত দেখুন <i class="fas fa-arrow-right ms-1"></i></span>
         </div>
       </div>
     }
-  }
-</div>
 
-<!-- Word Detail Modal -->
-@if (selectedWord()) {
-  @let sw = selectedWord()!;
-  <div class="modal-backdrop-custom">
-    <div class="word-modal p-4">
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 class="fw-bold mb-0">{{ sw.text }}</h4>
-        <button type="button" class="btn-close" (click)="closeWord()"></button>
+    <!-- Search -->
+    <div class="search-wrap mb-5">
+      <div class="search-box">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" class="search-input" placeholder="শব্দ খুঁজুন..."
+          [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)"
+          (keyup.enter)="search()">
+        <button class="search-btn" (click)="search()" [disabled]="isSearching()">
+          {{ isSearching() ? '...' : 'খুঁজুন' }}
+        </button>
       </div>
-      @if (sw.phonetic_uk) { <p class="text-muted small">উচ্চারণ (UK): {{ sw.phonetic_uk }}</p> }
-      @if (sw.phonetic_us) { <p class="text-muted small">উচ্চারণ (US): {{ sw.phonetic_us }}</p> }
-      @if (sw.part_of_speech) { <span class="badge bg-secondary mb-2">{{ sw.part_of_speech.name }}</span> }
-
-      @for (sense of sw.senses; track sense.id) {
-        <div class="sense-block mt-3 pt-3 border-top">
-          <p><strong>অর্থ:</strong> {{ sense.short_definition }}</p>
-          @if (sense.bangla_meanings.length) {
-            <p><strong>বাংলা:</strong> {{ sense.bangla_meanings.map(m => m.meaning).join(', ') }}</p>
-          }
-          @if (sense.examples.length) {
-            <div class="mt-2">
-              <strong>উদাহরণ:</strong>
-              <ul class="mt-1">
-                @for (ex of sense.examples; track ex.id) {
-                  <li class="text-muted small">
-                    {{ ex.sentence }}
-                    @if (ex.translations.length) { <span class="d-block">{{ ex.translations[0].translated_text }}</span> }
-                  </li>
-                }
-              </ul>
+      @if (searchResults().length) {
+        <div class="search-dropdown">
+          @for (word of searchResults(); track word.id) {
+            <div class="search-row" (click)="openWord(word.id)" role="button">
+              <span class="search-word">{{ word.text }}</span>
+              @if (word.part_of_speech) {
+                <span class="search-pos">{{ word.part_of_speech.name }}</span>
+              }
             </div>
           }
-          @if (sense.synonyms.length) { <p class="small text-muted mb-0"><strong>সমার্থক:</strong> {{ sense.synonyms.join(', ') }}</p> }
-          @if (sense.antonyms.length) { <p class="small text-muted mb-0"><strong>বিপরীত:</strong> {{ sense.antonyms.join(', ') }}</p> }
+        </div>
+      }
+    </div>
+
+    <!-- A-Z Browser -->
+    <h4 class="fw-bold mb-3">শব্দভান্ডার (A-Z)</h4>
+    <div class="letter-row mb-4">
+      @for (letter of letters; track letter) {
+        @if (wordsForLetter(letter).length) {
+          <button class="l-btn active" (click)="openWord(wordsForLetter(letter)[0].id)">{{ letter }}</button>
+        } @else {
+          <button class="l-btn" disabled>{{ letter }}</button>
+        }
+      }
+    </div>
+
+    @for (letter of letters; track letter) {
+      @if (wordsForLetter(letter).length) {
+        <div class="letter-section mb-4">
+          <div class="letter-heading">{{ letter }}</div>
+          <div class="word-grid">
+            @for (entry of wordsForLetter(letter); track entry.id) {
+              <button class="word-pill" (click)="openWord(entry.id)">{{ entry.text }}</button>
+            }
+          </div>
+        </div>
+      }
+    }
+  </div>
+</div>
+
+<!-- ── Word Detail Modal ─────────────────────────────────────── -->
+@if (selectedWord()) {
+  @let sw = selectedWord()!;
+  <div class="modal-bg" (click)="closeWord()">
+    <div class="word-card" (click)="$event.stopPropagation()">
+
+      <!-- Card header -->
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-word">{{ sw.text }}</div>
+          @if (sw.part_of_speech) {
+            <span class="card-pos">{{ sw.part_of_speech.name }}</span>
+          }
+
+          <!-- Phonetics + audio -->
+          <div class="phonetics-row">
+            @if (sw.phonetic_uk) {
+              <div class="phonetic-item">
+                <span class="accent-tag">UK</span>
+                <span class="phonetic-text">{{ sw.phonetic_uk }}</span>
+                <button class="speak-btn" [class.speaking]="isSpeaking() === 'uk'"
+                  (click)="speak(sw.text, 'uk')" title="UK উচ্চারণ শুনুন">
+                  <i class="fas" [class.fa-volume-up]="isSpeaking() !== 'uk'"
+                    [class.fa-circle-notch]="isSpeaking() === 'uk'"
+                    [class.fa-spin]="isSpeaking() === 'uk'"></i>
+                </button>
+              </div>
+            }
+            @if (sw.phonetic_us) {
+              <div class="phonetic-item">
+                <span class="accent-tag us">US</span>
+                <span class="phonetic-text">{{ sw.phonetic_us }}</span>
+                <button class="speak-btn" [class.speaking]="isSpeaking() === 'us'"
+                  (click)="speak(sw.text, 'us')" title="US উচ্চারণ শুনুন">
+                  <i class="fas" [class.fa-volume-up]="isSpeaking() !== 'us'"
+                    [class.fa-circle-notch]="isSpeaking() === 'us'"
+                    [class.fa-spin]="isSpeaking() === 'us'"></i>
+                </button>
+              </div>
+            }
+            @if (!sw.phonetic_uk && !sw.phonetic_us) {
+              <button class="speak-btn-solo" (click)="speak(sw.text, 'us')">
+                <i class="fas fa-volume-up me-2"></i> উচ্চারণ শুনুন
+              </button>
+            }
+          </div>
+        </div>
+        <button class="close-btn" (click)="closeWord()"><i class="fas fa-times"></i></button>
+      </div>
+
+      <!-- Sense tabs (if multiple senses) -->
+      @if (sw.senses.length > 1) {
+        <div class="sense-tabs">
+          @for (sense of sw.senses; track sense.id; let i = $index) {
+            <button class="sense-tab" [class.active]="activeSenseIndex() === i"
+              (click)="setActiveSense(i)">অর্থ {{ i + 1 }}</button>
+          }
+        </div>
+      }
+
+      <!-- Active sense body -->
+      @if (activeSense()) {
+        @let sense = activeSense()!;
+        <div class="card-body-scroll">
+
+          <!-- Definition block -->
+          <div class="def-block">
+            <div class="def-en">{{ sense.short_definition }}</div>
+            @if (sense.bangla_meanings.length) {
+              <div class="def-bn">
+                @for (bm of sense.bangla_meanings; track bm.id) {
+                  <span class="bn-meaning">{{ bm.meaning }}</span>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- Example sentences — visual cards -->
+          @if (sense.examples.length) {
+            <div class="examples-section">
+              <div class="section-label">
+                <i class="fas fa-quote-left me-2"></i>উদাহরণ বাক্য
+              </div>
+              @for (ex of sense.examples; track ex.id; let i = $index) {
+                <div class="example-card">
+                  <div class="example-num">{{ i + 1 }}</div>
+                  <div class="example-content">
+                    <p class="example-en"
+                      [innerHTML]="highlight(ex.sentence, sw.text)"></p>
+                    @if (ex.translations.length) {
+                      <p class="example-bn">{{ ex.translations[0].translated_text }}</p>
+                    }
+                    <button class="example-speak" (click)="speakExample(ex.sentence)"
+                      title="শুনুন">
+                      <i class="fas fa-play"></i>
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+
+          <!-- Synonyms & Antonyms -->
+          @if (sense.synonyms.length || sense.antonyms.length) {
+            <div class="syn-ant-row">
+              @if (sense.synonyms.length) {
+                <div class="syn-block">
+                  <div class="section-label syn"><i class="fas fa-equals me-1"></i>সমার্থক</div>
+                  <div class="word-tags">
+                    @for (s of sense.synonyms; track s) {
+                      <span class="syn-tag">{{ s }}</span>
+                    }
+                  </div>
+                </div>
+              }
+              @if (sense.antonyms.length) {
+                <div class="ant-block">
+                  <div class="section-label ant"><i class="fas fa-not-equal me-1"></i>বিপরীত</div>
+                  <div class="word-tags">
+                    @for (a of sense.antonyms; track a) {
+                      <span class="ant-tag">{{ a }}</span>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
+
+          <!-- Word forms -->
+          @if (sw.forms.length) {
+            <div class="forms-section">
+              <div class="section-label"><i class="fas fa-sitemap me-1"></i>রূপান্তর</div>
+              <div class="forms-grid">
+                @for (form of sw.forms; track form.id) {
+                  <div class="form-item">
+                    <span class="form-label">{{ form.label }}</span>
+                    <span class="form-word">{{ form.form }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+          }
         </div>
       }
     </div>

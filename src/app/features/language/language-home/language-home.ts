@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ContentService } from '../../../core/services/content.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { DictWord, DictWordAZEntry, DictWordSearchResult } from '../../../core/models/content.model';
+import { DictWord, DictWordAZEntry, DictWordSearchResult, DictSense } from '../../../core/models/content.model';
 
 @Component({
   selector: 'app-language-home',
@@ -21,12 +21,10 @@ export class LanguageHome implements OnInit {
   readonly searchQuery = signal('');
   readonly searchResults = signal<DictWordSearchResult[]>([]);
   readonly isSearching = signal(false);
+  readonly isSpeaking = signal<'uk' | 'us' | null>(null);
+  readonly activeSenseIndex = signal(0);
   readonly letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
-  // Matches the real backend permission (IsTeacherOrAdmin: teacher, admin,
-  // or Django staff) - gating the frontend more strictly than the backend
-  // actually enforces would just be confusing, since a teacher would be
-  // blocked by the UI while still able to call the API directly.
   readonly canManageDictionary = () => {
     const role = this.authService.currentUser()?.role;
     return role === 'admin' || role === 'teacher';
@@ -35,7 +33,7 @@ export class LanguageHome implements OnInit {
   ngOnInit(): void {
     this.contentService.getWordOfTheDay().subscribe({
       next: (w) => this.wotd.set(w),
-      error: () => {}, // 404 when no words exist yet - fine, just don't show the card
+      error: () => {},
     });
     this.contentService.getWordsAZ().subscribe({
       next: (data) => this.wordsByLetter.set(data),
@@ -54,16 +52,56 @@ export class LanguageHome implements OnInit {
   }
 
   openWord(id: number): void {
+    this.activeSenseIndex.set(0);
+    this.isSpeaking.set(null);
     this.contentService.getWordDetail(id).subscribe({ next: (w) => this.selectedWord.set(w) });
   }
 
-  closeWord(): void { this.selectedWord.set(null); }
+  closeWord(): void { this.selectedWord.set(null); this.stopSpeech(); }
   wordsForLetter(letter: string): DictWordAZEntry[] { return this.wordsByLetter()[letter] ?? []; }
 
-  // A word can have multiple senses, each with its own Bangla meanings -
-  // flatten for a simple display in the search dropdown / modal.
   firstMeaning(word: DictWord): string | null {
-    const meaning = word.senses?.[0]?.bangla_meanings?.[0]?.meaning;
-    return meaning ?? null;
+    return word.senses?.[0]?.bangla_meanings?.[0]?.meaning ?? null;
+  }
+
+  // ── Text-to-Speech ──────────────────────────────────────────
+  speak(text: string, accent: 'uk' | 'us'): void {
+    if (!('speechSynthesis' in window)) return;
+    this.stopSpeech();
+    this.isSpeaking.set(accent);
+    const utt = new SpeechSynthesisUtterance(text);
+    utt.lang = accent === 'uk' ? 'en-GB' : 'en-US';
+    utt.rate = 0.85;
+    utt.onend = () => this.isSpeaking.set(null);
+    utt.onerror = () => this.isSpeaking.set(null);
+    window.speechSynthesis.speak(utt);
+  }
+
+  stopSpeech(): void {
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    this.isSpeaking.set(null);
+  }
+
+  speakExample(sentence: string): void {
+    this.stopSpeech();
+    const utt = new SpeechSynthesisUtterance(sentence);
+    utt.lang = 'en-US'; utt.rate = 0.8;
+    window.speechSynthesis.speak(utt);
+  }
+
+  // ── Sense tabs ───────────────────────────────────────────────
+  setActiveSense(i: number): void { this.activeSenseIndex.set(i); }
+
+  activeSense(): DictSense | null {
+    const w = this.selectedWord();
+    if (!w?.senses.length) return null;
+    return w.senses[this.activeSenseIndex()] ?? w.senses[0];
+  }
+
+  // ── Highlight word in example sentence ──────────────────────
+  highlight(sentence: string, word: string): string {
+    if (!sentence || !word) return sentence;
+    const rx = new RegExp(`(${word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    return sentence.replace(rx, '<mark class="hl">$1</mark>');
   }
 }
