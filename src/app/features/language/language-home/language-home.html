@@ -176,7 +176,7 @@
               @for (ex of sense.examples; track ex.id; let i = $index) {
                 <div class="example-card">
                   <!-- AI-generated illustration -->
-                  @let illus = exIllustration(ex.id);
+                  @let illus = illustrationService.illustrations().get('ex-' + ex.id);
                   @if (illus && illus.status === 'loading') {
                     <div class="illus-loading">
                       <div class="illus-shimmer">
@@ -186,7 +186,7 @@
                     </div>
                   }
                   @if (illus && illus.status === 'ready' && illus.svg) {
-                    <div class="illus-wrap" [innerHTML]="illus.svg"></div>
+                    <div class="illus-wrap" [innerHTML]="safeSvg(illus.svg)"></div>
                   }
 
                   <div class="example-body">

@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ContentService } from '../../../core/services/content.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { IllustrationService } from '../../../core/services/illustration.service';
@@ -15,6 +16,7 @@ import { DictWord, DictWordAZEntry, DictWordSearchResult, DictSense } from '../.
 export class LanguageHome implements OnInit {
   private readonly contentService = inject(ContentService);
   private readonly authService = inject(AuthService);
+  private readonly sanitizer = inject(DomSanitizer);
   readonly illustrationService = inject(IllustrationService);
 
   readonly wotd = signal<DictWord | null>(null);
@@ -79,6 +81,10 @@ export class LanguageHome implements OnInit {
 
   exIllustration(exId: number) {
     return this.illustrationService.getIllustration(`ex-${exId}`);
+  }
+
+  safeSvg(svg: string): SafeHtml {
+    return this.sanitizer.bypassSecurityTrustHtml(svg);
   }
 
   closeWord(): void { this.selectedWord.set(null); this.stopSpeech(); }
