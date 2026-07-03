@@ -175,8 +175,20 @@
               </div>
               @for (ex of sense.examples; track ex.id; let i = $index) {
                 <div class="example-card">
-                  <!-- Unique animated SVG illustration — instant, no network, unique per sentence -->
-                  <div class="illus-wrap" [innerHTML]="safeSvg(getIllustrationSvg(ex.sentence, sw.text, activeSense()?.bangla_meanings?.[0]?.meaning ?? '', ex.id))"></div>
+                  <!-- Pixabay image — relevant photo for the example sentence -->
+                  @let illus = getIllustration(ex.sentence, sw.text, activeSense()?.bangla_meanings?.[0]?.meaning ?? '', ex.id, _tick());
+                  @if (illus.status === 'loading') {
+                    <div class="illus-loading">
+                      <div class="illus-shimmer-inner">
+                        <i class="fas fa-image"></i>
+                        <span>ছবি লোড হচ্ছে...</span>
+                      </div>
+                    </div>
+                  } @else if (illus.status === 'ready' && illus.url) {
+                    <div class="illus-photo">
+                      <img [src]="illus.url" [alt]="ex.sentence" class="illus-photo-img">
+                    </div>
+                  }
 
                   <div class="example-body">
                     <div class="example-num">{{ i + 1 }}</div>

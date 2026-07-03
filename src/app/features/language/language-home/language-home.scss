@@ -369,24 +369,56 @@
   font-weight: 700;
 }
 
-/* ── SVG Illustration ────────────────────────────────────── */
+/* ── Pixabay Photo Illustration ──────────────────────────── */
 .example-card {
   flex-direction: column;
   padding: 0;
   overflow: hidden;
 }
 
-.illus-wrap {
+.illus-loading {
   width: 100%;
-  border-bottom: 1px solid #e8edff;
-  line-height: 0;
-  background: #f8faff;
+  height: 180px;
+  background: linear-gradient(135deg, #f0f4ff, #e8edff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid #e0e7ff;
+}
 
-  svg {
-    width: 100%;
-    height: auto;
-    display: block;
-  }
+.illus-shimmer-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: #a5b4fc;
+  font-size: .8rem;
+  font-weight: 600;
+  animation: illus_pulse 1.4s ease-in-out infinite;
+
+  i { font-size: 2rem; }
+}
+
+@keyframes illus_pulse {
+  0%, 100% { opacity: .35; }
+  50% { opacity: .85; }
+}
+
+.illus-photo {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  border-bottom: 1px solid #e0e7ff;
+}
+
+.illus-photo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform .3s ease;
+
+  &:hover { transform: scale(1.03); }
 }
 
 .example-body {

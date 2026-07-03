@@ -61,9 +61,16 @@ export class LanguageHome implements OnInit {
     this.contentService.getWordDetail(id).subscribe({ next: (w) => this.selectedWord.set(w) });
   }
 
-  getIllustrationSvg(sentence: string, word: string, meaning: string, exId: number): string {
-    return this.illustrationService.getSvg(sentence, word, meaning, `ex-${exId}`);
+  // Trigger illustration fetch and return current result for template binding
+  getIllustration(sentence: string, word: string, meaning: string, exId: number, _tick?: number) {
+    const key = `ex-${exId}`;
+    return this.illustrationService.fetch(sentence, word, meaning, key, () => {
+      this._tick.update(v => v + 1);
+    });
   }
+
+  // Tick signal to trigger re-render when images load
+  readonly _tick = signal(0);
 
 
   safeSvg(svg: string): SafeHtml {
