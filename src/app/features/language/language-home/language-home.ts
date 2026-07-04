@@ -58,7 +58,21 @@ export class LanguageHome implements OnInit {
   openWord(id: number): void {
     this.activeSenseIndex.set(0);
     this.isSpeaking.set(null);
-    this.contentService.getWordDetail(id).subscribe({ next: (w) => this.selectedWord.set(w) });
+    this.contentService.getWordDetail(id).subscribe({
+      next: (w) => {
+        this.selectedWord.set(w);
+        // Prefetch all example images immediately so they're ready when user scrolls
+        const meaning = w.senses?.[0]?.bangla_meanings?.[0]?.meaning ?? '';
+        w.senses.forEach(sense => {
+          sense.examples.forEach(ex => {
+            this.illustrationService.fetch(
+              ex.sentence, w.text, meaning, `ex-${ex.id}`,
+              () => this._tick.update(v => v + 1)
+            );
+          });
+        });
+      }
+    });
   }
 
   // Trigger illustration fetch and return current result for template binding
