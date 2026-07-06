@@ -1,0 +1,212 @@
+<div class="container py-5">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-5 flex-wrap gap-2">
+    <div>
+      <h2 class="fw-bold mb-1">পরীক্ষা পরিচালনা</h2>
+      <p class="text-muted small mb-0">পরীক্ষার প্রশ্নপত্র স্ক্যান করে ডেটাবেজে আমদানি করুন</p>
+    </div>
+    <div class="d-flex gap-2">
+      <a routerLink="/admin" class="btn btn-outline-secondary btn-sm">অ্যাডমিন প্যানেল</a>
+      @if (!showForm()) {
+        <button class="btn btn-primary btn-sm" (click)="openForm()">
+          <i class="fas fa-plus me-1"></i> নতুন পরীক্ষা আমদানি
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Import Form -->
+  @if (showForm()) {
+    <div class="import-card mb-5">
+      <h5 class="fw-bold mb-4 pb-3 border-bottom">
+        <i class="fas fa-file-import me-2 text-primary"></i>পরীক্ষার প্রশ্নপত্র আমদানি
+      </h5>
+
+      @if (errorMsg()) { <div class="alert alert-danger">{{ errorMsg() }}</div> }
+      @if (successMsg()) { <div class="alert alert-success">{{ successMsg() }}</div> }
+
+      <!-- Progress -->
+      @if (jobStatus(); as job) {
+        <div class="progress-section mb-4">
+          <div class="d-flex justify-content-between mb-2">
+            <span class="fw-semibold small">
+              @if (job.status === 'processing') {
+                <i class="fas fa-spinner fa-spin me-1 text-primary"></i>
+                পৃষ্ঠা {{ job.processed_pages }}/{{ job.total_pages }} প্রসেস হচ্ছে...
+                @if (job.current_page) { — {{ job.current_page }} }
+              } @else if (job.status === 'done') {
+                <i class="fas fa-check-circle me-1 text-success"></i> সম্পন্ন!
+              } @else if (job.status === 'failed') {
+                <i class="fas fa-exclamation-circle me-1 text-danger"></i> ব্যর্থ
+              }
+            </span>
+            <span class="text-muted small">{{ job.questions_found }} প্রশ্ন পাওয়া গেছে</span>
+          </div>
+          <div class="progress" style="height:14px;border-radius:7px">
+            <div class="progress-bar progress-bar-striped"
+              [class.progress-bar-animated]="job.status === 'processing'"
+              [class.bg-success]="job.status === 'done'"
+              [class.bg-danger]="job.status === 'failed'"
+              [style.width]="progressBarWidth(job)"
+              role="progressbar">
+              {{ job.progress }}%
+            </div>
+          </div>
+          @if (job.error_log) {
+            <div class="alert alert-warning mt-2 small">
+              <strong>ত্রুটি লগ:</strong><br>
+              <pre class="mb-0">{{ job.error_log }}</pre>
+            </div>
+          }
+        </div>
+      }
+
+      @if (!jobStatus() || jobStatus()?.status === 'failed') {
+        <form [formGroup]="form">
+          <div class="row g-3 mb-3">
+            <div class="col-12">
+              <label class="form-label fw-semibold">পরীক্ষার নাম *</label>
+              <input type="text" class="form-control" formControlName="exam_title"
+                placeholder="e.g. Biman Bangladesh Airlines Cargo Helper 2021">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">সংস্থার নাম *</label>
+              <input type="text" class="form-control" formControlName="org_name"
+                placeholder="e.g. Biman Bangladesh Airlines">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">পদের নাম *</label>
+              <input type="text" class="form-control" formControlName="position_name"
+                placeholder="e.g. Cargo Helper">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">পরীক্ষার বছর *</label>
+              <input type="number" class="form-control" formControlName="exam_year" min="1980" max="2099">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">বিষয়</label>
+              <select class="form-select" formControlName="subject_name">
+                <option value="General Knowledge">সাধারণ জ্ঞান</option>
+                <option value="Mathematics">গণিত</option>
+                <option value="English">ইংরেজি</option>
+                <option value="Bengali">বাংলা</option>
+                <option value="Physics">পদার্থবিজ্ঞান</option>
+                <option value="Chemistry">রসায়ন</option>
+                <option value="ICT">তথ্য প্রযুক্তি</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label fw-semibold">প্রতি প্রশ্নে নম্বর</label>
+              <input type="number" class="form-control" formControlName="marks_per_q" min="1">
+            </div>
+            <div class="col-md-2">
+              <label class="form-label fw-semibold">নেগেটিভ মার্ক</label>
+              <input type="number" class="form-control" formControlName="negative_mark" min="0" step="0.25">
+            </div>
+          </div>
+
+          <!-- File Upload -->
+          <div class="upload-zone mb-3" (click)="fileInput.click()" (dragover)="$event.preventDefault()"
+            (drop)="$event.preventDefault(); fileInput.files && onFilesSelected($event)">
+            <input type="file" #fileInput accept="image/*" multiple class="d-none"
+              (change)="onFilesSelected($event)">
+            <i class="fas fa-cloud-upload-alt fa-2x text-primary mb-2 d-block"></i>
+            <p class="fw-semibold mb-1">প্রশ্নপত্রের ছবি আপলোড করুন</p>
+            <p class="text-muted small mb-0">সব পৃষ্ঠা একসাথে নির্বাচন করুন (JPG, PNG)</p>
+          </div>
+
+          @if (selectedFiles().length) {
+            <div class="file-list mb-4">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-semibold small">{{ selectedFiles().length }} টি ফাইল নির্বাচিত</span>
+                <button type="button" class="btn btn-sm btn-outline-secondary"
+                  (click)="selectedFiles.set([])">সব সরান</button>
+              </div>
+              <div class="file-chips">
+                @for (file of selectedFiles(); track file.name; let i = $index) {
+                  <span class="file-chip">
+                    <i class="fas fa-image me-1"></i>{{ file.name }}
+                    <button type="button" (click)="removeFile(i)">×</button>
+                  </span>
+                }
+              </div>
+            </div>
+          }
+
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-primary" (click)="startImport()"
+              [disabled]="isUploading() || !selectedFiles().length">
+              @if (isUploading()) {
+                <i class="fas fa-spinner fa-spin me-2"></i>আপলোড হচ্ছে...
+              } @else {
+                <i class="fas fa-rocket me-2"></i>আমদানি শুরু করুন
+              }
+            </button>
+            <button type="button" class="btn btn-outline-secondary" (click)="cancelForm()">বাতিল</button>
+          </div>
+        </form>
+      }
+
+      @if (jobStatus()?.status === 'done') {
+        <div class="d-flex gap-2 mt-3">
+          <button class="btn btn-outline-primary" (click)="cancelForm()">
+            <i class="fas fa-list me-2"></i>পরীক্ষার তালিকা দেখুন
+          </button>
+          <button class="btn btn-primary" (click)="openForm()">
+            <i class="fas fa-plus me-2"></i>আরেকটি পরীক্ষা আমদানি করুন
+          </button>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Exam List -->
+  @if (!showForm()) {
+    @if (isLoading()) {
+      <div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>
+    } @else if (exams().length === 0) {
+      <div class="empty-state text-center py-5">
+        <i class="fas fa-file-alt fa-3x text-muted mb-3 d-block opacity-25"></i>
+        <p class="text-muted">কোনো পরীক্ষা নেই। প্রথম পরীক্ষা আমদানি করুন।</p>
+        <button class="btn btn-primary" (click)="openForm()">আমদানি শুরু করুন</button>
+      </div>
+    } @else {
+      <div class="row g-3">
+        @for (exam of exams(); track exam.id) {
+          <div class="col-12">
+            <div class="exam-card d-flex align-items-center gap-3 p-3">
+              <div class="exam-icon"><i class="fas fa-file-alt"></i></div>
+              <div class="flex-grow-1">
+                <h6 class="fw-bold mb-1">{{ exam.title }}</h6>
+                <div class="d-flex gap-3 flex-wrap">
+                  <small class="text-muted"><i class="fas fa-building me-1"></i>{{ exam.organization }}</small>
+                  <small class="text-muted"><i class="fas fa-briefcase me-1"></i>{{ exam.position }}</small>
+                  <small class="text-muted"><i class="fas fa-calendar me-1"></i>{{ exam.exam_date | slice:0:4 }}</small>
+                  <span class="badge bg-primary-subtle text-primary">{{ exam.total_questions }} প্রশ্ন</span>
+                  @if (!exam.is_published) {
+                    <span class="badge bg-warning-subtle text-warning">আনপাবলিশড</span>
+                  }
+                </div>
+              </div>
+              <div class="d-flex gap-2 flex-shrink-0">
+                <a [routerLink]="['/past-exams', exam.id, 'browse']"
+                  class="btn btn-sm btn-outline-primary">
+                  <i class="fas fa-eye me-1"></i>দেখুন
+                </a>
+                <button class="btn btn-sm btn-outline-danger"
+                  [disabled]="isDeleting() === exam.id"
+                  (click)="deleteExam(exam.id, exam.title)">
+                  @if (isDeleting() === exam.id) {
+                    <i class="fas fa-spinner fa-spin"></i>
+                  } @else {
+                    <i class="fas fa-trash"></i>
+                  }
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

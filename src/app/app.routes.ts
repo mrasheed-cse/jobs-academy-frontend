@@ -70,5 +70,9 @@ export const routes: Routes = [
   { path: 'user/settings', canActivate: [authGuard], loadComponent: () => import('./features/user/settings/settings').then((m) => m.Settings) },
   { path: 'user/delete-account', canActivate: [authGuard], loadComponent: () => import('./features/user/delete-account/delete-account').then((m) => m.DeleteAccount) },
 
+
+  { path: 'admin/exams', canActivate: [dictionaryAdminGuard], loadComponent: () => import('./features/admin/exam-manage/exam-manage').then(m => m.ExamManage) },
+  { path: 'past-exams/:id/browse', loadComponent: () => import('./features/past-exams/exam-browse/exam-browse').then(m => m.ExamBrowse) },
+  { path: 'past-exams/:id/attempt', canActivate: [authGuard], loadComponent: () => import('./features/past-exams/exam-attempt/exam-attempt').then(m => m.ExamAttempt) },
   { path: '**', redirectTo: '' },
 ];

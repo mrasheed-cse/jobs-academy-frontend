@@ -1,0 +1,161 @@
+<div class="attempt-page">
+  @if (isLoading()) {
+    <div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>
+  } @else if (!exam()) {
+    <p class="text-danger text-center pt-5">পরীক্ষা পাওয়া যায়নি।</p>
+  } @else {
+    @let e = exam()!;
+
+    <!-- READY phase -->
+    @if (phase() === 'ready') {
+      <div class="container py-5">
+        <div class="ready-card mx-auto">
+          <div class="text-center mb-4">
+            <div class="exam-icon-lg mx-auto mb-3"><i class="fas fa-file-alt"></i></div>
+            <h3 class="fw-bold">{{ e.title }}</h3>
+            <p class="text-muted">{{ e.organization }} — {{ e.position }}</p>
+          </div>
+          <div class="info-grid mb-4">
+            <div class="info-item">
+              <i class="fas fa-list text-primary"></i>
+              <span>{{ e.total_questions }} প্রশ্ন</span>
+            </div>
+            <div class="info-item">
+              <i class="fas fa-clock text-warning"></i>
+              <span>{{ e.duration }} মিনিট</span>
+            </div>
+            <div class="info-item">
+              <i class="fas fa-check-circle text-success"></i>
+              <span>পাস মার্ক {{ e.pass_mark }}%</span>
+            </div>
+            <div class="info-item">
+              <i class="fas fa-minus-circle text-danger"></i>
+              <span>নেগেটিভ {{ e.negative_mark }}</span>
+            </div>
+          </div>
+          <div class="d-grid gap-2">
+            <button class="btn btn-primary btn-lg" (click)="startExam()">
+              <i class="fas fa-play me-2"></i>পরীক্ষা শুরু করুন
+            </button>
+            <a [routerLink]="['/past-exams', e.id, 'browse']" class="btn btn-outline-secondary">
+              <i class="fas fa-eye me-2"></i>প্রশ্ন ব্রাউজ করুন
+            </a>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- EXAM phase -->
+    @if (phase() === 'exam') {
+      <!-- Top bar -->
+      <div class="exam-topbar">
+        <div class="container d-flex align-items-center justify-content-between gap-3">
+          <span class="exam-title-sm">{{ e.title }}</span>
+          <div class="d-flex align-items-center gap-3">
+            <span class="answered-count">{{ answeredCount() }}/{{ e.total_questions }} উত্তর</span>
+            <div class="timer" [class.urgent]="timeLeft() < 300">
+              <i class="fas fa-clock me-1"></i>{{ timeDisplay() }}
+            </div>
+            <button class="btn btn-danger btn-sm" (click)="submitExam()" [disabled]="isSubmitting()">
+              @if (isSubmitting()) { <i class="fas fa-spinner fa-spin me-1"></i> }
+              জমা দিন
+            </button>
+          </div>
+        </div>
+        <!-- Time progress bar -->
+        <div class="time-bar">
+          <div class="time-bar-fill" [style.width]="timePercent() + '%'"
+            [class.urgent]="timeLeft() < 300"></div>
+        </div>
+      </div>
+
+      <div class="container py-4">
+        <div class="row g-4">
+          <!-- Question panel -->
+          <div class="col-lg-8">
+            @if (currentQuestion(); as q) {
+              <div class="q-panel">
+                <div class="q-panel-header">
+                  <span class="q-panel-num">প্রশ্ন {{ currentIndex() + 1 }}/{{ e.total_questions }}</span>
+                  @if (q.subject) { <span class="q-subject">{{ q.subject }}</span> }
+                </div>
+                <p class="q-panel-text" [innerHTML]="highlightText(q.text)"></p>
+                <div class="options-list">
+                  @for (opt of q.options; track opt.id; let j = $index) {
+                    <button class="opt-btn" [class.selected]="isSelected(q.id, opt.id)"
+                      (click)="selectOption(q.id, opt.id)">
+                      <span class="opt-label">{{ ['A','B','C','D'][j] }}</span>
+                      <span class="opt-content">{{ opt.text }}</span>
+                    </button>
+                  }
+                </div>
+                <div class="d-flex justify-content-between mt-4">
+                  <button class="btn btn-outline-secondary" (click)="navigate(-1)"
+                    [disabled]="currentIndex() === 0">
+                    <i class="fas fa-arrow-left me-1"></i>আগের প্রশ্ন
+                  </button>
+                  <button class="btn btn-outline-secondary" (click)="navigate(1)"
+                    [disabled]="currentIndex() === e.total_questions - 1">
+                    পরের প্রশ্ন<i class="fas fa-arrow-right ms-1"></i>
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+
+          <!-- Question navigator -->
+          <div class="col-lg-4">
+            <div class="q-navigator">
+              <h6 class="fw-bold mb-3">প্রশ্ন নেভিগেটর</h6>
+              <div class="q-grid">
+                @for (q of e.questions; track q.id; let i = $index) {
+                  <button class="q-dot" [class.current]="i === currentIndex()"
+                    [class.answered]="answers()[q.id] != null && i !== currentIndex()"
+                    (click)="goTo(i)">{{ i + 1 }}</button>
+                }
+              </div>
+              <div class="legend mt-3">
+                <span class="legend-item"><span class="dot answered"></span>উত্তর দেওয়া</span>
+                <span class="legend-item"><span class="dot current"></span>বর্তমান</span>
+                <span class="legend-item"><span class="dot"></span>বাকি</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- RESULT phase -->
+    @if (phase() === 'result') {
+      <div class="container py-5">
+        <div class="result-card mx-auto text-center">
+          @if (result(); as r) {
+            <div class="result-icon mb-3">
+              <i class="fas" [class.fa-trophy]="r.score >= e.pass_mark"
+                [class.fa-times-circle]="r.score < e.pass_mark"></i>
+            </div>
+            <h3 class="fw-bold mb-1">{{ r.score >= e.pass_mark ? 'অভিনন্দন!' : 'আরও চেষ্টা করুন' }}</h3>
+            <p class="text-muted mb-4">{{ e.title }}</p>
+            <div class="score-display mb-4">
+              <div class="score-num">{{ r.score ?? 0 | number:'1.0-1' }}%</div>
+              <div class="score-label">স্কোর</div>
+            </div>
+            <div class="result-stats mb-4">
+              <div class="stat"><span class="stat-val text-success">{{ r.correct_answers ?? 0 }}</span><span class="stat-lbl">সঠিক</span></div>
+              <div class="stat"><span class="stat-val text-danger">{{ r.wrong_answers ?? 0 }}</span><span class="stat-lbl">ভুল</span></div>
+              <div class="stat"><span class="stat-val text-muted">{{ e.total_questions - (r.answered_questions ?? 0) }}</span><span class="stat-lbl">বাদ</span></div>
+            </div>
+            <div class="d-flex gap-2 justify-content-center flex-wrap">
+              <a [routerLink]="['/past-exams', e.id, 'browse']" class="btn btn-outline-primary">
+                <i class="fas fa-eye me-1"></i>সমাধান দেখুন
+              </a>
+              <button class="btn btn-primary" (click)="phase.set('ready')">
+                <i class="fas fa-redo me-1"></i>আবার চেষ্টা করুন
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  }
+</div>

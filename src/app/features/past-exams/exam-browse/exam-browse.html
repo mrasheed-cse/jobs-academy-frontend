@@ -1,0 +1,72 @@
+<div class="browse-page">
+  <div class="container py-5">
+    @if (isLoading()) {
+      <div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>
+    } @else if (!exam()) {
+      <p class="text-danger text-center">পরীক্ষা পাওয়া যায়নি।</p>
+    } @else {
+      @let e = exam()!;
+
+      <!-- Header -->
+      <div class="exam-header mb-4">
+        <a routerLink="/admin/exams" class="back-link mb-3 d-inline-flex align-items-center gap-2">
+          <i class="fas fa-arrow-left"></i> পরীক্ষার তালিকা
+        </a>
+        <h2 class="fw-bold mb-1">{{ e.title }}</h2>
+        <div class="d-flex gap-3 flex-wrap mb-3">
+          <span class="meta-item"><i class="fas fa-building me-1"></i>{{ e.organization }}</span>
+          <span class="meta-item"><i class="fas fa-briefcase me-1"></i>{{ e.position }}</span>
+          <span class="meta-item"><i class="fas fa-list me-1"></i>{{ e.total_questions }} প্রশ্ন</span>
+          <span class="meta-item"><i class="fas fa-clock me-1"></i>{{ e.duration }} মিনিট</span>
+          <span class="meta-item"><i class="fas fa-minus-circle me-1"></i>নেগেটিভ: {{ e.negative_mark }}</span>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+          <a [routerLink]="['/past-exams', e.id, 'attempt']" class="btn btn-primary">
+            <i class="fas fa-play me-2"></i>পরীক্ষা দিন
+          </a>
+          <button class="btn btn-outline-secondary" (click)="revealAll()">সব উত্তর দেখুন</button>
+          <button class="btn btn-outline-secondary" (click)="hideAll()">সব লুকান</button>
+        </div>
+      </div>
+
+      <!-- Questions -->
+      <div class="questions-list">
+        @for (q of e.questions; track q.id; let i = $index) {
+          <div class="q-card">
+            <div class="q-header">
+              <span class="q-num">{{ i + 1 }}</span>
+              <p class="q-text mb-0" [innerHTML]="highlightText(q.text)"></p>
+            </div>
+            <div class="q-options">
+              @for (opt of q.options; track opt.id; let j = $index) {
+                <div class="opt-row"
+                  [class.correct]="isRevealed(q.id) && opt.is_correct"
+                  [class.incorrect]="false">
+                  <span class="opt-letter">{{ ['A','B','C','D'][j] }}</span>
+                  <span class="opt-text">{{ opt.text }}</span>
+                  @if (isRevealed(q.id) && opt.is_correct) {
+                    <i class="fas fa-check-circle text-success ms-auto"></i>
+                  }
+                </div>
+              }
+            </div>
+            <div class="q-footer">
+              <button class="btn-reveal" (click)="toggleReveal(q.id)">
+                @if (isRevealed(q.id)) {
+                  <i class="fas fa-eye-slash me-1"></i>উত্তর লুকান
+                } @else {
+                  <i class="fas fa-eye me-1"></i>উত্তর দেখুন
+                }
+              </button>
+              @if (isRevealed(q.id)) {
+                <span class="correct-badge">
+                  সঠিক উত্তর: <strong>{{ correctLetter(q) }}. {{ correctOption(q) }}</strong>
+                </span>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>
