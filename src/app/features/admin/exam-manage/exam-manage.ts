@@ -28,12 +28,59 @@ export class ExamManage implements OnInit, OnDestroy {
   readonly successMsg  = signal<string | null>(null);
   readonly isDeleting  = signal<number | null>(null);
 
+  readonly allSubjects = [
+    { value: 'General Knowledge', label: 'সাধারণ জ্ঞান (General Knowledge)' },
+    { value: 'Mathematics',       label: 'গণিত (Mathematics)' },
+    { value: 'English',           label: 'ইংরেজি (English)' },
+    { value: 'Bengali',           label: 'বাংলা (Bengali)' },
+    { value: 'Physics',           label: 'পদার্থবিজ্ঞান (Physics)' },
+    { value: 'Chemistry',         label: 'রসায়ন (Chemistry)' },
+    { value: 'Biology',           label: 'জীববিজ্ঞান (Biology)' },
+    { value: 'ICT',               label: 'তথ্য প্রযুক্তি (ICT)' },
+    { value: 'History',           label: 'ইতিহাস (History)' },
+    { value: 'Geography',         label: 'ভূগোল (Geography)' },
+    { value: 'Economics',         label: 'অর্থনীতি (Economics)' },
+    { value: 'Civics',            label: 'পৌরনীতি (Civics)' },
+  ];
+
+  readonly selectedSubjects = signal<string[]>(['General Knowledge']);
+  readonly subjectDropdownOpen = signal(false);
+
+  get allSelected(): boolean {
+    return this.selectedSubjects().length === this.allSubjects.length;
+  }
+
+  toggleAllSubjects(): void {
+    if (this.allSelected) {
+      this.selectedSubjects.set([]);
+    } else {
+      this.selectedSubjects.set(this.allSubjects.map(s => s.value));
+    }
+  }
+
+  toggleSubject(value: string): void {
+    this.selectedSubjects.update(sel =>
+      sel.includes(value) ? sel.filter(s => s !== value) : [...sel, value]
+    );
+  }
+
+  isSubjectSelected(value: string): boolean {
+    return this.selectedSubjects().includes(value);
+  }
+
+  subjectDisplayLabel(): string {
+    const sel = this.selectedSubjects();
+    if (sel.length === 0) return 'বিষয় নির্বাচন করুন';
+    if (sel.length === this.allSubjects.length) return 'সকল বিষয়';
+    if (sel.length === 1) return this.allSubjects.find(s => s.value === sel[0])?.label ?? sel[0];
+    return `${sel.length}টি বিষয় নির্বাচিত`;
+  }
+
   readonly form = this.fb.group({
     exam_title:    ['', Validators.required],
     org_name:      ['', Validators.required],
     position_name: ['', Validators.required],
     exam_year:     [new Date().getFullYear(), [Validators.required, Validators.min(1980)]],
-    subject_name:  ['General Knowledge'],
     marks_per_q:   [1],
     negative_mark: [0.25],
     model:         ['google/gemini-2.5-flash'],
@@ -59,7 +106,6 @@ export class ExamManage implements OnInit, OnDestroy {
     this.successMsg.set(null);
     this.form.reset({
       exam_year: new Date().getFullYear(),
-      subject_name: 'General Knowledge',
       marks_per_q: 1,
       negative_mark: 0.25,
       model: 'google/gemini-2.5-flash',
@@ -94,7 +140,8 @@ export class ExamManage implements OnInit, OnDestroy {
     fd.append('org_name',      v.org_name ?? '');
     fd.append('position_name', v.position_name ?? '');
     fd.append('exam_year',     String(v.exam_year));
-    fd.append('subject_name',  v.subject_name ?? 'General Knowledge');
+    const subjects = this.selectedSubjects();
+    fd.append('subject_name', subjects.length > 0 ? subjects.join(',') : 'General Knowledge');
     fd.append('marks_per_q',   String(v.marks_per_q ?? 1));
     fd.append('negative_mark', String(v.negative_mark ?? 0.25));
     fd.append('model',         v.model ?? 'google/gemini-2.5-flash');

@@ -84,16 +84,55 @@
               <input type="number" class="form-control" formControlName="exam_year" min="1980" max="2099">
             </div>
             <div class="col-md-4">
-              <label class="form-label fw-semibold">বিষয়</label>
-              <select class="form-select" formControlName="subject_name">
-                <option value="General Knowledge">সাধারণ জ্ঞান</option>
-                <option value="Mathematics">গণিত</option>
-                <option value="English">ইংরেজি</option>
-                <option value="Bengali">বাংলা</option>
-                <option value="Physics">পদার্থবিজ্ঞান</option>
-                <option value="Chemistry">রসায়ন</option>
-                <option value="ICT">তথ্য প্রযুক্তি</option>
-              </select>
+              <label class="form-label fw-semibold">বিষয় (একাধিক নির্বাচন করুন)</label>
+              <div class="subject-multiselect" >
+                <!-- Trigger button -->
+                <button type="button" class="subject-trigger"
+                  (click)="subjectDropdownOpen.update(v => !v)">
+                  <span class="trigger-label">{{ subjectDisplayLabel() }}</span>
+                  <i class="fas fa-chevron-down trigger-icon"
+                    [class.rotated]="subjectDropdownOpen()"></i>
+                </button>
+
+                <!-- Dropdown -->
+                @if (subjectDropdownOpen()) {
+                  <div class="subject-dropdown">
+                    <!-- Select All -->
+                    <label class="subject-option select-all-option"
+                      (click)="toggleAllSubjects()">
+                      <span class="custom-checkbox" [class.checked]="allSelected"
+                        [class.partial]="selectedSubjects().length > 0 && !allSelected">
+                        @if (allSelected) { <i class="fas fa-check"></i> }
+                        @else if (selectedSubjects().length > 0) { <i class="fas fa-minus"></i> }
+                      </span>
+                      <span class="option-label fw-bold">সকল বিষয় নির্বাচন করুন</span>
+                    </label>
+                    <div class="subject-divider"></div>
+                    <!-- Individual subjects -->
+                    @for (subj of allSubjects; track subj.value) {
+                      <label class="subject-option"
+                        (click)="toggleSubject(subj.value)">
+                        <span class="custom-checkbox" [class.checked]="isSubjectSelected(subj.value)">
+                          @if (isSubjectSelected(subj.value)) { <i class="fas fa-check"></i> }
+                        </span>
+                        <span class="option-label">{{ subj.label }}</span>
+                      </label>
+                    }
+                  </div>
+                }
+              </div>
+
+              <!-- Selected tags -->
+              @if (selectedSubjects().length > 0 && selectedSubjects().length < allSubjects.length) {
+                <div class="subject-tags mt-2">
+                  @for (sv of selectedSubjects(); track sv) {
+                    <span class="subject-tag">
+                      {{ sv }}
+                      <button type="button" (click)="toggleSubject(sv)">×</button>
+                    </span>
+                  }
+                </div>
+              }
             </div>
             <div class="col-md-2">
               <label class="form-label fw-semibold">প্রতি প্রশ্নে নম্বর</label>
