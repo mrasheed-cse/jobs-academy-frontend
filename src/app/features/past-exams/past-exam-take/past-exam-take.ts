@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, inject, signal, computed } from '@angular
 import { ActivatedRoute, Router } from '@angular/router';
 import { ExamService } from '../../../core/services/exam.service';
 import { ExamAnswer, Question } from '../../../core/models/exam.model';
+import { MathRenderPipe } from '../../../core/pipes/math-render.pipe';
 import { PastExamSubmitResponse } from '../../../core/models/past-exam.model';
 
 const BENGALI_LABELS = ['ক', 'খ', 'গ', 'ঘ', 'ঙ'];
@@ -13,7 +14,7 @@ interface QuestionRow {
 
 @Component({
   selector: 'app-past-exam-take',
-  imports: [],
+  imports: [MathRenderPipe],
   templateUrl: './past-exam-take.html',
   styleUrl: './past-exam-take.scss',
 })

@@ -16,7 +16,7 @@
                 <span class="fw-semibold">{{ q.index + 1 }}.</span>
                 <div>
                   @if (q.image) { <img [src]="q.image" class="img-fluid rounded mb-2" style="max-height:120px"> }
-                  @if (q.text) { <p class="fw-semibold mb-0">{{ q.text }}</p> }
+                  @if (q.text) { <p class="fw-semibold mb-0" [innerHTML]="q.text | mathRender"></p> }
                 </div>
               </div>
               <div class="d-grid gap-2 ms-4">
@@ -24,7 +24,7 @@
                   <button type="button" class="option-row" [class.selected]="isSelected(q.questionId, opt.id)" (click)="selectAnswer(q.questionId, opt.id)">
                     <span class="option-letter">{{ opt.label }}</span>
                     @if (opt.image) { <img [src]="opt.image" style="max-height:70px"> }
-                    @else { <span>{{ opt.text }}</span> }
+                    @else { <span [innerHTML]="opt.text | mathRender"></span> }
                   </button>
                 }
               </div>
