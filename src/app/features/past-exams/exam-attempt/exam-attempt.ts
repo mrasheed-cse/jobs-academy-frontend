@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { MathRenderPipe } from '../../../core/pipes/math-render.pipe';
 import { interval, Subscription } from 'rxjs';
 import { ExamImportService, PastExamDetail, ExamQuestion } from '../../../core/services/exam-import.service';
 import { DecimalPipe } from '@angular/common';
@@ -11,7 +12,7 @@ interface AnswerMap { [questionId: number]: number | null; } // questionId → o
 
 @Component({
   selector: 'app-exam-attempt',
-  imports: [RouterLink, DecimalPipe],
+  imports: [RouterLink, DecimalPipe, MathRenderPipe],
   templateUrl: './exam-attempt.html',
   styleUrl: './exam-attempt.scss',
 })

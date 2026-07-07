@@ -86,13 +86,13 @@
                   <span class="q-panel-num">প্রশ্ন {{ currentIndex() + 1 }}/{{ e.total_questions }}</span>
                   @if (q.subject) { <span class="q-subject">{{ q.subject }}</span> }
                 </div>
-                <p class="q-panel-text" [innerHTML]="highlightText(q.text)"></p>
+                <p class="q-panel-text" [innerHTML]="q.text | mathRender"></p>
                 <div class="options-list">
                   @for (opt of q.options; track opt.id; let j = $index) {
                     <button class="opt-btn" [class.selected]="isSelected(q.id, opt.id)"
                       (click)="selectOption(q.id, opt.id)">
                       <span class="opt-label">{{ ['A','B','C','D'][j] }}</span>
-                      <span class="opt-content">{{ opt.text }}</span>
+                      <span class="opt-content" [innerHTML]="opt.text | mathRender"></span>
                     </button>
                   }
                 </div>

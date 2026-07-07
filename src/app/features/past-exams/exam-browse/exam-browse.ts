@@ -1,11 +1,12 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { MathRenderPipe } from '../../../core/pipes/math-render.pipe';
 import { ExamImportService, PastExamDetail, ExamQuestion } from '../../../core/services/exam-import.service';
 
 @Component({
   selector: 'app-exam-browse',
-  imports: [RouterLink],
+  imports: [RouterLink, MathRenderPipe],
   templateUrl: './exam-browse.html',
   styleUrl: './exam-browse.scss',
 })
