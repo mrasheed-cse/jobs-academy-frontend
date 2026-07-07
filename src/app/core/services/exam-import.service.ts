@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 export interface ImportJobStatus {
@@ -74,12 +75,16 @@ export class ExamImportService {
   }
 
   getExams(): Observable<PastExamSummary[]> {
-    return this.http.get<PastExamSummary[]>(`${this.base}/api/exam-import/exams/`);
+    return this.http.get<PastExamSummary[]>(`${this.base}/api/exam-import/exams/`).pipe(
+      map(exams => exams.map(e => ({ ...e, subjects: e.subjects ?? [] })))
+    );
   }
 
   getExamDetail(id: number, showAnswers = false): Observable<PastExamDetail> {
     const q = showAnswers ? '?show_answers=1' : '';
-    return this.http.get<PastExamDetail>(`${this.base}/api/exam-import/exams/${id}/questions/${q}`);
+    return this.http.get<PastExamDetail>(`${this.base}/api/exam-import/exams/${id}/questions/${q}`).pipe(
+      map(e => ({ ...e, subjects: e.subjects ?? [] }))
+    );
   }
 
   deleteExam(id: number): Observable<void> {
