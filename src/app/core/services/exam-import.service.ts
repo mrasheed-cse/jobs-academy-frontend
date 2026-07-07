@@ -25,6 +25,7 @@ export interface PastExamSummary {
   total_questions: number;
   is_published:    boolean;
   negative_mark:   number;
+  subjects:        string[];
 }
 
 export interface QuestionOption {
@@ -53,6 +54,7 @@ export interface PastExamDetail {
   pass_mark:       number;
   negative_mark:   number;
   is_published:    boolean;
+  subjects:        string[];
   questions:       ExamQuestion[];
 }
 

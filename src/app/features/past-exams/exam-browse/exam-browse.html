@@ -20,6 +20,13 @@
           <span class="meta-item"><i class="fas fa-clock me-1"></i>{{ e.duration }} মিনিট</span>
           <span class="meta-item"><i class="fas fa-minus-circle me-1"></i>নেগেটিভ: {{ e.negative_mark }}</span>
         </div>
+        @if (e.subjects?.length) {
+          <div class="d-flex gap-2 flex-wrap mb-3">
+            @for (subj of e.subjects; track subj) {
+              <span class="subject-badge">{{ subj }}</span>
+            }
+          </div>
+        }
         <div class="d-flex gap-2 flex-wrap">
           <a [routerLink]="['/past-exams', e.id, 'attempt']" class="btn btn-primary">
             <i class="fas fa-play me-2"></i>পরীক্ষা দিন

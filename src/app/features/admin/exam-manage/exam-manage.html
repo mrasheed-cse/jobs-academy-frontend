@@ -222,6 +222,9 @@
                   <small class="text-muted"><i class="fas fa-briefcase me-1"></i>{{ exam.position }}</small>
                   <small class="text-muted"><i class="fas fa-calendar me-1"></i>{{ exam.exam_date | slice:0:4 }}</small>
                   <span class="badge bg-primary-subtle text-primary">{{ exam.total_questions }} প্রশ্ন</span>
+                  @for (subj of exam.subjects; track subj) {
+                    <span class="badge bg-secondary-subtle text-secondary">{{ subj }}</span>
+                  }
                   @if (!exam.is_published) {
                     <span class="badge bg-warning-subtle text-warning">আনপাবলিশড</span>
                   }

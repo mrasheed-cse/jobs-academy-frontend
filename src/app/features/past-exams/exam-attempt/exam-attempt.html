@@ -15,6 +15,13 @@
             <h3 class="fw-bold">{{ e.title }}</h3>
             <p class="text-muted">{{ e.organization }} — {{ e.position }}</p>
           </div>
+          @if (e.subjects?.length) {
+            <div class="d-flex gap-2 flex-wrap justify-content-center mb-3">
+              @for (subj of e.subjects; track subj) {
+                <span class="subject-pill">{{ subj }}</span>
+              }
+            </div>
+          }
           <div class="info-grid mb-4">
             <div class="info-item">
               <i class="fas fa-list text-primary"></i>
