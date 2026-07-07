@@ -39,6 +39,7 @@
       <!-- Questions -->
       <div class="questions-list">
         @for (q of e.questions; track q.id; let i = $index) {
+          @if (q.text && q.text.trim() && q.options.length > 0) {
           <div class="q-card">
             <div class="q-header">
               <span class="q-num">{{ i + 1 }}</span>
@@ -46,15 +47,17 @@
             </div>
             <div class="q-options">
               @for (opt of q.options; track opt.id; let j = $index) {
-                <div class="opt-row"
-                  [class.correct]="isRevealed(q.id) && opt.is_correct"
-                  [class.incorrect]="false">
-                  <span class="opt-letter">{{ ['A','B','C','D'][j] }}</span>
-                  <span class="opt-text" [innerHTML]="opt.text | mathRender"></span>
-                  @if (isRevealed(q.id) && opt.is_correct) {
-                    <i class="fas fa-check-circle text-success ms-auto"></i>
-                  }
-                </div>
+                @if (opt.text && opt.text.trim()) {
+                  <div class="opt-row"
+                    [class.correct]="isRevealed(q.id) && opt.is_correct"
+                    [class.incorrect]="false">
+                    <span class="opt-letter">{{ ['A','B','C','D'][j] }}</span>
+                    <span class="opt-text" [innerHTML]="opt.text | mathRender"></span>
+                    @if (isRevealed(q.id) && opt.is_correct) {
+                      <i class="fas fa-check-circle text-success ms-auto"></i>
+                    }
+                  </div>
+                }
               }
             </div>
             <div class="q-footer">
@@ -72,6 +75,7 @@
               }
             </div>
           </div>
+          }
         }
       </div>
     }
