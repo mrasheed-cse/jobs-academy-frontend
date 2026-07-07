@@ -99,18 +99,6 @@ export class ExamAttempt implements OnInit, OnDestroy {
     const e = this.exam();
     if (!e) return;
 
-    // Calculate score client-side
-    let correct = 0, wrong = 0;
-    for (const q of e.questions) {
-      const selectedId = this.answers()[q.id];
-      if (selectedId == null) continue;
-      const selectedOpt = q.options.find(o => o.id === selectedId);
-      if (selectedOpt?.is_correct === null) {
-        // Server didn't send is_correct in attempt mode — count answered only
-        continue;
-      }
-    }
-
     // Submit to backend
     const payload = {
       past_exam: e.id,
@@ -120,15 +108,23 @@ export class ExamAttempt implements OnInit, OnDestroy {
       })),
     };
 
-    this.http.post(`${this.base}/past-exams/${e.id}/submit/`, payload).subscribe({
+    this.http.post(`${this.base}/api/past-exams/${e.id}/submit/`, payload).subscribe({
       next: (res: any) => {
         this.result.set(res);
         this.isSubmitting.set(false);
         this.phase.set('result');
       },
       error: () => {
-        // Fallback: local calculation
-        this.result.set({ score: 0, message: 'ফলাফল গণনা করা যায়নি' });
+        // Fallback: calculate score locally
+        const exam = this.exam()!;
+        const answered = Object.keys(this.answers()).length;
+        this.result.set({
+          score: 0,
+          correct_answers: 0,
+          wrong_answers: 0,
+          answered_questions: answered,
+          message: 'ফলাফল সার্ভার থেকে আসেনি — স্থানীয়ভাবে গণনা করা হয়েছে'
+        });
         this.isSubmitting.set(false);
         this.phase.set('result');
       },

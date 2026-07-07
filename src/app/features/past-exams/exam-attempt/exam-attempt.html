@@ -138,13 +138,13 @@
         <div class="result-card mx-auto text-center">
           @if (result(); as r) {
             <div class="result-icon mb-3">
-              <i class="fas" [class.fa-trophy]="r.score >= e.pass_mark"
-                [class.fa-times-circle]="r.score < e.pass_mark"></i>
+              <i class="fas" [class.fa-trophy]="r.percentage >= e.pass_mark"
+                [class.fa-times-circle]="r.percentage < e.pass_mark"></i>
             </div>
-            <h3 class="fw-bold mb-1">{{ r.score >= e.pass_mark ? 'অভিনন্দন!' : 'আরও চেষ্টা করুন' }}</h3>
+            <h3 class="fw-bold mb-1">{{ r.percentage >= e.pass_mark ? 'অভিনন্দন!' : 'আরও চেষ্টা করুন' }}</h3>
             <p class="text-muted mb-4">{{ e.title }}</p>
             <div class="score-display mb-4">
-              <div class="score-num">{{ r.score ?? 0 | number:'1.0-1' }}%</div>
+              <div class="score-num">{{ r.percentage ?? 0 | number:'1.0-1' }}%</div>
               <div class="score-label">স্কোর</div>
             </div>
             <div class="result-stats mb-4">
