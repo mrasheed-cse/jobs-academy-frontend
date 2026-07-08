@@ -1,201 +1,196 @@
-<div class="exam-shell" [class.exam-active]="!isLoading() && !result()">
+<div class="exam-root">
 
-  <!-- ── Loading ─────────────────────────────────────────────── -->
+  <!-- ── LOADING ─────────────────────────────────────────── -->
   @if (isLoading()) {
-    <div class="loading-screen">
-      <div class="loading-card">
-        <div class="loading-spinner"></div>
-        <p class="mt-3 fw-semibold text-muted">প্রশ্নপত্র লোড হচ্ছে...</p>
+    <div class="load-screen">
+      <div class="load-card">
+        <div class="load-ring"></div>
+        <p>প্রশ্নপত্র লোড হচ্ছে...</p>
       </div>
     </div>
   }
 
-  <!-- ── Exam UI ──────────────────────────────────────────────── -->
+  <!-- ── EXAM ─────────────────────────────────────────────── -->
   @if (!isLoading() && !result()) {
 
-    <!-- Sticky top bar -->
-    <header class="exam-topbar">
-      <div class="topbar-inner">
-        <div class="exam-title-bar">
-          <i class="fas fa-file-alt me-2 opacity-75"></i>
-          <span class="exam-name-text">{{ examTitle() }}</span>
-        </div>
-        <div class="topbar-controls">
-          <div class="answered-pill">
-            <i class="fas fa-check-circle me-1"></i>
-            {{ answeredCount() }}/{{ questions().length }}
-          </div>
-          <div class="timer-pill" [class.timer-urgent]="timeRemainingSeconds() < 300"
-            [class.timer-warning]="timeRemainingSeconds() < 600 && timeRemainingSeconds() >= 300">
-            <i class="fas fa-clock me-1"></i>{{ timeDisplay() }}
-          </div>
-          <button class="submit-btn" (click)="onSubmit()" [disabled]="isSubmitting()">
-            @if (isSubmitting()) { <span class="btn-spinner"></span> }
-            @else { <i class="fas fa-paper-plane me-1"></i> }
-            জমা দিন
-          </button>
-        </div>
+    <!-- Sticky header -->
+    <div class="xbar">
+      <div class="xbar-left">
+        <span class="xbar-title">{{ examTitle() }}</span>
       </div>
-      <div class="time-ribbon">
-        <div class="time-ribbon-fill"
+      <div class="xbar-right">
+        <div class="xbar-stat">
+          <i class="fas fa-pen-to-square"></i>
+          <span>{{ answeredCount() }}/{{ questions().length }}</span>
+        </div>
+        <div class="xbar-timer" [class.warn]="timeRemainingSeconds() < 600" [class.danger]="timeRemainingSeconds() < 300">
+          <i class="fas fa-clock"></i>
+          <span>{{ timeDisplay() }}</span>
+        </div>
+        <button class="xbar-submit" (click)="onSubmit()" [disabled]="isSubmitting()">
+          @if (isSubmitting()) { <span class="xbar-spin"></span> } @else { <i class="fas fa-check"></i> }
+          জমা দিন
+        </button>
+      </div>
+      <!-- timer bar -->
+      <div class="xbar-bar">
+        <div class="xbar-bar-fill"
           [style.width]="timePercent() + '%'"
-          [class.ribbon-urgent]="timeRemainingSeconds() < 300"
-          [class.ribbon-warning]="timeRemainingSeconds() < 600 && timeRemainingSeconds() >= 300">
+          [class.warn]="timeRemainingSeconds() < 600"
+          [class.danger]="timeRemainingSeconds() < 300">
         </div>
       </div>
-    </header>
+    </div>
 
-    <!-- Main content -->
-    <div class="exam-body">
-      <div class="exam-content-grid">
+    <!-- Body: sidebar + questions -->
+    <div class="exam-layout">
 
-        <!-- Questions column -->
-        <main class="questions-col">
-          @for (q of visibleQuestions(); track q.questionId) {
-            <div class="question-card" [id]="'q-' + q.questionId"
-              [class.q-answered]="isAnswered(q.questionId)">
-              <div class="q-card-header">
-                <div class="q-number-badge">{{ q.index + 1 }}</div>
-                <div class="q-body-wrap">
-                  @if (q.image) {
-                    <img [src]="q.image" class="q-image" alt="question image">
-                  }
-                  @if (q.text) {
-                    <p class="q-text" [innerHTML]="q.text | mathRender"></p>
-                  }
-                  <div class="options-grid">
-                    @for (opt of q.options; track opt.id; let oi = $index) {
-                      @if (opt.text) {
-                        <button type="button" class="opt-card"
-                          [class.opt-selected]="isSelected(q.questionId, opt.id)"
-                          (click)="selectAnswer(q.questionId, opt.id)">
-                          <span class="opt-badge" [class.opt-badge-selected]="isSelected(q.questionId, opt.id)">
-                            {{ opt.label }}
-                          </span>
-                          <span class="opt-text-wrap" [innerHTML]="opt.text | mathRender"></span>
-                          @if (isSelected(q.questionId, opt.id)) {
-                            <i class="fas fa-check-circle opt-check"></i>
-                          }
-                        </button>
-                      }
+      <!-- Sidebar: question map -->
+      <aside class="qmap-sidebar">
+        <div class="qmap-card">
+          <div class="qmap-title">উত্তর ট্র্যাকার</div>
+          <div class="qmap-progress">
+            <div class="qmap-bar-wrap">
+              <div class="qmap-bar-fill" [style.width]="progressPercent() + '%'"></div>
+            </div>
+            <span class="qmap-pct">{{ progressPercent() }}%</span>
+          </div>
+          <div class="qmap-grid">
+            @for (q of questions(); track q.questionId; let i = $index) {
+              <button class="qmap-dot"
+                [class.dot-done]="isAnswered(q.questionId)"
+                (click)="scrollToQ(q.questionId)"
+                [title]="'প্রশ্ন ' + (i+1)">
+                {{ i + 1 }}
+              </button>
+            }
+          </div>
+          <div class="qmap-legend">
+            <span><span class="leg-dot leg-done"></span>উত্তর দেওয়া</span>
+            <span><span class="leg-dot"></span>বাকি</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- All questions -->
+      <main class="qlist">
+        @for (q of questions(); track q.questionId; let i = $index) {
+          <div class="qcard" [id]="'q-' + q.questionId" [class.qcard-done]="isAnswered(q.questionId)">
+            <div class="qcard-inner">
+              <div class="qnum" [class.qnum-done]="isAnswered(q.questionId)">{{ i + 1 }}</div>
+              <div class="qcontent">
+                @if (q.image) {
+                  <img [src]="q.image" class="qimg" alt="">
+                }
+                @if (q.text) {
+                  <p class="qtext" [innerHTML]="q.text | mathRender"></p>
+                }
+                <div class="opts">
+                  @for (opt of q.options; track opt.id; let oi = $index) {
+                    @if (opt.text) {
+                      <button class="opt" [class.opt-on]="isSelected(q.questionId, opt.id)"
+                        (click)="selectAnswer(q.questionId, opt.id)">
+                        <span class="opt-lbl" [class.opt-lbl-on]="isSelected(q.questionId, opt.id)">{{ opt.label }}</span>
+                        <span class="opt-txt" [innerHTML]="opt.text | mathRender"></span>
+                        @if (isSelected(q.questionId, opt.id)) {
+                          <i class="fas fa-circle-check opt-icon"></i>
+                        }
+                      </button>
                     }
-                  </div>
+                  }
                 </div>
               </div>
             </div>
-          }
-
-          <!-- Pagination -->
-          <div class="q-pagination">
-            <button class="page-btn" (click)="prevPage()" [disabled]="currentPage() === 0">
-              <i class="fas fa-arrow-left me-1"></i>আগে
-            </button>
-            <span class="page-info">{{ currentPage() + 1 }} / {{ totalPages() }}</span>
-            <button class="page-btn" (click)="nextPage()" [disabled]="currentPage() >= totalPages() - 1">
-              পরে<i class="fas fa-arrow-right ms-1"></i>
-            </button>
           </div>
-        </main>
+        }
 
-        <!-- Navigator sidebar -->
-        <aside class="nav-sidebar">
-          <div class="nav-card">
-            <div class="nav-header">প্রশ্ন নেভিগেটর</div>
-            <div class="nav-grid">
-              @for (q of questions(); track q.questionId; let i = $index) {
-                <button class="nav-dot"
-                  [class.nav-dot-answered]="isAnswered(q.questionId)"
-                  [class.nav-dot-current]="isOnCurrentPage(i)"
-                  (click)="goToQuestion(i)"
-                  [title]="'প্রশ্ন ' + (i+1)">
-                  {{ i + 1 }}
-                </button>
-              }
-            </div>
-            <div class="nav-legend">
-              <span class="legend-row"><span class="legend-dot answered"></span>উত্তর দেওয়া</span>
-              <span class="legend-row"><span class="legend-dot current"></span>এই পেজে</span>
-              <span class="legend-row"><span class="legend-dot"></span>বাকি</span>
-            </div>
-            <div class="nav-progress">
-              <div class="progress-label">
-                <span>{{ answeredCount() }} উত্তর দেওয়া</span>
-                <span class="fw-bold">{{ progressPercent() }}%</span>
-              </div>
-              <div class="progress-track">
-                <div class="progress-fill" [style.width]="progressPercent() + '%'"></div>
-              </div>
-            </div>
-          </div>
-        </aside>
+        <!-- Bottom submit -->
+        <div class="bottom-submit">
+          <p class="bottom-note">
+            <i class="fas fa-info-circle me-1"></i>
+            {{ answeredCount() }} টি উত্তর দিয়েছেন, {{ questions().length - answeredCount() }} টি বাকি আছে।
+          </p>
+          <button class="bottom-btn" (click)="onSubmit()" [disabled]="isSubmitting()">
+            @if (isSubmitting()) { <span class="xbar-spin"></span> } @else { <i class="fas fa-paper-plane me-2"></i> }
+            পরীক্ষা জমা দিন
+          </button>
+        </div>
+      </main>
 
-      </div>
     </div>
   }
 
-  <!-- ── Result Screen ────────────────────────────────────────── -->
+  <!-- ── RESULT ─────────────────────────────────────────────── -->
   @if (result()) {
     @let r = result()!;
-    <div class="result-screen">
-      <div class="result-container">
+    <div class="result-root">
+      <div class="result-card">
 
-        <!-- Trophy / Fail icon -->
-        <div class="result-icon-wrap" [class.result-pass]="r.is_passed" [class.result-fail]="!r.is_passed">
-          <i class="fas" [class.fa-trophy]="r.is_passed" [class.fa-times-circle]="!r.is_passed"></i>
+        <!-- Badge -->
+        <div class="result-badge" [class.pass]="r.is_passed" [class.fail]="!r.is_passed">
+          <i class="fas" [class.fa-trophy]="r.is_passed" [class.fa-circle-xmark]="!r.is_passed"></i>
         </div>
 
-        <h2 class="result-headline">{{ r.is_passed ? 'অভিনন্দন! উত্তীর্ণ হয়েছেন' : 'দুঃখিত, উত্তীর্ণ হননি' }}</h2>
-        <p class="result-exam-name">{{ examTitle() }}</p>
+        <h2 class="result-headline">
+          {{ r.is_passed ? 'অভিনন্দন! 🎉' : 'আরও চেষ্টা করুন' }}
+        </h2>
+        <p class="result-subline">{{ examTitle() }}</p>
 
-        <!-- Score ring -->
-        <div class="score-ring-wrap">
-          <svg class="score-ring" viewBox="0 0 120 120">
-            <circle cx="60" cy="60" r="52" fill="none" stroke="#e9ecef" stroke-width="10"/>
-            <circle cx="60" cy="60" r="52" fill="none"
+        <!-- Score donut -->
+        <div class="donut-wrap">
+          <svg viewBox="0 0 160 160" class="donut-svg">
+            <circle cx="80" cy="80" r="68" fill="none" stroke="#f1f5f9" stroke-width="14"/>
+            <circle cx="80" cy="80" r="68" fill="none"
               [attr.stroke]="r.is_passed ? '#22c55e' : '#ef4444'"
-              stroke-width="10"
+              stroke-width="14"
               stroke-linecap="round"
-              stroke-dasharray="326.7"
-              [attr.stroke-dashoffset]="326.7 - (326.7 * (r.percentage ?? 0) / 100)"
-              transform="rotate(-90 60 60)"/>
+              stroke-dasharray="427.3"
+              [attr.stroke-dashoffset]="427.3 * (1 - (r.percentage ?? 0) / 100)"
+              transform="rotate(-90 80 80)"
+              class="donut-arc"/>
           </svg>
-          <div class="score-ring-label">
-            <div class="score-pct">{{ r.percentage ?? 0 }}%</div>
-            <div class="score-sub">স্কোর</div>
+          <div class="donut-center">
+            <div class="donut-pct">{{ r.percentage ?? 0 }}%</div>
+            <div class="donut-lbl">স্কোর</div>
           </div>
         </div>
 
-        <!-- Stats grid -->
-        <div class="result-stats">
-          <div class="stat-box">
-            <div class="stat-icon correct"><i class="fas fa-check"></i></div>
-            <div class="stat-value text-success">{{ r.correct_answers ?? 0 }}</div>
-            <div class="stat-label">সঠিক</div>
+        <!-- Stats -->
+        <div class="result-grid">
+          <div class="rstat rstat-correct">
+            <i class="fas fa-check-circle"></i>
+            <span class="rstat-num">{{ r.correct_answers ?? 0 }}</span>
+            <span class="rstat-lbl">সঠিক</span>
           </div>
-          <div class="stat-box">
-            <div class="stat-icon wrong"><i class="fas fa-times"></i></div>
-            <div class="stat-value text-danger">{{ r.wrong_answers ?? 0 }}</div>
-            <div class="stat-label">ভুল</div>
+          <div class="rstat rstat-wrong">
+            <i class="fas fa-times-circle"></i>
+            <span class="rstat-num">{{ r.wrong_answers ?? 0 }}</span>
+            <span class="rstat-lbl">ভুল</span>
           </div>
-          <div class="stat-box">
-            <div class="stat-icon skipped"><i class="fas fa-minus"></i></div>
-            <div class="stat-value text-muted">{{ (r.total_questions ?? 0) - (r.answered_questions ?? (r.correct_answers??0) + (r.wrong_answers??0)) }}</div>
-            <div class="stat-label">বাদ</div>
+          <div class="rstat rstat-skip">
+            <i class="fas fa-minus-circle"></i>
+            <span class="rstat-num">{{ questions().length - answeredCount() }}</span>
+            <span class="rstat-lbl">বাদ</span>
           </div>
-          <div class="stat-box">
-            <div class="stat-icon score-icon"><i class="fas fa-star"></i></div>
-            <div class="stat-value text-primary">{{ r.score ?? 0 }}</div>
-            <div class="stat-label">নম্বর</div>
+          <div class="rstat rstat-score">
+            <i class="fas fa-star"></i>
+            <span class="rstat-num">{{ r.score ?? 0 }}</span>
+            <span class="rstat-lbl">নম্বর</span>
           </div>
         </div>
 
-        <!-- Action buttons -->
+        <!-- Status pill -->
+        <div class="status-pill" [class.pill-pass]="r.is_passed" [class.pill-fail]="!r.is_passed">
+          {{ r.is_passed ? '✓ উত্তীর্ণ' : '✗ অনুত্তীর্ণ' }}
+        </div>
+
+        <!-- Actions -->
         <div class="result-actions">
-          <button class="result-btn result-btn-outline" (click)="backToDetail()">
-            <i class="fas fa-arrow-left me-2"></i>পরীক্ষার পেজে
+          <button class="ra-btn ra-secondary" (click)="backToDetail()">
+            <i class="fas fa-arrow-left"></i> পেছনে যান
           </button>
-          <button class="result-btn result-btn-primary" (click)="retake()">
-            <i class="fas fa-redo me-2"></i>আবার দিন
+          <button class="ra-btn ra-primary" (click)="retake()">
+            <i class="fas fa-rotate-right"></i> আবার দিন
           </button>
         </div>
 

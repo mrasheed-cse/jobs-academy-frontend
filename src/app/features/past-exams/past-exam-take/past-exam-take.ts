@@ -6,8 +6,6 @@ import { MathRenderPipe } from '../../../core/pipes/math-render.pipe';
 import { PastExamSubmitResponse } from '../../../core/models/past-exam.model';
 
 const BENGALI_LABELS = ['ক', 'খ', 'গ', 'ঘ', 'ঙ'];
-const PAGE_SIZE = 10;
-
 interface QuestionRow {
   index: number;
   questionId: number;
@@ -37,16 +35,7 @@ export class PastExamTake implements OnInit, OnDestroy {
   readonly timeRemainingSeconds = signal(3600);
   readonly isSubmitting         = signal(false);
   readonly result               = signal<PastExamSubmitResponse | null>(null);
-  readonly currentPage          = signal(0);
 
-  readonly totalPages = computed(() =>
-    Math.ceil(this.questions().length / PAGE_SIZE)
-  );
-
-  readonly visibleQuestions = computed(() => {
-    const start = this.currentPage() * PAGE_SIZE;
-    return this.questions().slice(start, start + PAGE_SIZE);
-  });
 
   readonly timeDisplay = computed(() => {
     const t = this.timeRemainingSeconds();
@@ -136,29 +125,9 @@ export class PastExamTake implements OnInit, OnDestroy {
     return this.answers.has(questionId);
   }
 
-  isOnCurrentPage(index: number): boolean {
-    const start = this.currentPage() * PAGE_SIZE;
-    return index >= start && index < start + PAGE_SIZE;
-  }
-
-  nextPage(): void {
-    if (this.currentPage() < this.totalPages() - 1) {
-      this.currentPage.update(p => p + 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }
-
-  prevPage(): void {
-    if (this.currentPage() > 0) {
-      this.currentPage.update(p => p - 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }
-
-  goToQuestion(index: number): void {
-    const page = Math.floor(index / PAGE_SIZE);
-    this.currentPage.set(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  scrollToQ(questionId: number): void {
+    const el = document.getElementById('q-' + questionId);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
   onSubmit(): void {
@@ -182,7 +151,6 @@ export class PastExamTake implements OnInit, OnDestroy {
   retake(): void {
     this.result.set(null);
     this.answers.clear();
-    this.currentPage.set(0);
     this.timeRemainingSeconds.set(this.totalDuration);
     this.questions.update(q => [...q]);
     this.startTimer();
