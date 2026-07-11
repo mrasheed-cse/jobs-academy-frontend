@@ -10,6 +10,7 @@
   --dark: #0f172a;
   --secondary: #64748b;
   --light-bg: #f8fafc;
+  --exam-bg: #fffff0;
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
 }
@@ -71,4 +72,17 @@ body {
   justify-content: center;
   font-size: 1.5rem;
   margin-bottom: 1.5rem;
+}
+
+/* Exam page background */
+.exam-page-bg,
+main app-past-exam-types,
+main app-past-exam-list,
+main app-past-exam-detail,
+main app-past-exam-take,
+main app-exam-browse,
+main app-exam-attempt {
+  background-color: var(--exam-bg) !important;
+  display: block;
+  min-height: 100%;
 }

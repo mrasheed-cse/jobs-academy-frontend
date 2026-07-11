@@ -1,0 +1,5 @@
+main {
+  /* Let child components control their own background */
+  background: inherit;
+  min-height: calc(100vh - 120px);
+}
