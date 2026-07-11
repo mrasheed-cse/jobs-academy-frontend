@@ -35,6 +35,13 @@ export class MathRenderPipe implements PipeTransform {
     // Convert sqrt() notation: sqrt(x) → √x
     html = html.replace(/sqrt\(([^)]+)\)/g, '√$1');
 
+    // Fix log base notation: log2(x) → log<sub>2</sub>(x)
+    html = html.replace(/log([0-9])\s*\(/g, 'log<sub>$1</sub>(');
+    html = html.replace(/log([0-9])\s*([^(<\s])/g, 'log<sub>$1</sub>$2');
+
+    // Fix degree symbol if missing: 180 followed by Bengali degree-like context
+    html = html.replace(/([0-9০-৯]+)\s*degree/gi, '$1°');
+
     // Convert Unicode superscript digits to <sup> for consistent styling
     const supMap: Record<string, string> = {
       '²': '<sup>2</sup>', '³': '<sup>3</sup>', '¹': '<sup>1</sup>',
