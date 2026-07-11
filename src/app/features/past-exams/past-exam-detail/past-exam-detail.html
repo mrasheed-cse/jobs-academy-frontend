@@ -1,28 +1,107 @@
-<div class="container py-4">
-  <div class="row justify-content-center">
-    <div class="col-lg-6 col-md-8">
-      @if (isLoading()) {
-        <div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>
-      } @else if (!exam()) {
-        <p class="text-danger text-center py-4">পরীক্ষা পাওয়া যায়নি।</p>
-      } @else {
-        @let e = exam()!;
-        <div class="detail-card">
-          <h2 class="fw-bold mb-4">{{ e.title }}</h2>
-          <div class="row">
-            <div class="col-6 mb-3"><div class="info-box"><span class="info-label">মোট প্রশ্ন</span><span class="fw-bold">{{ e.total_questions }}</span></div></div>
-            <div class="col-6 mb-3"><div class="info-box"><span class="info-label">পাস মার্ক</span><span class="fw-bold">{{ e.pass_mark }}</span></div></div>
-            <div class="col-6 mb-3"><div class="info-box"><span class="info-label">নেগেটিভ মার্ক</span><span class="fw-bold">{{ e.negative_mark }}</span></div></div>
-            <div class="col-6 mb-3"><div class="info-box"><span class="info-label">সময় (মিনিট)</span><span class="fw-bold">{{ e.duration }}</span></div></div>
-            <div class="col-6 mb-3"><div class="info-box"><span class="info-label">সংস্থা</span><span class="fw-bold">{{ e.organization ?? 'উল্লেখ নেই' }}</span></div></div>
-            <div class="col-6 mb-3"><div class="info-box"><span class="info-label">পরীক্ষার তারিখ</span><span class="fw-bold">{{ e.exam_date }}</span></div></div>
+<div class="page-bg">
+  <div class="container py-4">
+
+    <!-- Breadcrumb navigation -->
+    <nav class="detail-breadcrumb mb-3">
+      <a routerLink="/">হোম</a>
+      <span class="sep"><i class="fas fa-chevron-right"></i></span>
+      <a routerLink="/past-exams">পূর্ববর্তী পরীক্ষা</a>
+      <span class="sep"><i class="fas fa-chevron-right"></i></span>
+      <span class="current">বিস্তারিত</span>
+    </nav>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-7 col-md-9">
+        @if (isLoading()) {
+          <div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>
+        } @else if (!exam()) {
+          <p class="text-danger text-center py-4">পরীক্ষা পাওয়া যায়নি।</p>
+        } @else {
+          @let e = exam()!;
+          <div class="detail-card">
+
+            <!-- Back button + title -->
+            <div class="d-flex align-items-start gap-3 mb-4">
+              <button class="back-btn" (click)="goBack()" title="পিছনে যান">
+                <i class="fas fa-arrow-left"></i>
+              </button>
+              <div>
+                <h2 class="fw-bold mb-1">{{ e.title }}</h2>
+                @if (e.organization) {
+                  <p class="org-tag mb-0">
+                    <i class="fas fa-building me-1"></i>{{ e.organization }}
+                  </p>
+                }
+              </div>
+            </div>
+
+            <!-- Info grid -->
+            <div class="row g-3 mb-4">
+              <div class="col-6">
+                <div class="info-box">
+                  <i class="fas fa-list-ol info-icon"></i>
+                  <span class="info-label">মোট প্রশ্ন</span>
+                  <span class="info-value">{{ e.total_questions }}</span>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="info-box">
+                  <i class="fas fa-clock info-icon"></i>
+                  <span class="info-label">সময় (মিনিট)</span>
+                  <span class="info-value">{{ e.duration }}</span>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="info-box">
+                  <i class="fas fa-check-circle info-icon text-success"></i>
+                  <span class="info-label">পাস মার্ক</span>
+                  <span class="info-value">{{ e.pass_mark }}</span>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="info-box">
+                  <i class="fas fa-minus-circle info-icon text-danger"></i>
+                  <span class="info-label">নেগেটিভ মার্ক</span>
+                  <span class="info-value">{{ e.negative_mark }}</span>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="info-box">
+                  <i class="fas fa-calendar info-icon"></i>
+                  <span class="info-label">পরীক্ষার তারিখ</span>
+                  <span class="info-value">{{ e.exam_date }}</span>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="info-box">
+                  <i class="fas fa-building info-icon"></i>
+                  <span class="info-label">সংস্থা</span>
+                  <span class="info-value">{{ e.organization ?? 'উল্লেখ নেই' }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="d-grid gap-2">
+              <button type="button" class="btn btn-primary btn-lg" (click)="startExam()">
+                <i class="fas fa-play me-2"></i>পরীক্ষা দিন
+              </button>
+              <div class="d-flex gap-2">
+                <button type="button" class="btn btn-outline-secondary flex-grow-1" (click)="goBack()">
+                  <i class="fas fa-arrow-left me-1"></i>পিছনে যান
+                </button>
+                <button type="button" class="btn btn-outline-secondary flex-grow-1" (click)="viewLeaderboard()">
+                  <i class="fas fa-trophy me-1"></i>লিডারবোর্ড
+                </button>
+                <a [routerLink]="['/past-exams', exam()!.id, 'browse']" class="btn btn-outline-primary flex-grow-1">
+                  <i class="fas fa-eye me-1"></i>প্রশ্ন দেখুন
+                </a>
+              </div>
+            </div>
+
           </div>
-          <div class="d-flex gap-2 mt-3">
-            <button type="button" class="btn btn-primary flex-grow-1" (click)="startExam()">পরীক্ষা দিন</button>
-            <button type="button" class="btn btn-outline-secondary flex-grow-1" (click)="viewLeaderboard()">লিডারবোর্ড</button>
-          </div>
-        </div>
-      }
+        }
+      </div>
     </div>
   </div>
 </div>

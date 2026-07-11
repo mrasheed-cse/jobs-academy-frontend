@@ -1,11 +1,11 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ExamService } from '../../../core/services/exam.service';
 import { PastExamListItem } from '../../../core/models/past-exam.model';
 
 @Component({
   selector: 'app-past-exam-detail',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './past-exam-detail.html',
   styleUrl: './past-exam-detail.scss',
 })
@@ -28,4 +28,5 @@ export class PastExamDetail implements OnInit {
 
   startExam(): void { this.router.navigate(['/past-exams', 'take', this.examId]); }
   viewLeaderboard(): void { this.router.navigate(['/past-exams', 'leaderboard', this.examId]); }
+  goBack(): void { this.router.navigate(['/past-exams']); }
 }
