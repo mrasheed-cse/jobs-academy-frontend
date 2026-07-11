@@ -15,24 +15,29 @@
 
     <!-- Sticky header -->
     <div class="xbar">
-      <div class="xbar-left">
+      <!-- Row 1: Exam title -->
+      <div class="xbar-title-row">
+        <div class="xbar-icon"><i class="fas fa-file-alt"></i></div>
         <span class="xbar-title">{{ examTitle() }}</span>
       </div>
+      <!-- Row 2: Controls -->
       <div class="xbar-right">
         <div class="xbar-stat">
           <i class="fas fa-pen-to-square"></i>
-          <span>{{ answeredCount() }}/{{ questions().length }}</span>
+          <span>{{ answeredCount() }}/{{ questions().length }} উত্তর</span>
         </div>
-        <div class="xbar-timer" [class.warn]="timeRemainingSeconds() < 600" [class.danger]="timeRemainingSeconds() < 300">
+        <div class="xbar-timer"
+          [class.warn]="timeRemainingSeconds() < 600"
+          [class.danger]="timeRemainingSeconds() < 300">
           <i class="fas fa-clock"></i>
           <span>{{ timeDisplay() }}</span>
         </div>
         <button class="xbar-submit" (click)="onSubmit()" [disabled]="isSubmitting()">
-          @if (isSubmitting()) { <span class="xbar-spin"></span> } @else { <i class="fas fa-check"></i> }
+          @if (isSubmitting()) { <span class="xbar-spin"></span> } @else { <i class="fas fa-paper-plane"></i> }
           জমা দিন
         </button>
       </div>
-      <!-- timer bar -->
+      <!-- Time ribbon -->
       <div class="xbar-bar">
         <div class="xbar-bar-fill"
           [style.width]="timePercent() + '%'"

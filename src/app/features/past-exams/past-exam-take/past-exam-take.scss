@@ -33,26 +33,47 @@
   position: sticky;
   top: 0;
   z-index: 500;
-  background: #1e1b4b;
-  box-shadow: 0 2px 16px rgba(0,0,0,.3);
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+  box-shadow: 0 4px 20px rgba(0,0,0,.35);
 }
-.xbar-left {
-  display: none; // hidden on mobile, shown on md+
+
+/* Row 1: exam title */
+.xbar-title-row {
+  padding: 10px 16px 7px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.xbar-icon {
+  width: 30px; height: 30px;
+  background: rgba(99,102,241,.3);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #a5b4fc;
+  font-size: .8rem;
+  flex-shrink: 0;
 }
 .xbar-title {
-  font-size: .83rem;
-  color: #a5b4fc;
-  font-weight: 600;
-  white-space: nowrap;
+  font-size: .97rem;
+  color: #fff;
+  font-weight: 700;
+  line-height: 1.3;
   overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 340px;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
 }
+
+/* Row 2: controls */
+.xbar-left { display: none; }
 .xbar-right {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 16px;
+  padding: 8px 16px;
   justify-content: space-between;
   width: 100%;
 }
@@ -451,16 +472,20 @@
 /* ── Responsive ──────────────────────────────────────────────── */
 @media (min-width: 640px) {
   .xbar-right { justify-content: flex-end; }
+  .xbar-title { -webkit-line-clamp: 1; }
 }
 
 @media (min-width: 768px) {
-  .xbar-right { padding: 10px 24px; }
-  .xbar-left { display: flex; align-items: center; padding-left: 24px; padding-top: 10px; }
+  .xbar-title-row { padding: 12px 24px 8px; }
+  .xbar-title { font-size: 1.05rem; }
+  .xbar-right { padding: 8px 24px; }
   .exam-layout { padding: 28px 24px 60px; }
 }
 
 @media (min-width: 1024px) {
   .qmap-sidebar { display: block; }
-  .xbar-right { padding: 10px 28px; }
+  .xbar-title-row { padding: 14px 32px 9px; }
+  .xbar-title { font-size: 1.1rem; }
+  .xbar-right { padding: 10px 32px; }
   .exam-layout { padding: 28px 28px 60px; }
 }
