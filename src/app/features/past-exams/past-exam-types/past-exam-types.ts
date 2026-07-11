@@ -1,11 +1,11 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { ExamService } from '../../../core/services/exam.service';
-import { ExamType } from '../../../core/models/exam.model';
 
 @Component({
   selector: 'app-past-exam-types',
-  imports: [],
+  imports: [FormsModule],
   templateUrl: './past-exam-types.html',
   styleUrl: './past-exam-types.scss',
 })
@@ -13,24 +13,30 @@ export class PastExamTypes implements OnInit {
   private readonly examService = inject(ExamService);
   private readonly router = inject(Router);
 
-  readonly examTypes = signal<ExamType[]>([]);
+  readonly organizations = signal<any[]>([]);
   readonly isLoading = signal(true);
   readonly loadFailed = signal(false);
   readonly searchQuery = signal('');
 
-  readonly filteredTypes = () =>
-    this.examTypes().filter((t) =>
-      t.name.toLowerCase().includes(this.searchQuery().toLowerCase())
-    );
+  readonly filtered = computed(() =>
+    this.organizations().filter(o =>
+      o.name.toLowerCase().includes(this.searchQuery().toLowerCase())
+    )
+  );
 
   ngOnInit(): void {
-    this.examService.getPastExamTypes().subscribe({
-      next: (types) => { this.examTypes.set(types); this.isLoading.set(false); },
+    this.examService.getOrganizations().subscribe({
+      next: (orgs) => {
+        // Only show orgs that have past exams — filter by checking results
+        // Backend returns all orgs; we show them all and let the list page handle empty
+        this.organizations.set(orgs);
+        this.isLoading.set(false);
+      },
       error: () => { this.isLoading.set(false); this.loadFailed.set(true); },
     });
   }
 
-  openType(typeId: number): void {
-    this.router.navigate(['/past-exams', typeId]);
+  openOrg(orgId: number): void {
+    this.router.navigate(['/past-exams', 'org', orgId]);
   }
 }

@@ -25,6 +25,7 @@ export const routes: Routes = [
   { path: 'past-exams/details/:examId', loadComponent: () => import('./features/past-exams/past-exam-detail/past-exam-detail').then((m) => m.PastExamDetail) },
   { path: 'past-exams/take/:examId', canActivate: [authGuard], loadComponent: () => import('./features/past-exams/past-exam-take/past-exam-take').then((m) => m.PastExamTake) },
   { path: 'past-exams/leaderboard/:examId', loadComponent: () => import('./features/exams/exam-leaderboard/exam-leaderboard').then((m) => m.ExamLeaderboard) },
+  { path: 'past-exams/org/:orgId', loadComponent: () => import('./features/past-exams/past-exam-list/past-exam-list').then((m) => m.PastExamList) },
   { path: 'past-exams/:typeId', loadComponent: () => import('./features/past-exams/past-exam-list/past-exam-list').then((m) => m.PastExamList) },
 
   // --- Jobs & Notices ---
