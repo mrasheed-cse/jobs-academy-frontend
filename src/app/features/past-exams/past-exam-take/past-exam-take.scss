@@ -1,7 +1,7 @@
 /* ── Base ───────────────────────────────────────────────────── */
 .exam-root {
   min-height: 100vh;
-  background: #f8fafc;
+  background: #fffff0;
   font-family: 'Noto Sans Bengali', 'Segoe UI', system-ui, sans-serif;
 }
 
@@ -215,13 +215,13 @@
   width: 33px; height: 33px;
   border-radius: 8px;
   border: 1.5px solid #e2e8f0;
-  background: #f8fafc;
+  background: #fffff0;
   font-size: .7rem;
   font-weight: 700;
   color: #64748b;
   cursor: pointer;
   transition: all .12s;
-  &:hover { border-color: #6366f1; color: #6366f1; background: #eef2ff; }
+  &:hover { border-color: #6366f1; color: #6366f1; background: #fffff0; }
   &.dot-done { background: #22c55e; border-color: #22c55e; color: #fff; }
 }
 .qmap-legend {
@@ -242,7 +242,7 @@
   width: 12px; height: 12px;
   border-radius: 3px;
   border: 1.5px solid #e2e8f0;
-  background: #f8fafc;
+  background: #fffff0;
   &.leg-done { background: #22c55e; border-color: #22c55e; }
 }
 
@@ -274,7 +274,7 @@
 .qnum {
   width: 36px; height: 36px;
   border-radius: 10px;
-  background: #eef2ff;
+  background: #fffff0;
   color: #4f46e5;
   font-size: .8rem;
   font-weight: 800;
@@ -308,7 +308,7 @@
   display: flex;
   align-items: center;
   gap: 11px;
-  background: #f8fafc;
+  background: #fffff0;
   border: 2px solid #e2e8f0;
   border-radius: 12px;
   padding: 11px 14px;
@@ -316,10 +316,10 @@
   text-align: left;
   width: 100%;
   transition: all .14s;
-  &:hover { border-color: #a5b4fc; background: #eef2ff; transform: translateX(3px); }
+  &:hover { border-color: #a5b4fc; background: #fffff0; transform: translateX(3px); }
   &.opt-on {
     border-color: #4f46e5;
-    background: #eef2ff;
+    background: #fffff0;
     box-shadow: 0 3px 10px rgba(79,70,229,.15);
   }
 }
@@ -383,7 +383,7 @@
 /* ── Result ──────────────────────────────────────────────────── */
 .result-root {
   min-height: 100vh;
-  background: #f8fafc;
+  background: #fffff0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -437,8 +437,8 @@
   i { font-size: 1rem; margin-bottom: 2px; }
   &-correct { background: #f0fdf4; i { color: #22c55e; } }
   &-wrong    { background: #fff1f2; i { color: #ef4444; } }
-  &-skip     { background: #f8fafc; i { color: #94a3b8; } }
-  &-score    { background: #eef2ff; i { color: #6366f1; } }
+  &-skip     { background: #fffff0; i { color: #94a3b8; } }
+  &-score    { background: #fffff0; i { color: #6366f1; } }
 }
 .rstat-num { font-size: 1.25rem; font-weight: 800; color: #1e293b; }
 .rstat-lbl { font-size: .68rem; color: #94a3b8; font-weight: 600; }
