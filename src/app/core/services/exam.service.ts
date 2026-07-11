@@ -107,7 +107,7 @@ export class ExamService {
   }
 
   getPastExamsByOrganization(orgId: number | string): Observable<PastExamListItem[]> {
-    return this.http.get<PastExamListItem[]>(`${this.baseUrl}/quiz/past-exams/`, {
+    return this.http.get<PastExamListItem[]>(`${this.baseUrl}/quiz/past_exams/`, {
       params: { organization: orgId },
     });
   }
