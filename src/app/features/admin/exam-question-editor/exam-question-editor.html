@@ -1,0 +1,169 @@
+<div class="editor-shell">
+
+  <!-- Header -->
+  <div class="editor-header">
+    <div class="container-fluid px-4">
+      <div class="d-flex align-items-center justify-content-between py-3 flex-wrap gap-2">
+        <div class="d-flex align-items-center gap-3">
+          <a routerLink="/admin/exams" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+          </a>
+          <div>
+            <h5 class="fw-bold mb-0 text-white">{{ exam()?.title }}</h5>
+            <span class="badge" [class.bg-success]="exam()?.is_published"
+              [class.bg-warning]="!exam()?.is_published">
+              {{ exam()?.is_published ? 'প্রকাশিত' : 'অপ্রকাশিত' }}
+            </span>
+          </div>
+        </div>
+        <div class="d-flex gap-2 align-items-center">
+          <span class="text-indigo-200 small">{{ exam()?.total_questions }} প্রশ্ন</span>
+          @if (!exam()?.is_published) {
+            <button class="btn-publish" (click)="publish()" [disabled]="isPublishing()">
+              @if (isPublishing()) { <span class="spin-sm"></span> }
+              @else { <i class="fas fa-globe me-1"></i> }
+              প্রকাশ করুন
+            </button>
+          } @else {
+            <button class="btn-unpublish" (click)="unpublish()" [disabled]="isPublishing()">
+              <i class="fas fa-eye-slash me-1"></i> অপ্রকাশিত করুন
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="editor-body">
+    @if (isLoading()) {
+      <div class="text-center py-5">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="mt-2 text-muted">প্রশ্ন লোড হচ্ছে...</p>
+      </div>
+    } @else {
+      <div class="container-fluid px-4">
+
+        <!-- Success/Error toast -->
+        @if (toast()) {
+          <div class="toast-bar" [class.toast-success]="toastType()==='success'"
+            [class.toast-error]="toastType()==='error'">
+            <i class="fas" [class.fa-check-circle]="toastType()==='success'"
+              [class.fa-exclamation-circle]="toastType()==='error'"></i>
+            {{ toast() }}
+          </div>
+        }
+
+        <div class="questions-editor">
+          @for (q of questions(); track q.id; let i = $index) {
+            <div class="qe-card" [class.qe-approved]="q.status==='approved'"
+              [class.qe-submitted]="q.status==='submitted'"
+              [class.qe-rejected]="q.status==='rejected'">
+
+              <!-- Question header -->
+              <div class="qe-top">
+                <div class="qe-num-badge" [class.badge-approved]="q.status==='approved'"
+                  [class.badge-submitted]="q.status==='submitted'">
+                  {{ i + 1 }}
+                </div>
+                <div class="qe-status-row">
+                  <select class="status-select"
+                    [value]="q.status"
+                    (change)="updateStatus(q, $event)">
+                    <option value="submitted">পর্যালোচনা প্রয়োজন</option>
+                    <option value="approved">অনুমোদিত</option>
+                    <option value="rejected">প্রত্যাখ্যাত</option>
+                  </select>
+                  <span class="subject-chip">{{ q.subject || 'সাধারণ জ্ঞান' }}</span>
+                </div>
+                <button class="btn-delete-q" (click)="deleteQuestion(q)"
+                  title="প্রশ্ন মুছুন">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+
+              <!-- Question text editor -->
+              <div class="qe-body">
+                <label class="field-label">প্রশ্নের টেক্সট</label>
+                <textarea class="qe-textarea"
+                  [value]="q.text || ''"
+                  (blur)="saveQuestionText(q, $event)"
+                  rows="3"
+                  placeholder="প্রশ্নের টেক্সট লিখুন..."></textarea>
+
+                <!-- Question image -->
+                <div class="img-row">
+                  @if (q.image) {
+                    <div class="img-preview">
+                      <img [src]="q.image" alt="question image" class="preview-img">
+                      <button class="btn-remove-img" (click)="removeQuestionImage(q)">
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                  }
+                  <label class="btn-upload-img">
+                    <i class="fas fa-image me-1"></i>
+                    {{ q.image ? 'ছবি পরিবর্তন' : 'ছবি যোগ করুন' }}
+                    <input type="file" accept="image/*" class="d-none"
+                      (change)="uploadQuestionImage(q, $event)">
+                  </label>
+                </div>
+
+                <!-- Options -->
+                <div class="options-editor">
+                  <label class="field-label mt-2">উত্তরের অপশন</label>
+                  @for (opt of q.options; track opt.id; let oi = $index) {
+                    <div class="opt-editor-row" [class.opt-correct]="opt.is_correct">
+                      <button class="correct-toggle"
+                        [class.correct-active]="opt.is_correct"
+                        (click)="toggleCorrect(q, opt)"
+                        [title]="opt.is_correct ? 'সঠিক উত্তর' : 'সঠিক হিসেবে চিহ্নিত করুন'">
+                        <i class="fas" [class.fa-check-circle]="opt.is_correct"
+                          [class.fa-circle]="!opt.is_correct"></i>
+                      </button>
+                      <span class="opt-lbl-badge">{{ ['ক','খ','গ','ঘ','ঙ'][oi] }}</span>
+                      <input type="text" class="opt-input"
+                        [value]="opt.text || ''"
+                        (blur)="saveOptionText(opt, $event)"
+                        placeholder="অপশন {{ ['ক','খ','গ','ঘ'][oi] }}">
+                      @if (opt.image) {
+                        <div class="opt-img-wrap">
+                          <img [src]="opt.image" class="opt-img-preview">
+                          <button class="btn-remove-img sm" (click)="removeOptionImage(opt)">
+                            <i class="fas fa-times"></i>
+                          </button>
+                        </div>
+                      }
+                      <label class="btn-opt-img" title="ছবি যোগ করুন">
+                        <i class="fas fa-image"></i>
+                        <input type="file" accept="image/*" class="d-none"
+                          (change)="uploadOptionImage(opt, $event)">
+                      </label>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Bottom publish -->
+        @if (!exam()?.is_published && questions().length > 0) {
+          <div class="bottom-publish">
+            <p class="mb-2 text-muted small">
+              <i class="fas fa-info-circle me-1"></i>
+              সব প্রশ্ন পর্যালোচনা করুন তারপর প্রকাশ করুন।
+              <strong>{{ approvedCount() }}/{{ questions().length }}</strong> অনুমোদিত।
+            </p>
+            <button class="btn-publish-big" (click)="publish()" [disabled]="isPublishing()">
+              @if (isPublishing()) { <span class="spin-sm"></span> }
+              @else { <i class="fas fa-globe me-2"></i> }
+              পরীক্ষা প্রকাশ করুন
+            </button>
+          </div>
+        }
+
+      </div>
+    }
+  </div>
+</div>
