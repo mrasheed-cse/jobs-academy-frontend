@@ -75,5 +75,6 @@ export const routes: Routes = [
   { path: 'admin/exams', canActivate: [dictionaryAdminGuard], loadComponent: () => import('./features/admin/exam-manage/exam-manage').then(m => m.ExamManage) },
   { path: 'past-exams/:id/browse', loadComponent: () => import('./features/past-exams/exam-browse/exam-browse').then(m => m.ExamBrowse) },
   { path: 'past-exams/:id/attempt', canActivate: [authGuard], loadComponent: () => import('./features/past-exams/exam-attempt/exam-attempt').then(m => m.ExamAttempt) },
+  { path: 'admin/exams/:examId/questions', loadComponent: () => import('./features/admin/exam-question-editor/exam-question-editor').then(m => m.ExamQuestionEditor) },
   { path: '**', redirectTo: '' },
 ];
