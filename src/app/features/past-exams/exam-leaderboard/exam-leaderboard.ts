@@ -4,16 +4,12 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 
 interface LeaderboardEntry {
-  rank: number;
   username: string;
-  full_name: string;
-  score: number;
-  correct_answers: number;
-  wrong_answers: number;
-  total_questions: number;
-  percentage: number;
-  attempt_time: string;
-  is_current_user: boolean;
+  user_id: number;
+  position: number;
+  exam_title: string;
+  current_score: number;
+  best_score: number;
 }
 
 @Component({
@@ -30,26 +26,55 @@ export class ExamLeaderboard implements OnInit {
   readonly examId    = signal(0);
   readonly examTitle = signal('');
   readonly entries   = signal<LeaderboardEntry[]>([]);
-  readonly totalEntries = signal(0);
-  readonly userRank  = signal<number | null>(null);
   readonly isLoading = signal(true);
+  readonly loadFailed = signal(false);
 
-  readonly myEntry = computed(() =>
-    this.entries().find(e => e.is_current_user) ?? null
-  );
+  readonly currentUserId = signal<number | null>(null);
+
+  readonly userRank = computed(() => {
+    const uid = this.currentUserId();
+    if (!uid) return null;
+    const e = this.entries().find(e => e.user_id === uid);
+    return e?.position ?? null;
+  });
+
+  readonly myEntry = computed(() => {
+    const uid = this.currentUserId();
+    return uid ? this.entries().find(e => e.user_id === uid) ?? null : null;
+  });
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('examId'));
     this.examId.set(id);
-    this.http.get<any>(`${this.base}/quiz/past-exam/${id}/leaderboard/`).subscribe({
+
+    // Get current user from localStorage
+    const token = localStorage.getItem('token');
+    if (token) {
+      this.http.get<any>(`${this.base}/api/user-profile/`).subscribe({
+        next: (u) => this.currentUserId.set(u.id),
+        error: () => {}
+      });
+    }
+
+    this.http.get<LeaderboardEntry[]>(`${this.base}/quiz/past-exam/${id}/leaderboard/`).subscribe({
       next: (data) => {
-        this.examTitle.set(data.exam_title);
-        this.entries.set(data.entries);
-        this.totalEntries.set(data.total_entries);
-        this.userRank.set(data.user_rank);
+        this.entries.set(data);
+        if (data.length > 0) this.examTitle.set(data[0].exam_title);
         this.isLoading.set(false);
       },
-      error: () => this.isLoading.set(false),
+      error: () => { this.isLoading.set(false); this.loadFailed.set(true); },
     });
+  }
+
+  isCurrentUser(entry: LeaderboardEntry): boolean {
+    return this.currentUserId() === entry.user_id;
+  }
+
+  getInitial(username: string): string {
+    return username?.charAt(0)?.toUpperCase() ?? '?';
+  }
+
+  getPercentage(entry: LeaderboardEntry): number {
+    return 0; // score without total questions — show score only
   }
 }
