@@ -4,12 +4,15 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 
 interface LeaderboardEntry {
+  rank: number;
   username: string;
-  user_id: number;
-  position: number;
-  exam_title: string;
-  current_score: number;
-  best_score: number;
+  full_name: string;
+  score: number;
+  correct_answers: number;
+  wrong_answers: number;
+  total_questions: number;
+  attempt_time: string;
+  is_current_user: boolean;
 }
 
 @Component({
@@ -23,58 +26,35 @@ export class ExamLeaderboard implements OnInit {
   private readonly http  = inject(HttpClient);
   private readonly base  = environment.apiBaseUrl;
 
-  readonly examId    = signal(0);
-  readonly examTitle = signal('');
-  readonly entries   = signal<LeaderboardEntry[]>([]);
-  readonly isLoading = signal(true);
-  readonly loadFailed = signal(false);
+  readonly examId       = signal(0);
+  readonly examTitle    = signal('');
+  readonly entries      = signal<LeaderboardEntry[]>([]);
+  readonly totalEntries = signal(0);
+  readonly isLoading    = signal(true);
+  readonly loadFailed   = signal(false);
 
-  readonly currentUserId = signal<number | null>(null);
-
-  readonly userRank = computed(() => {
-    const uid = this.currentUserId();
-    if (!uid) return null;
-    const e = this.entries().find(e => e.user_id === uid);
-    return e?.position ?? null;
-  });
-
-  readonly myEntry = computed(() => {
-    const uid = this.currentUserId();
-    return uid ? this.entries().find(e => e.user_id === uid) ?? null : null;
-  });
+  readonly userRank  = computed(() => this.entries().find(e => e.is_current_user)?.rank ?? null);
+  readonly myEntry   = computed(() => this.entries().find(e => e.is_current_user) ?? null);
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('examId'));
     this.examId.set(id);
-
-    // Get current user from localStorage
-    const token = localStorage.getItem('token');
-    if (token) {
-      this.http.get<any>(`${this.base}/api/user-profile/`).subscribe({
-        next: (u) => this.currentUserId.set(u.id),
-        error: () => {}
-      });
-    }
-
-    this.http.get<LeaderboardEntry[]>(`${this.base}/quiz/past-exam/${id}/leaderboard/`).subscribe({
+    this.http.get<any>(`${this.base}/quiz/past-exam/${id}/leaderboard/`).subscribe({
       next: (data) => {
-        this.entries.set(data);
-        if (data.length > 0) this.examTitle.set(data[0].exam_title);
+        this.examTitle.set(data.exam_title);
+        this.entries.set(data.entries);
+        this.totalEntries.set(data.total_entries);
         this.isLoading.set(false);
       },
       error: () => { this.isLoading.set(false); this.loadFailed.set(true); },
     });
   }
 
-  isCurrentUser(entry: LeaderboardEntry): boolean {
-    return this.currentUserId() === entry.user_id;
+  getInitial(name: string): string {
+    return name?.charAt(0)?.toUpperCase() ?? '?';
   }
 
-  getInitial(username: string): string {
-    return username?.charAt(0)?.toUpperCase() ?? '?';
-  }
-
-  getPercentage(entry: LeaderboardEntry): number {
-    return 0; // score without total questions — show score only
+  getPct(e: LeaderboardEntry): number {
+    return e.total_questions > 0 ? Math.round(e.score / e.total_questions * 100) : 0;
   }
 }
