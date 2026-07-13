@@ -1,0 +1,147 @@
+<div class="lb-shell">
+
+  <!-- Header -->
+  <div class="lb-hero">
+    <div class="container">
+      <a routerLink="/past-exams" class="lb-back">
+        <i class="fas fa-arrow-left me-2"></i>পূর্ববর্তী পরীক্ষা
+      </a>
+      <div class="lb-hero-title">
+        <div class="trophy-icon"><i class="fas fa-trophy"></i></div>
+        <div>
+          <h2 class="mb-1">লিডারবোর্ড</h2>
+          <p class="mb-0 opacity-75 small">{{ examTitle() }}</p>
+        </div>
+      </div>
+
+      <!-- User's own rank card -->
+      @if (userRank()) {
+        <div class="my-rank-card">
+          <span class="my-rank-label">আপনার অবস্থান</span>
+          <span class="my-rank-num">#{{ userRank() }}</span>
+          <span class="my-rank-score">স্কোর: {{ myEntry()?.score }}</span>
+        </div>
+      }
+
+      <!-- Stats -->
+      <div class="lb-stats">
+        <div class="lb-stat">
+          <span class="lb-stat-num">{{ totalEntries() }}</span>
+          <span class="lb-stat-lbl">অংশগ্রহণকারী</span>
+        </div>
+        <div class="lb-stat">
+          <span class="lb-stat-num">{{ entries()[0]?.score ?? 0 }}</span>
+          <span class="lb-stat-lbl">সর্বোচ্চ স্কোর</span>
+        </div>
+        <div class="lb-stat">
+          <span class="lb-stat-num">{{ entries()[0]?.percentage ?? 0 }}%</span>
+          <span class="lb-stat-lbl">সর্বোচ্চ %</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="lb-body">
+    <div class="container">
+      @if (isLoading()) {
+        <div class="text-center py-5">
+          <div class="spinner-border text-primary"></div>
+          <p class="mt-2 text-muted">লোড হচ্ছে...</p>
+        </div>
+      } @else if (entries().length === 0) {
+        <div class="lb-empty">
+          <i class="fas fa-inbox fa-3x mb-3 opacity-25"></i>
+          <p>এখনো কেউ এই পরীক্ষায় অংশ নেয়নি।</p>
+          <a [routerLink]="['/past-exams', 'take', examId()]" class="btn btn-primary">
+            প্রথম হওয়ার সুযোগ নিন!
+          </a>
+        </div>
+      } @else {
+        <!-- Top 3 podium -->
+        @if (entries().length >= 3) {
+          <div class="podium">
+            <!-- 2nd -->
+            <div class="podium-spot silver">
+              <div class="podium-avatar">{{ entries()[1].full_name.charAt(0) }}</div>
+              <div class="podium-name">{{ entries()[1].full_name }}</div>
+              <div class="podium-score">{{ entries()[1].score }}</div>
+              <div class="podium-block">২য়</div>
+            </div>
+            <!-- 1st -->
+            <div class="podium-spot gold">
+              <div class="podium-crown"><i class="fas fa-crown"></i></div>
+              <div class="podium-avatar">{{ entries()[0].full_name.charAt(0) }}</div>
+              <div class="podium-name">{{ entries()[0].full_name }}</div>
+              <div class="podium-score">{{ entries()[0].score }}</div>
+              <div class="podium-block">১ম</div>
+            </div>
+            <!-- 3rd -->
+            <div class="podium-spot bronze">
+              <div class="podium-avatar">{{ entries()[2].full_name.charAt(0) }}</div>
+              <div class="podium-name">{{ entries()[2].full_name }}</div>
+              <div class="podium-score">{{ entries()[2].score }}</div>
+              <div class="podium-block">৩য়</div>
+            </div>
+          </div>
+        }
+
+        <!-- Full table -->
+        <div class="lb-table-card">
+          <table class="lb-table">
+            <thead>
+              <tr>
+                <th class="rank-col">র‍্যাংক</th>
+                <th>নাম</th>
+                <th class="num-col">স্কোর</th>
+                <th class="num-col">সঠিক</th>
+                <th class="num-col">ভুল</th>
+                <th class="num-col">%</th>
+                <th class="date-col">তারিখ</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (e of entries(); track e.rank) {
+                <tr [class.my-row]="e.is_current_user">
+                  <td class="rank-col">
+                    @if (e.rank === 1) { <span class="rank-badge gold-badge">🥇</span> }
+                    @else if (e.rank === 2) { <span class="rank-badge silver-badge">🥈</span> }
+                    @else if (e.rank === 3) { <span class="rank-badge bronze-badge">🥉</span> }
+                    @else { <span class="rank-num">#{{ e.rank }}</span> }
+                  </td>
+                  <td>
+                    <div class="user-cell">
+                      <div class="user-avatar">{{ e.full_name.charAt(0) }}</div>
+                      <span class="user-name">
+                        {{ e.full_name }}
+                        @if (e.is_current_user) { <span class="you-badge">আপনি</span> }
+                      </span>
+                    </div>
+                  </td>
+                  <td class="num-col fw-bold">{{ e.score }}</td>
+                  <td class="num-col text-success">{{ e.correct_answers }}</td>
+                  <td class="num-col text-danger">{{ e.wrong_answers }}</td>
+                  <td class="num-col">
+                    <span class="pct-badge" [class.pct-high]="e.percentage >= 80"
+                      [class.pct-mid]="e.percentage >= 50 && e.percentage < 80"
+                      [class.pct-low]="e.percentage < 50">
+                      {{ e.percentage }}%
+                    </span>
+                  </td>
+                  <td class="date-col text-muted small">{{ e.attempt_time }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- CTA -->
+        <div class="lb-cta">
+          <a [routerLink]="['/past-exams', 'take', examId()]" class="btn-try">
+            <i class="fas fa-redo me-2"></i>আবার পরীক্ষা দিন
+          </a>
+        </div>
+      }
+    </div>
+  </div>
+</div>
