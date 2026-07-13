@@ -19,7 +19,7 @@
         <div class="my-rank-card">
           <span class="my-rank-label">আপনার অবস্থান</span>
           <span class="my-rank-num">#{{ userRank() }}</span>
-          <span class="my-rank-score">স্কোর: {{ myEntry()?.best_score }}</span>
+          <span class="my-rank-score">স্কোর: {{ myEntry()?.score }}</span>
         </div>
       }
 
@@ -116,7 +116,7 @@
                       </span>
                     </div>
                   </td>
-                  <td class="num-col fw-bold text-success">{{ e.best_score }}</td>
+                  <td class="num-col fw-bold text-success">{{ e.score }}</td>
                   <td class="num-col text-muted">{{ e.current_score }}</td>
                 </tr>
               }
