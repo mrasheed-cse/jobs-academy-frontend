@@ -1,6 +1,4 @@
 <div class="lb-shell">
-
-  <!-- Header -->
   <div class="lb-hero">
     <div class="container">
       <a routerLink="/past-exams" class="lb-back">
@@ -13,8 +11,6 @@
           <p class="mb-0 opacity-75 small">{{ examTitle() }}</p>
         </div>
       </div>
-
-      <!-- User's own rank -->
       @if (userRank()) {
         <div class="my-rank-card">
           <span class="my-rank-label">আপনার অবস্থান</span>
@@ -22,22 +18,19 @@
           <span class="my-rank-score">স্কোর: {{ myEntry()?.score }}</span>
         </div>
       }
-
-      <!-- Stats -->
       <div class="lb-stats">
         <div class="lb-stat">
-          <span class="lb-stat-num">{{ entries().length }}</span>
+          <span class="lb-stat-num">{{ totalEntries() }}</span>
           <span class="lb-stat-lbl">অংশগ্রহণকারী</span>
         </div>
         <div class="lb-stat">
-          <span class="lb-stat-num">{{ entries()[0]?.best_score ?? 0 }}</span>
+          <span class="lb-stat-num">{{ entries()[0]?.score ?? 0 }}</span>
           <span class="lb-stat-lbl">সর্বোচ্চ স্কোর</span>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Body -->
   <div class="lb-body">
     <div class="container">
       @if (isLoading()) {
@@ -59,65 +52,75 @@
           </a>
         </div>
       } @else {
-
-        <!-- Top 3 podium -->
         @if (entries().length >= 3) {
           <div class="podium">
             <div class="podium-spot silver">
-              <div class="podium-avatar">{{ getInitial(entries()[1].username) }}</div>
-              <div class="podium-name">{{ entries()[1].username }}</div>
-              <div class="podium-score">{{ entries()[1].best_score }}</div>
+              <div class="podium-avatar">{{ getInitial(entries()[1].full_name) }}</div>
+              <div class="podium-name">{{ entries()[1].full_name }}</div>
+              <div class="podium-score">{{ entries()[1].score }}</div>
               <div class="podium-block">২য়</div>
             </div>
             <div class="podium-spot gold">
               <div class="podium-crown"><i class="fas fa-crown"></i></div>
-              <div class="podium-avatar">{{ getInitial(entries()[0].username) }}</div>
-              <div class="podium-name">{{ entries()[0].username }}</div>
-              <div class="podium-score">{{ entries()[0].best_score }}</div>
+              <div class="podium-avatar">{{ getInitial(entries()[0].full_name) }}</div>
+              <div class="podium-name">{{ entries()[0].full_name }}</div>
+              <div class="podium-score">{{ entries()[0].score }}</div>
               <div class="podium-block">১ম</div>
             </div>
             <div class="podium-spot bronze">
-              <div class="podium-avatar">{{ getInitial(entries()[2].username) }}</div>
-              <div class="podium-name">{{ entries()[2].username }}</div>
-              <div class="podium-score">{{ entries()[2].best_score }}</div>
+              <div class="podium-avatar">{{ getInitial(entries()[2].full_name) }}</div>
+              <div class="podium-name">{{ entries()[2].full_name }}</div>
+              <div class="podium-score">{{ entries()[2].score }}</div>
               <div class="podium-block">৩য়</div>
             </div>
           </div>
         }
 
-        <!-- Full table -->
         <div class="lb-table-card">
           <table class="lb-table">
             <thead>
               <tr>
                 <th class="rank-col">র‍্যাংক</th>
                 <th>নাম</th>
-                <th class="num-col">সেরা স্কোর</th>
-                <th class="num-col">সর্বশেষ স্কোর</th>
+                <th class="num-col">স্কোর</th>
+                <th class="num-col">সঠিক</th>
+                <th class="num-col">ভুল</th>
+                <th class="num-col">%</th>
+                <th class="date-col">তারিখ</th>
               </tr>
             </thead>
             <tbody>
-              @for (e of entries(); track e.user_id) {
-                <tr [class.my-row]="isCurrentUser(e)">
+              @for (e of entries(); track e.rank) {
+                <tr [class.my-row]="e.is_current_user">
                   <td class="rank-col">
-                    @if (e.position === 1) { <span class="rank-badge">🥇</span> }
-                    @else if (e.position === 2) { <span class="rank-badge">🥈</span> }
-                    @else if (e.position === 3) { <span class="rank-badge">🥉</span> }
-                    @else { <span class="rank-num">#{{ e.position }}</span> }
+                    @if (e.rank === 1) { <span class="rank-badge">🥇</span> }
+                    @else if (e.rank === 2) { <span class="rank-badge">🥈</span> }
+                    @else if (e.rank === 3) { <span class="rank-badge">🥉</span> }
+                    @else { <span class="rank-num">#{{ e.rank }}</span> }
                   </td>
                   <td>
                     <div class="user-cell">
-                      <div class="user-avatar">{{ getInitial(e.username) }}</div>
+                      <div class="user-avatar">{{ getInitial(e.full_name) }}</div>
                       <span class="user-name">
-                        {{ e.username }}
-                        @if (isCurrentUser(e)) {
+                        {{ e.full_name }}
+                        @if (e.is_current_user) {
                           <span class="you-badge">আপনি</span>
                         }
                       </span>
                     </div>
                   </td>
                   <td class="num-col fw-bold text-success">{{ e.score }}</td>
-                  <td class="num-col text-muted">{{ e.current_score }}</td>
+                  <td class="num-col text-success">{{ e.correct_answers }}</td>
+                  <td class="num-col text-danger">{{ e.wrong_answers }}</td>
+                  <td class="num-col">
+                    <span class="pct-badge"
+                      [class.pct-high]="getPct(e) >= 80"
+                      [class.pct-mid]="getPct(e) >= 50 && getPct(e) < 80"
+                      [class.pct-low]="getPct(e) < 50">
+                      {{ getPct(e) }}%
+                    </span>
+                  </td>
+                  <td class="date-col text-muted small">{{ e.attempt_time }}</td>
                 </tr>
               }
             </tbody>
