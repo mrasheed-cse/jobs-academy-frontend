@@ -3,9 +3,23 @@
   <!-- ── LOADING ─────────────────────────────────────────── -->
   @if (isLoading()) {
     <div class="load-screen">
-      <div class="load-card">
-        <div class="load-ring"></div>
-        <p>প্রশ্নপত্র লোড হচ্ছে...</p>
+      <div class="load-hero">
+        <div class="load-logo"><i class="fas fa-graduation-cap"></i></div>
+        <h2 class="load-title">প্রশ্নপত্র লোড হচ্ছে</h2>
+        <p class="load-sub">অনুগ্রহ করে অপেক্ষা করুন...</p>
+        <div class="load-bar-wrap"><div class="load-bar-fill"></div></div>
+      </div>
+      <div class="load-skeleton-wrap">
+        @for (n of [1,2]; track n) {
+          <div class="load-sk-card">
+            <div class="sk-line sk-num"></div>
+            <div class="sk-line sk-long"></div>
+            <div class="sk-line sk-med"></div>
+            <div class="sk-opts">
+              @for (o of [1,2,3,4]; track o) { <div class="sk-opt"></div> }
+            </div>
+          </div>
+        }
       </div>
     </div>
   }

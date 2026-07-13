@@ -13,7 +13,24 @@
     <div class="row justify-content-center">
       <div class="col-lg-7 col-md-9">
         @if (isLoading()) {
-          <div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>
+          <div class="detail-loading">
+            <div class="dl-card">
+              <div class="dl-sk-header">
+                <div class="sk-b sk-b-sq"></div>
+                <div style="flex:1"><div class="sk-b sk-b-long"></div><div class="sk-b sk-b-short mt-2"></div></div>
+              </div>
+              <div class="dl-sk-grid">
+                @for (n of [1,2,3,4,5,6]; track n) {
+                  <div class="dl-sk-stat">
+                    <div class="sk-b sk-b-icon"></div>
+                    <div class="sk-b sk-b-label"></div>
+                    <div class="sk-b sk-b-val"></div>
+                  </div>
+                }
+              </div>
+              <div class="sk-b sk-b-btn"></div>
+            </div>
+          </div>
         } @else if (!exam()) {
           <p class="text-danger text-center py-4">পরীক্ষা পাওয়া যায়নি।</p>
         } @else {
