@@ -94,6 +94,7 @@
       <!-- All questions -->
       <main class="qlist">
         @for (q of questions(); track q.questionId; let i = $index) {
+          @defer (on viewport; prefetch on idle) {
           <div class="qcard" [id]="'q-' + q.questionId" [class.qcard-done]="isAnswered(q.questionId)">
             <div class="qcard-inner">
               <div class="qnum" [class.qnum-done]="isAnswered(q.questionId)">{{ i + 1 }}</div>
@@ -121,6 +122,21 @@
               </div>
             </div>
           </div>
+          } @placeholder (minimum 50ms) {
+            <div class="qcard-ph" [id]="'q-' + q.questionId">
+              <div class="ph-inner">
+                <div class="ph-num"></div>
+                <div class="ph-body">
+                  <div class="ph-line ph-l"></div>
+                  <div class="ph-line ph-m"></div>
+                  <div class="ph-opts">
+                    <div class="ph-opt"></div><div class="ph-opt"></div>
+                    <div class="ph-opt"></div><div class="ph-opt"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
         }
 
         <!-- Bottom submit -->
