@@ -1,0 +1,266 @@
+<div class="wi-shell">
+
+  <!-- Header -->
+  <div class="wi-header">
+    <div class="container-fluid px-4 py-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
+      <div class="d-flex align-items-center gap-3">
+        <a routerLink="/admin" class="wi-back"><i class="fas fa-arrow-left"></i></a>
+        <div>
+          <h5 class="fw-bold mb-0 text-white">শব্দ আমদানি</h5>
+          <span class="text-indigo-200 small">AI-powered English Dictionary Builder</span>
+        </div>
+      </div>
+      <div class="d-flex gap-2">
+        <button class="btn-tab" [class.active]="tab() === 'upload'" (click)="tab.set('upload')">
+          <i class="fas fa-upload me-1"></i>আপলোড
+        </button>
+        <button class="btn-tab" [class.active]="tab() === 'review'" (click)="loadPending(); tab.set('review')">
+          <i class="fas fa-check-circle me-1"></i>পর্যালোচনা
+          @if (pendingWords().length > 0) {
+            <span class="badge-count">{{ pendingWords().length }}</span>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wi-body">
+    <div class="container-fluid px-4">
+
+      <!-- Toast -->
+      @if (toast()) {
+        <div class="wi-toast" [class.toast-ok]="toastType()==='ok'" [class.toast-err]="toastType()==='err'">
+          <i class="fas" [class.fa-check-circle]="toastType()==='ok'" [class.fa-exclamation-circle]="toastType()==='err'"></i>
+          {{ toast() }}
+        </div>
+      }
+
+      <!-- ── Upload Tab ─────────────────────────────────────────── -->
+      @if (tab() === 'upload') {
+        <div class="upload-section">
+          <div class="upload-card">
+            <div class="upload-icon"><i class="fas fa-file-excel"></i></div>
+            <h4 class="fw-bold mb-2">Excel ফাইল আপলোড করুন</h4>
+            <p class="text-muted small mb-4">
+              প্রথম কলামে ইংরেজি শব্দের তালিকা রাখুন। AI প্রতিটি শব্দের অর্থ, উচ্চারণ, উদাহরণ বাক্য এবং বাংলা অনুবাদ তৈরি করবে।
+            </p>
+
+            <!-- Drop zone -->
+            <label class="drop-zone" [class.drop-active]="dragOver()"
+              (dragover)="$event.preventDefault(); dragOver.set(true)"
+              (dragleave)="dragOver.set(false)"
+              (drop)="onDrop($event)">
+              <i class="fas fa-cloud-upload-alt fa-2x mb-3 text-indigo-400"></i>
+              @if (selectedFile()) {
+                <p class="fw-bold text-success mb-1"><i class="fas fa-check me-1"></i>{{ selectedFile()!.name }}</p>
+                <p class="text-muted small">{{ wordCount() }} টি শব্দ পাওয়া গেছে</p>
+              } @else {
+                <p class="fw-semibold mb-1">Excel ফাইল ড্র্যাগ করুন বা ক্লিক করুন</p>
+                <p class="text-muted small">.xlsx ফাইল, প্রথম কলামে শব্দের তালিকা</p>
+              }
+              <input type="file" accept=".xlsx,.xls" class="d-none" (change)="onFileSelect($event)">
+            </label>
+
+            @if (!isImporting()) {
+              <button class="btn-import" (click)="startImport()"
+                [disabled]="!selectedFile()">
+                <i class="fas fa-rocket me-2"></i>AI দিয়ে আমদানি শুরু করুন
+              </button>
+            }
+
+            <!-- Progress -->
+            @if (isImporting() || jobStatus()) {
+              @let s = jobStatus();
+              <div class="import-progress">
+                <div class="progress-header">
+                  <span class="fw-bold">{{ s?.current_word || 'প্রস্তুত হচ্ছে...' }}</span>
+                  <span class="fw-bold text-indigo">{{ s?.progress_percent ?? 0 }}%</span>
+                </div>
+                <div class="progress-bar-wrap">
+                  <div class="progress-bar-fill" [style.width]="(s?.progress_percent ?? 0) + '%'"></div>
+                </div>
+                <!-- Summary stats -->
+                <div class="import-stats-grid">
+                  <div class="istat">
+                    <span class="istat-num">{{ s?.total_attempted ?? 0 }}</span>
+                    <span class="istat-lbl">মোট শব্দ</span>
+                  </div>
+                  <div class="istat istat-skip">
+                    <span class="istat-num">{{ s?.skipped_duplicates ?? 0 }}</span>
+                    <span class="istat-lbl">ডুপ্লিকেট বাদ</span>
+                  </div>
+                  <div class="istat istat-ok">
+                    <span class="istat-num">{{ s?.processed_words ?? 0 }}</span>
+                    <span class="istat-lbl">সফল</span>
+                  </div>
+                  <div class="istat istat-err">
+                    <span class="istat-num">{{ s?.failed_words ?? 0 }}</span>
+                    <span class="istat-lbl">ব্যর্থ</span>
+                  </div>
+                  <div class="istat istat-pending">
+                    <span class="istat-num">{{ (s?.words_to_process ?? 0) - (s?.processed_words ?? 0) - (s?.failed_words ?? 0) }}</span>
+                    <span class="istat-lbl">বাকি</span>
+                  </div>
+                </div>
+                @if (s?.skipped_duplicates && s?.skipped_duplicates > 0) {
+                  <div class="duplicate-info">
+                    <i class="fas fa-info-circle me-1"></i>
+                    {{ s?.skipped_duplicates }} টি শব্দ ইতিমধ্যে ডেটাবেসে আছে, বাদ দেওয়া হয়েছে।
+                    @if (s?.skipped_list?.length && s?.skipped_list?.length <= 10) {
+                      <span class="skipped-words"> ({{ s?.skipped_list?.join(', ') }})</span>
+                    }
+                  </div>
+                }
+                @if (s?.status === 'done') {
+                  <div class="import-done">
+                    <i class="fas fa-check-circle text-success me-2"></i>
+                    আমদানি সম্পন্ন! {{ s?.processed_words }} টি শব্দ পর্যালোচনার জন্য অপেক্ষায় আছে।
+                    <button class="btn-go-review ms-2" (click)="loadPending(); tab.set('review')">
+                      পর্যালোচনা করুন →
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+
+          </div>
+
+          <!-- Instructions -->
+          <div class="instructions-card">
+            <h6 class="fw-bold mb-3"><i class="fas fa-info-circle me-2 text-indigo"></i>কীভাবে ব্যবহার করবেন</h6>
+            <ol class="instruction-list">
+              <li>Excel ফাইলের <strong>A কলামে</strong> ইংরেজি শব্দগুলো লিখুন (একটি করে প্রতি সারিতে)</li>
+              <li>ফাইল আপলোড করুন এবং <strong>"AI দিয়ে আমদানি শুরু করুন"</strong> ক্লিক করুন</li>
+              <li>AI প্রতিটি শব্দের জন্য: অর্থ, উচ্চারণ, বাংলা অনুবাদ, উদাহরণ বাক্য তৈরি করবে</li>
+              <li><strong>পর্যালোচনা</strong> ট্যাবে গিয়ে প্রতিটি শব্দ যাচাই করুন</li>
+              <li>সঠিক শব্দগুলো অনুমোদন করুন — অনুমোদিত শব্দ ব্যবহারকারীদের জন্য প্রকাশিত হবে</li>
+            </ol>
+          </div>
+        </div>
+      }
+
+      <!-- ── Review Tab ──────────────────────────────────────────── -->
+      @if (tab() === 'review') {
+        <div class="review-section">
+          <!-- Toolbar -->
+          <div class="review-toolbar">
+            <div class="d-flex align-items-center gap-2">
+              <span class="fw-bold">{{ pendingWords().length }} টি শব্দ পর্যালোচনায় আছে</span>
+            </div>
+            <div class="d-flex gap-2">
+              <button class="btn-bulk-approve" (click)="bulkApproveAll()" [disabled]="isBulkApproving()">
+                @if (isBulkApproving()) { <span class="spin-sm"></span> }
+                @else { <i class="fas fa-check-double me-1"></i> }
+                সব অনুমোদন করুন
+              </button>
+            </div>
+          </div>
+
+          @if (isLoadingPending()) {
+            <div class="text-center py-5">
+              <div class="spinner-border text-primary"></div>
+              <p class="mt-2 text-muted">শব্দ লোড হচ্ছে...</p>
+            </div>
+          } @else if (pendingWords().length === 0) {
+            <div class="review-empty">
+              <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+              <p class="fw-bold">সব শব্দ পর্যালোচনা সম্পন্ন!</p>
+              <p class="text-muted small">নতুন শব্দ আমদানি করতে আপলোড ট্যাবে যান।</p>
+            </div>
+          } @else {
+            <div class="word-grid">
+              @for (w of pendingWords(); track w.id) {
+                <div class="word-card" [class.editing]="editingId() === w.id">
+                  <!-- Word header -->
+                  <div class="wc-head">
+                    <div>
+                      <span class="word-text">{{ w.text }}</span>
+                      <span class="pos-badge">{{ w.part_of_speech }}</span>
+                      <span class="level-badge level-{{ w.word_level }}">{{ w.word_level }}</span>
+                    </div>
+                    <div class="wc-phonetic">{{ w.phonetic_uk }}</div>
+                  </div>
+
+                  <!-- Content (view mode) -->
+                  @if (editingId() !== w.id) {
+                    <div class="wc-body">
+                      <div class="wc-field">
+                        <label>সংজ্ঞা</label>
+                        <p>{{ w.short_definition }}</p>
+                      </div>
+                      <div class="wc-field">
+                        <label>বাংলা অর্থ</label>
+                        <p class="bangla">{{ w.bangla_meaning }}</p>
+                      </div>
+                      <div class="wc-field">
+                        <label>উদাহরণ</label>
+                        <p class="example-en">{{ w.example_sentence }}</p>
+                        <p class="example-bn bangla">{{ w.example_bangla }}</p>
+                      </div>
+                      @if (w.synonyms) {
+                        <div class="wc-field">
+                          <label>Synonyms</label>
+                          <p class="synonyms">{{ w.synonyms }}</p>
+                        </div>
+                      }
+                    </div>
+                    <div class="wc-actions">
+                      <button class="btn-edit" (click)="startEdit(w)">
+                        <i class="fas fa-edit me-1"></i>সম্পাদনা
+                      </button>
+                      <button class="btn-reject" (click)="rejectWord(w)">
+                        <i class="fas fa-times me-1"></i>প্রত্যাখ্যান
+                      </button>
+                      <button class="btn-approve" (click)="approveWord(w)">
+                        <i class="fas fa-check me-1"></i>অনুমোদন
+                      </button>
+                    </div>
+
+                  } @else {
+                    <!-- Edit mode -->
+                    <div class="wc-edit-body">
+                      <div class="edit-row">
+                        <label>সংজ্ঞা (English)</label>
+                        <textarea class="edit-field" [(ngModel)]="editData.short_definition" rows="2"></textarea>
+                      </div>
+                      <div class="edit-row">
+                        <label>বাংলা অর্থ</label>
+                        <input class="edit-field" [(ngModel)]="editData.bangla_meaning">
+                      </div>
+                      <div class="edit-row">
+                        <label>উদাহরণ বাক্য</label>
+                        <input class="edit-field" [(ngModel)]="editData.example_sentence">
+                      </div>
+                      <div class="edit-row">
+                        <label>বাংলা অনুবাদ</label>
+                        <input class="edit-field" [(ngModel)]="editData.example_bangla">
+                      </div>
+                      <div class="edit-row">
+                        <label>Synonyms</label>
+                        <input class="edit-field" [(ngModel)]="editData.synonyms">
+                      </div>
+                      <div class="edit-row">
+                        <label>উচ্চারণ (UK)</label>
+                        <input class="edit-field" [(ngModel)]="editData.phonetic_uk">
+                      </div>
+                    </div>
+                    <div class="wc-actions">
+                      <button class="btn-cancel" (click)="cancelEdit()">বাতিল</button>
+                      <button class="btn-save" (click)="saveEdit(w)">
+                        <i class="fas fa-save me-1"></i>সংরক্ষণ
+                      </button>
+                      <button class="btn-approve" (click)="saveAndApprove(w)">
+                        <i class="fas fa-check me-1"></i>সংরক্ষণ ও অনুমোদন
+                      </button>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+    </div>
+  </div>
+</div>
