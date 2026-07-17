@@ -48,8 +48,8 @@ export class WordImport implements OnInit, OnDestroy {
   }
 
   private estimateWordCount(file: File): void {
-    // Rough estimate based on file size — actual count shown after upload
-    this.wordCount.set(Math.round(file.size / 15));
+    // Actual count returned from server after upload starts
+    this.wordCount.set(0);
   }
 
   startImport(): void {
