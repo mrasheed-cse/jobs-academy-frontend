@@ -115,7 +115,7 @@
                     (click)="setFilterOrg('')">সব সংস্থা</button>
                   @for (org of organizations(); track org.id) {
                     <button class="org-chip" [class.active]="filterOrgId() === org.id.toString()"
-                      (click)="setFilterOrg(String(org.id))">{{ org.name }}</button>
+                      (click)="setFilterOrg(org.id.toString())">{{ org.name }}</button>
                   }
                 </div>
               </div>
