@@ -107,16 +107,26 @@
               <h6 class="settings-title">পূর্ববর্তী পরীক্ষা নির্বাচন করুন</h6>
               <p class="text-muted small mb-3">নিচের তালিকা থেকে যে পরীক্ষাগুলো থেকে প্রশ্ন নিতে চান সেগুলো বেছে নিন।</p>
 
+              <!-- Organization filter chips -->
+              <div class="org-filter-wrap mb-3">
+                <p class="small fw-semibold mb-2">সংস্থা ফিল্টার করুন (একাধিক নির্বাচন করুন):</p>
+                <div class="org-chips">
+                  <button class="org-chip" [class.active]="!filterOrgId()"
+                    (click)="setFilterOrg('')">সব সংস্থা</button>
+                  @for (org of organizations(); track org.id) {
+                    <button class="org-chip" [class.active]="filterOrgId() === String(org.id)"
+                      (click)="setFilterOrg(String(org.id))">{{ org.name }}</button>
+                  }
+                </div>
+              </div>
+
               @if (isLoadingExams()) {
                 <div class="text-center py-3"><div class="spinner-border spinner-border-sm text-primary"></div></div>
-              } @else if (pastExams().length === 0) {
-                <p class="text-muted small text-center py-3">
-                  @if (selectedOrgId()) { এই সংস্থার কোনো পরীক্ষা নেই। }
-                  @else { উপরে সংস্থা নির্বাচন করুন। }
-                </p>
+              } @else if (allPastExams().length === 0) {
+                <p class="text-muted small text-center py-3">কোনো পূর্ববর্তী পরীক্ষা পাওয়া যায়নি।</p>
               } @else {
                 <div class="exam-checklist">
-                  @for (exam of pastExams(); track exam.id) {
+                  @for (exam of filteredPastExams(); track exam.id) {
                     <label class="exam-check-item" [class.checked]="isExamSelected(exam.id)"
                       (click)="toggleExam(exam.id)">
                       <span class="check-box" [class.checked]="isExamSelected(exam.id)">
@@ -124,7 +134,9 @@
                       </span>
                       <div class="exam-check-info">
                         <span class="exam-check-title">{{ exam.title }}</span>
-                        <span class="exam-check-meta">{{ exam.total_questions }} প্রশ্ন · {{ exam.exam_date }}</span>
+                        <span class="exam-check-meta">
+                          {{ exam.organization }} · {{ exam.total_questions }} প্রশ্ন · {{ exam.exam_date }}
+                        </span>
                       </div>
                     </label>
                   }
@@ -133,6 +145,7 @@
                   <div class="selected-summary">
                     <i class="fas fa-check-circle text-success me-1"></i>
                     {{ selectedExamIds().length }} টি পরীক্ষা নির্বাচিত
+                    ({{ selectedQuestionCount() }} প্রশ্ন উপলব্ধ)
                   </div>
                 }
               }

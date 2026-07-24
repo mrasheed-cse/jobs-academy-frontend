@@ -36,6 +36,22 @@ export class ModelTestCreate implements OnInit {
   readonly pastExams      = signal<any[]>([]);
   readonly selectedExamIds = signal<number[]>([]);
   readonly recentExams    = signal<any[]>([]);
+  readonly allPastExams   = signal<any[]>([]);
+  readonly filterOrgId    = signal('');
+  readonly String = String;  // expose to template
+
+  readonly filteredPastExams = computed(() => {
+    const orgId = this.filterOrgId();
+    const all = this.allPastExams();
+    if (!orgId) return all;
+    return all.filter(e => String(e.organization_id) === orgId);
+  });
+
+  readonly selectedQuestionCount = computed(() =>
+    this.allPastExams()
+      .filter(e => this.selectedExamIds().includes(e.id))
+      .reduce((sum, e) => sum + e.total_questions, 0)
+  );
 
   readonly isLoadingExams = signal(false);
   readonly isCreating     = signal(false);
@@ -56,6 +72,7 @@ export class ModelTestCreate implements OnInit {
     this.loadOrganizations();
     this.loadExamTypes();
     this.loadRecentExams();
+    this.loadAllPastExams();
   }
 
   private showToast(msg: string, type: 'ok' | 'err' = 'ok'): void {
@@ -88,11 +105,23 @@ export class ModelTestCreate implements OnInit {
     });
   }
 
+  loadAllPastExams(): void {
+    this.isLoadingExams.set(true);
+    this.http.get<any>(`${this.base}/quiz/model-tests/past-exams/`).subscribe({
+      next: (res) => {
+        this.allPastExams.set(res.past_exams || []);
+        this.isLoadingExams.set(false);
+      },
+      error: () => this.isLoadingExams.set(false),
+    });
+  }
+
+  setFilterOrg(orgId: string): void {
+    this.filterOrgId.set(orgId);
+  }
+
   onOrgChange(orgId: string): void {
     this.selectedOrgId.set(orgId);
-    this.selectedExamIds.set([]);
-    this.pastExams.set([]);
-    if (orgId) this.loadPastExams(orgId);
   }
 
   loadPastExams(orgId: string): void {
