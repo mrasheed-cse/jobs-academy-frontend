@@ -30,6 +30,9 @@
                   } @else if (q.text) {
                     <p class="fw-semibold mb-0" [innerHTML]="q.text | mathRender"></p>
                   }
+                  @if (q.sourceExam) {
+                    <span class="source-tag"><i class="fas fa-tag me-1"></i>{{ q.sourceExam }}</span>
+                  }
                 </div>
               </div>
 

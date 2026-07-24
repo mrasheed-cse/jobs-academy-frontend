@@ -114,3 +114,11 @@
   color: #495057;
   font-weight: 500;
 }
+
+.source-tag {
+  display: inline-flex; align-items: center;
+  background: #eef2ff; color: #4f46e5;
+  padding: 2px 10px; border-radius: 50px;
+  font-size: .7rem; font-weight: 700;
+  margin-top: 6px;
+}

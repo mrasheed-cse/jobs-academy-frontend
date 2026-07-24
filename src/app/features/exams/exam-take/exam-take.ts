@@ -54,6 +54,7 @@ export class ExamTake implements OnInit, OnDestroy {
       questionId: q.question.id,
       text: q.question.text || null,
       image: q.question.image || null,
+      sourceExam: (q.question as any).source_exam || null,
       isLocked: !this.hasFullAccess() && index >= FREE_QUESTION_LIMIT,
       options: q.question.options.map((opt, optIndex) => ({
         id: opt.id,
