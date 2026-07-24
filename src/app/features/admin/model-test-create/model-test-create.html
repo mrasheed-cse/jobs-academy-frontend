@@ -1,0 +1,242 @@
+<div class="mc-shell">
+
+  <!-- Header -->
+  <div class="mc-header">
+    <div class="container-fluid px-4 py-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
+      <div class="d-flex align-items-center gap-3">
+        <a routerLink="/admin" class="mc-back"><i class="fas fa-arrow-left"></i></a>
+        <div>
+          <h5 class="fw-bold mb-0 text-white">মডেল টেস্ট তৈরি</h5>
+          <span class="text-indigo-200 small">নতুন মডেল টেস্ট পরিকল্পনা করুন</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mc-body">
+    <div class="container-fluid px-4">
+
+      <!-- Toast -->
+      @if (toast()) {
+        <div class="mc-toast" [class.toast-ok]="toastType()==='ok'" [class.toast-err]="toastType()==='err'">
+          <i class="fas" [class.fa-check-circle]="toastType()==='ok'" [class.fa-exclamation-circle]="toastType()==='err'"></i>
+          {{ toast() }}
+        </div>
+      }
+
+      <div class="create-grid">
+
+        <!-- Left: Settings -->
+        <div class="settings-col">
+
+          <!-- Method tabs -->
+          <div class="method-tabs">
+            <button class="method-tab" [class.active]="method() === 'question_bank'" (click)="method.set('question_bank')">
+              <i class="fas fa-database me-2"></i>প্রশ্ন ব্যাংক থেকে
+            </button>
+            <button class="method-tab" [class.active]="method() === 'excel'" (click)="method.set('excel')">
+              <i class="fas fa-file-excel me-2"></i>Excel থেকে
+            </button>
+          </div>
+
+          <!-- Basic settings (common) -->
+          <div class="settings-card">
+            <h6 class="settings-title">মডেল টেস্টের বিবরণ</h6>
+
+            <div class="field-group">
+              <label>মডেল টেস্টের নাম *</label>
+              <input type="text" class="field-input" [ngModel]="title()" (ngModelChange)="title.set($event)"
+                placeholder="যেমন: সমবায় অধিদপ্তর মডেল টেস্ট ০১">
+            </div>
+
+            <div class="field-row">
+              <div class="field-group">
+                <label>সংস্থা</label>
+                <select class="field-input" [ngModel]="selectedOrgId()" (ngModelChange)="onOrgChange($event)">
+                  <option value="">-- নির্বাচন করুন --</option>
+                  @for (org of organizations(); track org.id) {
+                    <option [value]="org.id">{{ org.name }}</option>
+                  }
+                </select>
+              </div>
+              <div class="field-group">
+                <label>পরীক্ষার ধরন</label>
+                <select class="field-input" [ngModel]="examTypeId()" (ngModelChange)="examTypeId.set($event)">
+                  @for (t of examTypes(); track t.id) {
+                    <option [value]="t.id">{{ t.name }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field-group">
+                <label>মোট প্রশ্ন</label>
+                <input type="number" class="field-input" [ngModel]="totalQuestions()"
+                  (ngModelChange)="totalQuestions.set($event)" min="5" max="200">
+              </div>
+              <div class="field-group">
+                <label>সময় (মিনিট)</label>
+                <input type="number" class="field-input" [ngModel]="duration()"
+                  (ngModelChange)="duration.set($event)" min="10" max="300">
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field-group">
+                <label>মোট নম্বর</label>
+                <input type="number" class="field-input" [ngModel]="totalMarks()"
+                  (ngModelChange)="totalMarks.set($event)" min="1">
+              </div>
+              <div class="field-group">
+                <label>পাস মার্ক</label>
+                <input type="number" class="field-input" [ngModel]="passMark()"
+                  (ngModelChange)="passMark.set($event)" min="1">
+              </div>
+              <div class="field-group">
+                <label>নেগেটিভ মার্ক</label>
+                <input type="number" class="field-input" [ngModel]="negativeMark()"
+                  (ngModelChange)="negativeMark.set($event)" min="0" max="1" step="0.25">
+              </div>
+            </div>
+          </div>
+
+          <!-- Question bank method -->
+          @if (method() === 'question_bank') {
+            <div class="settings-card">
+              <h6 class="settings-title">পূর্ববর্তী পরীক্ষা নির্বাচন করুন</h6>
+              <p class="text-muted small mb-3">নিচের তালিকা থেকে যে পরীক্ষাগুলো থেকে প্রশ্ন নিতে চান সেগুলো বেছে নিন।</p>
+
+              @if (isLoadingExams()) {
+                <div class="text-center py-3"><div class="spinner-border spinner-border-sm text-primary"></div></div>
+              } @else if (pastExams().length === 0) {
+                <p class="text-muted small text-center py-3">
+                  @if (selectedOrgId()) { এই সংস্থার কোনো পরীক্ষা নেই। }
+                  @else { উপরে সংস্থা নির্বাচন করুন। }
+                </p>
+              } @else {
+                <div class="exam-checklist">
+                  @for (exam of pastExams(); track exam.id) {
+                    <label class="exam-check-item" [class.checked]="isExamSelected(exam.id)"
+                      (click)="toggleExam(exam.id)">
+                      <span class="check-box" [class.checked]="isExamSelected(exam.id)">
+                        @if (isExamSelected(exam.id)) { <i class="fas fa-check"></i> }
+                      </span>
+                      <div class="exam-check-info">
+                        <span class="exam-check-title">{{ exam.title }}</span>
+                        <span class="exam-check-meta">{{ exam.total_questions }} প্রশ্ন · {{ exam.exam_date }}</span>
+                      </div>
+                    </label>
+                  }
+                </div>
+                @if (selectedExamIds().length > 0) {
+                  <div class="selected-summary">
+                    <i class="fas fa-check-circle text-success me-1"></i>
+                    {{ selectedExamIds().length }} টি পরীক্ষা নির্বাচিত
+                  </div>
+                }
+              }
+            </div>
+          }
+
+          <!-- Excel method -->
+          @if (method() === 'excel') {
+            <div class="settings-card">
+              <h6 class="settings-title">Excel ফাইল আপলোড করুন</h6>
+
+              <div class="excel-format-info">
+                <p class="fw-semibold mb-2 small">Excel কলামের ফরম্যাট:</p>
+                <div class="format-table">
+                  <div class="format-row header">
+                    <span>A: Question</span><span>B: Option1</span><span>C: Option2</span>
+                    <span>D: Option3</span><span>E: Option4</span><span>F: Answer</span><span>G: Subject</span>
+                  </div>
+                  <div class="format-row example">
+                    <span>বাংলাদেশের রাজধানী?</span><span>ঢাকা</span><span>চট্টগ্রাম</span>
+                    <span>রাজশাহী</span><span>খুলনা</span><span>A</span><span>GK</span>
+                  </div>
+                </div>
+              </div>
+
+              <label class="excel-drop-zone" [class.drop-active]="dragOver()"
+                (dragover)="$event.preventDefault(); dragOver.set(true)"
+                (dragleave)="dragOver.set(false)"
+                (drop)="onDrop($event)">
+                @if (excelFile()) {
+                  <p class="fw-bold text-success mb-1"><i class="fas fa-check me-1"></i>{{ excelFile()!.name }}</p>
+                } @else {
+                  <i class="fas fa-file-excel fa-2x mb-2 text-success"></i>
+                  <p class="mb-1 fw-semibold">Excel ফাইল ড্র্যাগ করুন বা ক্লিক করুন</p>
+                  <p class="text-muted small">.xlsx ফাইল</p>
+                }
+                <input type="file" accept=".xlsx,.xls" class="d-none" (change)="onFileSelect($event)">
+              </label>
+            </div>
+          }
+
+          <!-- Submit -->
+          <button class="btn-create" (click)="create()" [disabled]="isCreating() || !canCreate()">
+            @if (isCreating()) { <span class="spin-sm"></span> }
+            @else { <i class="fas fa-plus-circle me-2"></i> }
+            মডেল টেস্ট তৈরি করুন
+          </button>
+
+        </div>
+
+        <!-- Right: Preview -->
+        <div class="preview-col">
+          <div class="preview-card">
+            <h6 class="settings-title">পূর্বরূপ</h6>
+            <div class="preview-name">{{ title() || 'মডেল টেস্টের নাম...' }}</div>
+            <div class="preview-meta">
+              <div class="pm-row"><i class="fas fa-list-ol"></i><span>প্রশ্ন: {{ totalQuestions() }}</span></div>
+              <div class="pm-row"><i class="fas fa-clock"></i><span>সময়: {{ duration() }} মিনিট</span></div>
+              <div class="pm-row"><i class="fas fa-star"></i><span>মোট: {{ totalMarks() }} নম্বর</span></div>
+              <div class="pm-row"><i class="fas fa-check-circle text-success"></i><span>পাস: {{ passMark() }}</span></div>
+              <div class="pm-row"><i class="fas fa-minus-circle text-danger"></i><span>নেগেটিভ: {{ negativeMark() }}</span></div>
+              @if (selectedOrgId()) {
+                <div class="pm-row"><i class="fas fa-building"></i>
+                  <span>{{ organizations() | orgName:selectedOrgId() }}</span>
+                </div>
+              }
+              @if (method() === 'question_bank' && selectedExamIds().length > 0) {
+                <div class="pm-row"><i class="fas fa-database text-indigo"></i>
+                  <span>{{ selectedExamIds().length }} টি পরীক্ষা থেকে প্রশ্ন</span>
+                </div>
+              }
+              @if (method() === 'excel' && excelFile()) {
+                <div class="pm-row"><i class="fas fa-file-excel text-success"></i>
+                  <span>{{ excelFile()!.name }}</span>
+                </div>
+              }
+            </div>
+
+            @if (createdExamId()) {
+              <div class="create-success">
+                <i class="fas fa-trophy text-warning fa-2x mb-2"></i>
+                <p class="fw-bold mb-2">মডেল টেস্ট তৈরি হয়েছে!</p>
+                <a [routerLink]="['/model-tests', 'details', createdExamId()]" class="btn-view-exam">
+                  <i class="fas fa-eye me-1"></i>দেখুন
+                </a>
+              </div>
+            }
+          </div>
+
+          <!-- Recently created -->
+          @if (recentExams().length > 0) {
+            <div class="recent-card">
+              <h6 class="settings-title">সম্প্রতি তৈরি</h6>
+              @for (e of recentExams(); track e.exam_id) {
+                <a [routerLink]="['/model-tests', 'details', e.exam_id]" class="recent-item">
+                  <span class="recent-title">{{ e.title }}</span>
+                  <i class="fas fa-chevron-right text-muted small"></i>
+                </a>
+              }
+            </div>
+          }
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

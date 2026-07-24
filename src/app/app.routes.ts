@@ -77,5 +77,6 @@ export const routes: Routes = [
   { path: 'past-exams/:id/attempt', canActivate: [authGuard], loadComponent: () => import('./features/past-exams/exam-attempt/exam-attempt').then(m => m.ExamAttempt) },
   { path: 'admin/exams/:examId/questions', loadComponent: () => import('./features/admin/exam-question-editor/exam-question-editor').then(m => m.ExamQuestionEditor) },
   { path: 'admin/words/import', loadComponent: () => import('./features/admin/word-import/word-import').then(m => m.WordImport) },
+  { path: 'admin/model-tests/create', loadComponent: () => import('./features/admin/model-test-create/model-test-create').then(m => m.ModelTestCreate) },
   { path: '**', redirectTo: '' },
 ];
