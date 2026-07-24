@@ -31,13 +31,12 @@ export class ModelTestCreate implements OnInit {
   readonly passMark       = signal(50);
   readonly negativeMark   = signal(0.25);
 
-  readonly organizations  = signal<any[]>([]);
-  readonly examTypes      = signal<any[]>([]);
-  readonly pastExams      = signal<any[]>([]);
+  readonly organizations   = signal<any[]>([]);
+  readonly examTypes       = signal<any[]>([]);
+  readonly allPastExams    = signal<any[]>([]);
   readonly selectedExamIds = signal<number[]>([]);
-  readonly recentExams    = signal<any[]>([]);
-  readonly allPastExams   = signal<any[]>([]);
-  readonly filterOrgId    = signal('');
+  readonly recentExams     = signal<any[]>([]);
+  readonly filterOrgId     = signal('');
 
   readonly filteredPastExams = computed(() => {
     const orgId = this.filterOrgId();
@@ -49,23 +48,7 @@ export class ModelTestCreate implements OnInit {
   readonly selectedQuestionCount = computed(() =>
     this.allPastExams()
       .filter((e: any) => this.selectedExamIds().includes(e.id))
-      .reduce((sum: number, e: any) => sum + e.total_questions, 0)
-  );
-  readonly allPastExams   = signal<any[]>([]);
-  readonly filterOrgId    = signal('');
-  readonly String = String;  // expose to template
-
-  readonly filteredPastExams = computed(() => {
-    const orgId = this.filterOrgId();
-    const all = this.allPastExams();
-    if (!orgId) return all;
-    return all.filter(e => String(e.organization_id) === orgId);
-  });
-
-  readonly selectedQuestionCount = computed(() =>
-    this.allPastExams()
-      .filter(e => this.selectedExamIds().includes(e.id))
-      .reduce((sum, e) => sum + e.total_questions, 0)
+      .reduce((sum: number, e: any) => sum + (e.total_questions || 0), 0)
   );
 
   readonly isLoadingExams = signal(false);
@@ -113,28 +96,6 @@ export class ModelTestCreate implements OnInit {
     });
   }
 
-  loadRecentExams(): void {
-    this.http.get<any>(`${this.base}/quiz/user_exams_list/`).subscribe({
-      next: (res) => this.recentExams.set((res.results || res).slice(0, 5)),
-      error: () => {},
-    });
-  }
-
-  loadAllPastExams(): void {
-    this.isLoadingExams.set(true);
-    this.http.get<any>(`${this.base}/quiz/model-tests/past-exams/`).subscribe({
-      next: (res) => {
-        this.allPastExams.set(res.past_exams || []);
-        this.isLoadingExams.set(false);
-      },
-      error: () => this.isLoadingExams.set(false),
-    });
-  }
-
-  setFilterOrg(orgId: string): void {
-    this.filterOrgId.set(orgId);
-  }
-
   loadAllPastExams(): void {
     this.isLoadingExams.set(true);
     this.http.get<any>(`${this.base}/quiz/model-tests/past-exams/`).subscribe({
@@ -143,19 +104,16 @@ export class ModelTestCreate implements OnInit {
     });
   }
 
-  setFilterOrg(orgId: string): void { this.filterOrgId.set(orgId); }
-
-  onOrgChange(orgId: string): void {
-    this.selectedOrgId.set(orgId);
-  }
-
-  loadPastExams(orgId: string): void {
-    this.isLoadingExams.set(true);
-    this.http.get<any>(`${this.base}/quiz/model-tests/past-exams/?organization_id=${orgId}`).subscribe({
-      next: (res) => { this.pastExams.set(res.past_exams || []); this.isLoadingExams.set(false); },
-      error: () => this.isLoadingExams.set(false),
+  loadRecentExams(): void {
+    this.http.get<any>(`${this.base}/quiz/user_exams_list/`).subscribe({
+      next: (res) => this.recentExams.set((res.results || res).slice(0, 5)),
+      error: () => {},
     });
   }
+
+  setFilterOrg(orgId: string): void { this.filterOrgId.set(orgId); }
+
+  onOrgChange(orgId: string): void { this.selectedOrgId.set(orgId); }
 
   isExamSelected(id: number): boolean { return this.selectedExamIds().includes(id); }
 
@@ -195,16 +153,8 @@ export class ModelTestCreate implements OnInit {
         past_exam_ids: this.selectedExamIds(),
       };
       this.http.post<any>(`${this.base}/quiz/model-tests/create/`, body).subscribe({
-        next: (res) => {
-          this.isCreating.set(false);
-          this.createdExamId.set(res.exam_id);
-          this.showToast(res.message);
-          this.loadRecentExams();
-        },
-        error: (err) => {
-          this.isCreating.set(false);
-          this.showToast(err.error?.error || 'তৈরি করতে ব্যর্থ হয়েছে', 'err');
-        },
+        next: (res) => { this.isCreating.set(false); this.createdExamId.set(res.exam_id); this.showToast(res.message); this.loadRecentExams(); },
+        error: (err) => { this.isCreating.set(false); this.showToast(err.error?.error || 'তৈরি করতে ব্যর্থ', 'err'); },
       });
     } else {
       const fd = new FormData();
@@ -219,16 +169,8 @@ export class ModelTestCreate implements OnInit {
       fd.append('negative_mark', String(this.negativeMark()));
       fd.append('file', this.excelFile()!);
       this.http.post<any>(`${this.base}/quiz/model-tests/create/`, fd).subscribe({
-        next: (res) => {
-          this.isCreating.set(false);
-          this.createdExamId.set(res.exam_id);
-          this.showToast(res.message);
-          this.loadRecentExams();
-        },
-        error: (err) => {
-          this.isCreating.set(false);
-          this.showToast(err.error?.error || 'তৈরি করতে ব্যর্থ হয়েছে', 'err');
-        },
+        next: (res) => { this.isCreating.set(false); this.createdExamId.set(res.exam_id); this.showToast(res.message); this.loadRecentExams(); },
+        error: (err) => { this.isCreating.set(false); this.showToast(err.error?.error || 'তৈরি করতে ব্যর্থ', 'err'); },
       });
     }
   }
