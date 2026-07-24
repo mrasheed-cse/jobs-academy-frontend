@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy, inject, signal, computed } from '@angular/core';
+import { MathRenderPipe } from '../../../core/pipes/math-render.pipe';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ExamService } from '../../../core/services/exam.service';
 import { ExamDetail, ExamAnswer, ExamSubmitResponse, Question } from '../../../core/models/exam.model';
