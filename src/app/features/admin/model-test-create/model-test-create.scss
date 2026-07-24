@@ -150,3 +150,12 @@
   &.active { background: #6366f1; color: #fff; border-color: #6366f1; }
   &:hover:not(.active) { border-color: #6366f1; color: #6366f1; }
 }
+
+.org-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.org-chip {
+  background: #f1f5f9; color: #64748b; border: 1.5px solid #e2e8f0;
+  padding: 5px 14px; border-radius: 50px; font-size: .76rem; font-weight: 700;
+  cursor: pointer; transition: all .15s;
+  &.active { background: #6366f1; color: #fff; border-color: #6366f1; }
+  &:hover:not(.active) { border-color: #6366f1; color: #6366f1; }
+}
