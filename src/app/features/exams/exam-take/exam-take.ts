@@ -17,7 +17,7 @@ interface QuestionRow {
 
 @Component({
   selector: 'app-exam-take',
-  imports: [],
+  imports: [MathRenderPipe, ],
   templateUrl: './exam-take.html',
   styleUrl: './exam-take.scss',
 })

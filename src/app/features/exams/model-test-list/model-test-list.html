@@ -1,48 +1,93 @@
 <div class="page-bg">
   <div class="container py-4">
-    <ul class="nav nav-tabs mb-3">
-      <li class="nav-item">
-        <a class="nav-link fw-bold" [class.active]="activeTab() === 'withSubject'" href="#" (click)="setTab('withSubject'); $event.preventDefault()">বিষয়ভিত্তিক</a>
+    <div class="page-header mb-4">
+      <h4 class="fw-bold mb-1">মডেল টেস্ট</h4>
+      <p class="text-muted small mb-0">প্রস্তুতি নিন, এগিয়ে যান</p>
+    </div>
+
+    <ul class="nav-tabs-custom mb-4">
+      <li>
+        <button class="tab-btn" [class.active]="activeTab() === 'withSubject'"
+          (click)="setTab('withSubject')">বিষয়ভিত্তিক</button>
       </li>
-      <li class="nav-item">
-        <a class="nav-link fw-bold" [class.active]="activeTab() === 'withoutSubject'" href="#" (click)="setTab('withoutSubject'); $event.preventDefault()">সম্পূর্ণ পরীক্ষা</a>
+      <li>
+        <button class="tab-btn" [class.active]="activeTab() === 'withoutSubject'"
+          (click)="setTab('withoutSubject')">সম্পূর্ণ পরীক্ষা</button>
       </li>
     </ul>
 
     @if (isLoading()) {
-      <div class="text-center py-5">
-        <div class="spinner-border text-primary" role="status"></div>
+      <div class="cards-skeleton">
+        @for (n of [1,2,3,4,5,6]; track n) {
+          <div class="sk-card">
+            <div class="sk-line sk-badge"></div>
+            <div class="sk-line sk-title"></div>
+            <div class="sk-line sk-meta"></div>
+            <div class="sk-line sk-meta short"></div>
+            <div class="sk-line sk-btn"></div>
+          </div>
+        }
       </div>
     } @else if (loadFailed()) {
-      <p class="text-danger text-center py-4">পরীক্ষা লোড করতে ব্যর্থ হয়েছে।</p>
+      <div class="empty-state">
+        <i class="fas fa-exclamation-circle text-danger fa-2x mb-3"></i>
+        <p class="text-danger">পরীক্ষা লোড করতে ব্যর্থ হয়েছে।</p>
+      </div>
     } @else {
-      <div class="row">
-        @let visibleExams = activeTab() === 'withSubject' ? examsWithSubject() : examsWithoutSubject();
-        @if (visibleExams.length === 0) {
-          <p class="text-muted text-center py-4">কোনো পরীক্ষা পাওয়া যায়নি।</p>
-        } @else {
+      @let visibleExams = activeTab() === 'withSubject' ? examsWithSubject() : examsWithoutSubject();
+      @if (visibleExams.length === 0) {
+        <div class="empty-state">
+          <i class="fas fa-inbox fa-3x mb-3 opacity-25"></i>
+          <p class="text-muted">কোনো মডেল টেস্ট পাওয়া যায়নি।</p>
+        </div>
+      } @else {
+        <div class="exam-grid">
           @for (exam of visibleExams; track exam.exam_id) {
-            <div class="col-12 col-md-6 col-lg-4 mb-4">
-              <div class="exam-card position-relative">
-                @if (exam.subject_name) {
-                  <div class="subject-badge">{{ exam.subject_name }}</div>
-                }
-                <div class="card-body">
-                  <div class="type-pill">{{ exam.exam_type_name || 'পরীক্ষা' }}</div>
-                  <h5 class="card-title">{{ exam.title || 'শিরোনাম নেই' }}</h5>
-                  <p class="text-muted small mb-2">{{ exam.total_mark || 0 }} নম্বর • {{ exam.total_questions || 0 }} প্রশ্ন • {{ exam.duration || 0 }}</p>
-                  <p class="mb-1"><strong>পদ:</strong> {{ exam.position_name || 'উল্লেখ নেই' }}</p>
-                  <p class="mb-3"><strong>সংস্থা:</strong> {{ exam.organization_name || 'উল্লেখ নেই' }}</p>
-                  <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-success btn-sm" (click)="openDetails(exam.exam_id)">বিস্তারিত</button>
-                    <button type="button" class="btn btn-outline-secondary btn-sm" (click)="share(exam.exam_id, exam.title)">শেয়ার</button>
-                  </div>
+            <div class="exam-card">
+              <!-- Top accent bar -->
+              <div class="card-accent"></div>
+              <div class="card-inner">
+                <!-- Type badge -->
+                <div class="type-badge">{{ exam.exam_type_name || 'মডেল টেস্ট' }}</div>
+
+                <!-- Title -->
+                <h5 class="card-title">{{ exam.title || 'শিরোনাম নেই' }}</h5>
+
+                <!-- Stats row -->
+                <div class="stats-row">
+                  <span class="stat"><i class="fas fa-list-ol"></i>{{ exam.total_questions || 0 }} প্রশ্ন</span>
+                  <span class="stat"><i class="fas fa-clock"></i>{{ exam.duration || '60 মিনিট' }}</span>
+                  <span class="stat"><i class="fas fa-star"></i>{{ exam.total_mark || 0 }} নম্বর</span>
+                </div>
+
+                <!-- Org & position -->
+                <div class="meta-row">
+                  @if (exam.organization_name) {
+                    <span class="meta-chip org-chip">
+                      <i class="fas fa-building"></i>{{ exam.organization_name }}
+                    </span>
+                  }
+                  @if (exam.position_name) {
+                    <span class="meta-chip pos-chip">
+                      <i class="fas fa-briefcase"></i>{{ exam.position_name }}
+                    </span>
+                  }
+                </div>
+
+                <!-- Actions -->
+                <div class="card-actions">
+                  <button class="btn-details" (click)="openDetails(exam.exam_id)">
+                    <i class="fas fa-eye me-1"></i>বিস্তারিত
+                  </button>
+                  <button class="btn-share" (click)="share(exam.exam_id, exam.title)">
+                    <i class="fas fa-share-alt"></i>
+                  </button>
                 </div>
               </div>
             </div>
           }
-        }
-      </div>
+        </div>
+      }
     }
   </div>
 </div>

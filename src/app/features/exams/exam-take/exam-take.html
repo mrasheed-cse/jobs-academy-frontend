@@ -28,7 +28,7 @@
                   @if (q.image) {
                     <img [src]="q.image" alt="প্রশ্নের ছবি" class="img-fluid rounded shadow-sm question-image">
                   } @else if (q.text) {
-                    <p class="fw-semibold mb-0">{{ q.text }}</p>
+                    <p class="fw-semibold mb-0" [innerHTML]="q.text | mathRender"></p>
                   }
                 </div>
               </div>
@@ -46,7 +46,7 @@
                     @if (opt.image) {
                       <img [src]="opt.image" alt="অপশন" class="option-image">
                     } @else {
-                      <span>{{ opt.text }}</span>
+                      <span [innerHTML]="opt.text | mathRender"></span>
                     }
                   </button>
                 }
