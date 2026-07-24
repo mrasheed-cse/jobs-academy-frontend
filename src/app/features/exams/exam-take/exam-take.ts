@@ -12,6 +12,7 @@ interface QuestionRow {
   questionId: number;
   text: string | null;
   image: string | null;
+  sourceExam: string | null;
   options: Array<{ id: number; label: string; text: string | null; image: string | null }>;
   isLocked: boolean;
 }
