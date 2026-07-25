@@ -1,5 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { ActivatedRoute, Location } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
+import { Location } from '@angular/common';
 import { ExamService } from '../../../core/services/exam.service';
 import { ExamLeaderboardEntry } from '../../../core/models/exam.model';
 
