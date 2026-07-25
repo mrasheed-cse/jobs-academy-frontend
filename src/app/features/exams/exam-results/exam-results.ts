@@ -14,7 +14,6 @@ import { ExamAttempt } from '../../../core/models/exam.model';
 export class ExamResults implements OnInit {
   private readonly location = inject(Location);
   private readonly route = inject(ActivatedRoute);
-  private readonly location = inject(Location);
   private readonly examService = inject(ExamService);
 
   readonly attempts = signal<ExamAttempt[]>([]);
