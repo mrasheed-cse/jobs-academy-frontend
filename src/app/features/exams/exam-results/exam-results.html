@@ -1,48 +1,53 @@
-<div class="page-bg">
-  <div class="container py-5">
-    <h4 class="text-center mb-4 section-title">আপনার ফলাফল</h4>
-
-    @if (isLoading()) {
-      <div class="text-center py-5">
-        <div class="spinner-border text-primary" role="status"></div>
+<div class="res-shell">
+  <div class="res-hero">
+    <div class="container">
+      <div class="d-flex align-items-center gap-3 mb-2">
+        <button class="res-back" (click)="goBack()"><i class="fas fa-arrow-left"></i></button>
+        <div>
+          <h4 class="fw-bold mb-0 text-white">আপনার ফলাফল</h4>
+          <p class="mb-0 small opacity-75">পরীক্ষার ইতিহাস</p>
+        </div>
       </div>
-    } @else if (loadFailed()) {
-      <p class="text-danger text-center">ফলাফল লোড করতে ব্যর্থ হয়েছে।</p>
-    } @else if (attempts().length === 0) {
-      <p class="text-muted text-center">আপনি এখনো এই পরীক্ষাটি দেননি।</p>
-    } @else {
-      <div class="table-responsive">
-        <table class="table table-bordered text-center align-middle">
-          <thead>
-            <tr>
-              <th>তারিখ</th>
-              <th>প্রশ্ন</th>
-              <th>উত্তর দেওয়া</th>
-              <th>সঠিক</th>
-              <th>ভুল</th>
-              <th>নম্বর</th>
-              <th>পাস মার্ক</th>
-              <th>স্ট্যাটাস</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (attempt of attempts(); track attempt.id) {
-              <tr>
-                <td>{{ attempt.attempt_time | date:'short' }}</td>
-                <td>{{ attempt.total_questions }}</td>
-                <td>{{ attempt.answered }}</td>
-                <td class="text-success">{{ attempt.total_correct_answers }}</td>
-                <td class="text-danger">{{ attempt.wrong_answers }}</td>
-                <td>{{ attempt.score }}</td>
-                <td>{{ attempt.pass_mark }}</td>
-                <td [class.text-success]="attempt.is_passed" [class.text-danger]="!attempt.is_passed">
-                  {{ attempt.is_passed ? 'উত্তীর্ণ' : 'অনুত্তীর্ণ' }}
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    }
+    </div>
+  </div>
+  <div class="res-body">
+    <div class="container">
+      @if (isLoading()) {
+        <div class="text-center py-5"><div class="spinner-border text-primary"></div></div>
+      } @else if (loadFailed()) {
+        <div class="res-empty"><p class="text-danger">ফলাফল লোড করতে ব্যর্থ হয়েছে।</p></div>
+      } @else if (attempts().length === 0) {
+        <div class="res-empty"><i class="fas fa-clipboard fa-3x mb-3 opacity-25"></i><p class="text-muted fw-semibold">আপনি এখনো এই পরীক্ষাটি দেননি।</p></div>
+      } @else {
+        @let best = attempts()[0];
+        <div class="best-card">
+          <div class="best-label">সেরা ফলাফল</div>
+          <div class="best-stats">
+            <div class="bst"><span class="bsn text-success">{{ best.total_correct_answers }}</span><span class="bsl">সঠিক</span></div>
+            <div class="bdiv"></div>
+            <div class="bst"><span class="bsn text-danger">{{ best.wrong_answers }}</span><span class="bsl">ভুল</span></div>
+            <div class="bdiv"></div>
+            <div class="bst"><span class="bsn text-primary">{{ best.score }}</span><span class="bsl">নম্বর</span></div>
+            <div class="bdiv"></div>
+            <div class="bst"><span class="bsn" [class.text-success]="best.is_passed" [class.text-danger]="!best.is_passed">{{ best.is_passed ? 'উত্তীর্ণ' : 'অনুত্তীর্ণ' }}</span><span class="bsl">ফলাফল</span></div>
+          </div>
+        </div>
+        <div class="res-table-card">
+          <div class="res-ttl">সব চেষ্টা ({{ attempts().length }}টি)</div>
+          <div class="res-thead"><span class="rc-s">#</span><span class="rc-d">তারিখ</span><span class="rc-n">প্রশ্ন</span><span class="rc-n">সঠিক</span><span class="rc-n">ভুল</span><span class="rc-n">নম্বর</span><span class="rc-st">স্ট্যাটাস</span></div>
+          @for (attempt of attempts(); track attempt.id; let i = $index) {
+            <div class="res-row" [class.best-row]="i===0">
+              <span class="rc-s text-muted fw-bold">{{ i+1 }}</span>
+              <span class="rc-d small text-muted">{{ attempt.attempt_time | date:'dd/MM/yy HH:mm' }}</span>
+              <span class="rc-n">{{ attempt.total_questions }}</span>
+              <span class="rc-n text-success fw-bold">{{ attempt.total_correct_answers }}</span>
+              <span class="rc-n text-danger">{{ attempt.wrong_answers }}</span>
+              <span class="rc-n fw-bold">{{ attempt.score }}</span>
+              <span class="rc-st"><span class="sp" [class.pass]="attempt.is_passed" [class.fail]="!attempt.is_passed">{{ attempt.is_passed ? 'উত্তীর্ণ' : 'অনুত্তীর্ণ' }}</span></span>
+            </div>
+          }
+        </div>
+      }
+    </div>
   </div>
 </div>

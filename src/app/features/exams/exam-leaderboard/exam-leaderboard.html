@@ -1,46 +1,75 @@
-<div class="page-bg">
-  <div class="container py-5">
-    <h4 class="text-center mb-4 section-title">লিডারবোর্ড</h4>
-
-    @if (isLoading()) {
-      <div class="text-center py-5">
-        <div class="spinner-border text-primary" role="status"></div>
-      </div>
-    } @else if (loadFailed()) {
-      <p class="text-danger text-center">লিডারবোর্ড লোড করতে ব্যর্থ হয়েছে।</p>
-    } @else if (topEntries().length === 0) {
-      <p class="text-muted text-center">এখনো কোনো ফলাফল পাওয়া যায়নি।</p>
-    } @else {
-      <div class="table-responsive">
-        <table class="table table-bordered text-center align-middle">
-          <thead>
-            <tr>
-              <th>অবস্থান</th>
-              <th>ব্যবহারকারী</th>
-              <th>পয়েন্ট</th>
-              <th>চেষ্টা</th>
-              <th>শতকরা হার</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (entry of topEntries(); track entry.id) {
-              <tr [class.table-primary]="myEntry()?.id === entry.id">
-                <td>{{ entry.rank ?? ($index + 1) }}</td>
-                <td>{{ entry.username }}</td>
-                <td>{{ entry.points }}</td>
-                <td>{{ entry.attempts }}</td>
-                <td>{{ entry.percentage }}%</td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-
-      @if (myEntry() && !topEntries().some(e => e.id === myEntry()!.id)) {
-        <div class="my-rank-card mt-4 p-3 text-center">
-          <strong>আপনার অবস্থান:</strong> #{{ myEntry()!.rank }} — {{ myEntry()!.points }} পয়েন্ট ({{ myEntry()!.percentage }}%)
+<div class="lb-shell">
+  <div class="lb-hero">
+    <div class="container">
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <button class="lb-back" (click)="goBack()"><i class="fas fa-arrow-left"></i></button>
+        <div>
+          <h4 class="fw-bold mb-0 text-white">লিডারবোর্ড</h4>
+          <p class="mb-0 small opacity-75">শীর্ষ পরীক্ষার্থীদের তালিকা</p>
         </div>
+      </div>
+      <div class="lb-stats">
+        <div class="lb-stat"><span class="lb-stat-num">{{ topEntries().length }}</span><span class="lb-stat-lbl">অংশগ্রহণকারী</span></div>
+        @if (myEntry()) {
+          <div class="lb-stat"><span class="lb-stat-num">#{{ myEntry()!.rank }}</span><span class="lb-stat-lbl">আপনার অবস্থান</span></div>
+          <div class="lb-stat"><span class="lb-stat-num">{{ myEntry()!.points }}</span><span class="lb-stat-lbl">আপনার পয়েন্ট</span></div>
+        }
+      </div>
+    </div>
+  </div>
+  <div class="lb-body">
+    <div class="container">
+      @if (isLoading()) {
+        <div class="text-center py-5"><div class="spinner-border text-primary"></div><p class="mt-2 text-muted small">লোড হচ্ছে...</p></div>
+      } @else if (loadFailed()) {
+        <div class="lb-empty"><i class="fas fa-exclamation-circle fa-2x text-danger mb-3"></i><p class="text-danger">লিডারবোর্ড লোড করতে ব্যর্থ হয়েছে।</p></div>
+      } @else if (topEntries().length === 0) {
+        <div class="lb-empty"><i class="fas fa-trophy fa-3x mb-3 opacity-25"></i><p class="text-muted fw-semibold">এখনো কেউ এই পরীক্ষা দেয়নি।</p></div>
+      } @else {
+        @if (topEntries().length >= 3) {
+          <div class="podium">
+            <div class="podium-spot silver">
+              <div class="podium-av">{{ topEntries()[1].username.charAt(0).toUpperCase() }}</div>
+              <div class="podium-nm">{{ topEntries()[1].username }}</div>
+              <div class="podium-pts">{{ topEntries()[1].points }}</div>
+              <div class="podium-blk">২য়</div>
+            </div>
+            <div class="podium-spot gold">
+              <div class="podium-crown"><i class="fas fa-crown"></i></div>
+              <div class="podium-av lg">{{ topEntries()[0].username.charAt(0).toUpperCase() }}</div>
+              <div class="podium-nm">{{ topEntries()[0].username }}</div>
+              <div class="podium-pts">{{ topEntries()[0].points }}</div>
+              <div class="podium-blk tall">১ম</div>
+            </div>
+            <div class="podium-spot bronze">
+              <div class="podium-av">{{ topEntries()[2].username.charAt(0).toUpperCase() }}</div>
+              <div class="podium-nm">{{ topEntries()[2].username }}</div>
+              <div class="podium-pts">{{ topEntries()[2].points }}</div>
+              <div class="podium-blk short">৩য়</div>
+            </div>
+          </div>
+        }
+        <div class="lb-table-card">
+          <div class="lb-thead"><span class="c-rank">র‍্যাংক</span><span class="c-name">পরীক্ষার্থী</span><span class="c-num">পয়েন্ট</span><span class="c-num">চেষ্টা</span><span class="c-num">শতকরা</span></div>
+          @for (entry of topEntries(); track entry.id; let i = $index) {
+            <div class="lb-row" [class.my-row]="myEntry()?.id === entry.id">
+              <span class="c-rank">
+                @if (i === 0) { <span>🥇</span> }
+                @else if (i === 1) { <span>🥈</span> }
+                @else if (i === 2) { <span>🥉</span> }
+                @else { <span class="rn">#{{ i+1 }}</span> }
+              </span>
+              <span class="c-name"><div class="ui"><div class="uav">{{ entry.username.charAt(0).toUpperCase() }}</div><span class="unm">{{ entry.username }}@if(myEntry()?.id===entry.id){<span class="you">আপনি</span>}</span></div></span>
+              <span class="c-num fw-bold">{{ entry.points }}</span>
+              <span class="c-num text-muted">{{ entry.attempts }}</span>
+              <span class="c-num"><span class="pct" [class.hi]="entry.percentage>=80" [class.mi]="entry.percentage>=50&&entry.percentage<80" [class.lo]="entry.percentage<50">{{ entry.percentage }}%</span></span>
+            </div>
+          }
+        </div>
+        @if (myEntry() && !topEntries().some(e => e.id === myEntry()!.id)) {
+          <div class="my-banner"><i class="fas fa-user-circle me-2"></i>আপনার অবস্থান: <strong class="ms-1">#{{ myEntry()!.rank }}</strong><span class="ms-3">{{ myEntry()!.points }} পয়েন্ট ({{ myEntry()!.percentage }}%)</span></div>
+        }
       }
-    }
+    </div>
   </div>
 </div>

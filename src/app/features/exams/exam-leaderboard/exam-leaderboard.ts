@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Location } from '@angular/router';
 import { ExamService } from '../../../core/services/exam.service';
 import { ExamLeaderboardEntry } from '../../../core/models/exam.model';
 
@@ -12,11 +12,14 @@ import { ExamLeaderboardEntry } from '../../../core/models/exam.model';
 export class ExamLeaderboard implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly examService = inject(ExamService);
+  private readonly location = inject(Location);
 
   readonly topEntries = signal<ExamLeaderboardEntry[]>([]);
   readonly myEntry = signal<ExamLeaderboardEntry | null>(null);
   readonly isLoading = signal(true);
   readonly loadFailed = signal(false);
+
+  goBack(): void { this.location.back(); }
 
   ngOnInit(): void {
     const examId = this.route.snapshot.paramMap.get('examId') ?? '';

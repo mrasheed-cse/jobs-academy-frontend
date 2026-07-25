@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute } from '@angular/router'; import { Location } from '@angular/common';;
 import { DatePipe } from '@angular/common';
 import { ExamService } from '../../../core/services/exam.service';
 import { ExamAttempt } from '../../../core/models/exam.model';
@@ -11,12 +11,16 @@ import { ExamAttempt } from '../../../core/models/exam.model';
   styleUrl: './exam-results.scss',
 })
 export class ExamResults implements OnInit {
+  private readonly location = inject(Location);
   private readonly route = inject(ActivatedRoute);
+  private readonly location = inject(Location);
   private readonly examService = inject(ExamService);
 
   readonly attempts = signal<ExamAttempt[]>([]);
   readonly isLoading = signal(true);
   readonly loadFailed = signal(false);
+
+  goBack(): void { this.location.back(); }
 
   ngOnInit(): void {
     const examId = this.route.snapshot.paramMap.get('examId') ?? '';
