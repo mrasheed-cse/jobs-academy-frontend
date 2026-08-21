@@ -83,7 +83,7 @@ export class ExamManage implements OnInit, OnDestroy {
     exam_year:     [new Date().getFullYear(), [Validators.required, Validators.min(1980)]],
     marks_per_q:   [1],
     negative_mark: [0.25],
-    model:         ['google/gemini-2.5-flash'],
+    model:         ['nvidia/nemotron-3-ultra-550b-a55b:free'],
   });
 
   ngOnInit(): void { this.loadExams(); }
@@ -108,7 +108,7 @@ export class ExamManage implements OnInit, OnDestroy {
       exam_year: new Date().getFullYear(),
       marks_per_q: 1,
       negative_mark: 0.25,
-      model: 'google/gemini-2.5-flash',
+      model: 'nvidia/nemotron-3-ultra-550b-a55b:free',
     });
   }
 
@@ -144,7 +144,7 @@ export class ExamManage implements OnInit, OnDestroy {
     fd.append('subject_name', subjects.length > 0 ? subjects.join(',') : 'General Knowledge');
     fd.append('marks_per_q',   String(v.marks_per_q ?? 1));
     fd.append('negative_mark', String(v.negative_mark ?? 0.25));
-    fd.append('model',         v.model ?? 'google/gemini-2.5-flash');
+    fd.append('model',         v.model ?? 'nvidia/nemotron-3-ultra-550b-a55b:free');
     this.selectedFiles().forEach(f => fd.append('images', f));
 
     this.svc.startImport(fd).subscribe({
