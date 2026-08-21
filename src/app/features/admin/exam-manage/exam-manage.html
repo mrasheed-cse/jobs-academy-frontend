@@ -241,7 +241,7 @@
                 </a>
                 @if (exam.total_questions === 0) {
                   <button class="btn btn-sm btn-outline-danger"
-                    (click)="deleteExam(exam.id)"
+                    (click)="deleteExam(exam.id, exam.title)"
                     title="প্রশ্ন নেই — মুছে পুনরায় আমদানি করুন">
                     <i class="fas fa-redo me-1"></i>পুনরায় আমদানি
                   </button>
