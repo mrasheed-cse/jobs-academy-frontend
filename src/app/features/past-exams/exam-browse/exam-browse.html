@@ -96,6 +96,12 @@
                       <i class="fas fa-check-circle me-1"></i>
                       সঠিক: <strong>{{ correctLetter(q) }}. {{ correctOption(q) }}</strong>
                     </div>
+                    @if (q.explanation) {
+                      <div class="explanation-box">
+                        <div class="explanation-label"><i class="fas fa-lightbulb me-1"></i>ব্যাখ্যা</div>
+                        <div class="explanation-text">{{ q.explanation }}</div>
+                      </div>
+                    }
                   }
                 </div>
               </div>
