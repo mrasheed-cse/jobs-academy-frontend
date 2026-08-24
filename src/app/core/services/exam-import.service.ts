@@ -36,12 +36,13 @@ export interface QuestionOption {
 }
 
 export interface ExamQuestion {
-  id:      number;
-  order:   number;
-  text:    string;
-  subject: string;
-  marks:   number;
-  options: QuestionOption[];
+  id:          number;
+  order:       number;
+  text:        string;
+  subject:     string;
+  marks:       number;
+  explanation: string;
+  options:     QuestionOption[];
 }
 
 export interface PastExamDetail {
