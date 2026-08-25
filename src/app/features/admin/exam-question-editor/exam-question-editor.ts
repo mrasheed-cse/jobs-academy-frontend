@@ -112,6 +112,18 @@ export class ExamQuestionEditor implements OnInit {
     });
   }
 
+  saveExplanation(q: EditorQuestion, event: Event): void {
+    const val = (event.target as HTMLTextAreaElement).value.trim();
+    if (val === (q.explanation || '')) return;
+    q.explanation = val;
+    const fd = new FormData();
+    fd.append('explanation', val);
+    this.svc.updateQuestion(q.peq_id, fd).subscribe({
+      next: () => this.showToast('ব্যাখ্যা সংরক্ষিত হয়েছে', 'success'),
+      error: () => this.showToast('সংরক্ষণ ব্যর্থ হয়েছে', 'error'),
+    });
+  }
+
   saveOptionText(opt: EditorOption, event: Event): void {
     const text = (event.target as HTMLInputElement).value.trim();
     if (text === opt.text) return;

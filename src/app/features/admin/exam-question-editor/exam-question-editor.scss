@@ -232,3 +232,11 @@
   display: inline-block;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+.explanation-editor { }
+.explanation-textarea {
+  width: 100%; border: 1.5px solid #e2e8f0; border-radius: 10px;
+  padding: 10px 14px; font-size: .88rem; font-family: inherit;
+  resize: vertical; min-height: 80px;
+  &:focus { outline: none; border-color: #f59e0b; }
+}

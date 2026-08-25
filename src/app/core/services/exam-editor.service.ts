@@ -19,6 +19,7 @@ export interface EditorQuestion {
   marks: number;
   subject: string;
   status: string;
+  explanation: string;
   options: EditorOption[];
 }
 
