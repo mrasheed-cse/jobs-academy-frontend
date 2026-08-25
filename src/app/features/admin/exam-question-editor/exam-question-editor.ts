@@ -112,6 +112,32 @@ export class ExamQuestionEditor implements OnInit {
     });
   }
 
+  uploadExplanationImage(q: EditorQuestion, event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    const fd = new FormData();
+    fd.append('explanation_image', file);
+    this.svc.updateQuestion(q.peq_id, fd).subscribe({
+      next: (res: any) => {
+        q.explanation_image = res.explanation_image;
+        this.showToast('ব্যাখ্যার ছবি আপলোড হয়েছে', 'success');
+      },
+      error: () => this.showToast('আপলোড ব্যর্থ হয়েছে', 'error'),
+    });
+  }
+
+  removeExplanationImage(q: EditorQuestion): void {
+    const fd = new FormData();
+    fd.append('remove_explanation_image', 'true');
+    this.svc.updateQuestion(q.peq_id, fd).subscribe({
+      next: () => {
+        q.explanation_image = null;
+        this.showToast('ব্যাখ্যার ছবি মুছে গেছে', 'success');
+      },
+      error: () => this.showToast('মুছতে ব্যর্থ হয়েছে', 'error'),
+    });
+  }
+
   saveExplanation(q: EditorQuestion, event: Event): void {
     const val = (event.target as HTMLTextAreaElement).value.trim();
     if (val === (q.explanation || '')) return;

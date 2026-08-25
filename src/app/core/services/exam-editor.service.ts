@@ -20,6 +20,7 @@ export interface EditorQuestion {
   subject: string;
   status: string;
   explanation: string;
+  explanation_image: string | null;
   options: EditorOption[];
 }
 
