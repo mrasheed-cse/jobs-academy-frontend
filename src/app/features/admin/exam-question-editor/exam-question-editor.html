@@ -166,31 +166,6 @@
                     </label>
                   </div>
                 </div>
-                <!-- Explanation editor -->
-                <div class="explanation-editor mt-3">
-                  <label class="field-label">ব্যাখ্যা (Explanation)</label>
-                  <textarea class="qe-textarea explanation-textarea"
-                    [value]="q.explanation || ''"
-                    (blur)="saveExplanation(q, $event)"
-                    rows="3"
-                    placeholder="প্রশ্নের ব্যাখ্যা লিখুন..."></textarea>
-                  <div class="img-row mt-2">
-                    @if (q.explanation_image) {
-                      <div class="img-preview">
-                        <img [src]="q.explanation_image" alt="explanation image" class="preview-img">
-                        <button class="btn-remove-img" (click)="removeExplanationImage(q)">
-                          <i class="fas fa-times"></i>
-                        </button>
-                      </div>
-                    }
-                    <label class="btn-upload-img">
-                      <i class="fas fa-image me-1"></i>
-                      {{ q.explanation_image ? 'ব্যাখ্যার ছবি পরিবর্তন' : 'ব্যাখ্যার ছবি যোগ করুন' }}
-                      <input type="file" accept="image/*" class="d-none"
-                        (change)="uploadExplanationImage(q, $event)">
-                    </label>
-                  </div>
-                </div>
                 </div>
               </div>
             </div>
