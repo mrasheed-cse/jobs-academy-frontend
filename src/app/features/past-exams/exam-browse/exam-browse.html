@@ -51,7 +51,7 @@
       <div class="container">
         <div class="questions-wrap">
           @for (q of e.questions; track q.id; let i = $index) {
-            @if (q.text && q.text.trim() && q.options.length > 0) {
+            @if ((q.text || q.image) && q.options.length > 0) {
               <div class="bq-card" [class.bq-revealed]="isRevealed(q.id)">
                 <!-- Question header -->
                 <div class="bq-header">
