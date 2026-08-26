@@ -168,14 +168,14 @@ export class ExamQuestionEditor implements OnInit {
     fd.append('correct_option', f.correct);
     fd.append('subject', f.subject);
     this.http.post<any>(`${this.svc['base']}/api/exam-import/exams/${examId}/insert-question/`, fd).subscribe({
-      next: (newQ) => {
+      next: (_newQ: any) => {
         this.isSavingInsert.set(false);
         this.insertingAfter.set(null);
         // Reload questions to get updated ordering
         this.loadExam(+examId);
         this.showToast('প্রশ্ন যোগ হয়েছে', 'success');
       },
-      error: () => { this.isSavingInsert.set(false); this.showToast('যোগ করতে ব্যর্থ', 'error'); },
+      error: (_e: unknown) => { this.isSavingInsert.set(false); this.showToast('যোগ করতে ব্যর্থ', 'error'); },
     });
   }
 
