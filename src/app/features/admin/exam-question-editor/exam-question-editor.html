@@ -169,6 +169,42 @@
                 </div>
               </div>
             </div>
+            <!-- Insert question button -->
+            <div class="insert-btn-row">
+              @if (insertingAfter() === q.order) {
+                <div class="insert-form-card">
+                  <div class="insert-form-header">
+                    <span class="fw-bold small">নতুন প্রশ্ন যোগ করুন ({{ q.order }} নম্বরের পরে)</span>
+                    <button class="btn-close-insert" (click)="closeInsertForm()"><i class="fas fa-times"></i></button>
+                  </div>
+                  <textarea class="qe-textarea mt-2" [value]="insertForm().text"
+                    (input)="updateInsertForm('text', $any($event.target).value)"
+                    rows="2" placeholder="প্রশ্নের টেক্সট লিখুন *"></textarea>
+                  <div class="insert-opts-grid mt-2">
+                    <input class="opt-input" [value]="insertForm().optA" (input)="updateInsertForm('optA', $any($event.target).value)" placeholder="ক) অপশন A">
+                    <input class="opt-input" [value]="insertForm().optB" (input)="updateInsertForm('optB', $any($event.target).value)" placeholder="খ) অপশন B">
+                    <input class="opt-input" [value]="insertForm().optC" (input)="updateInsertForm('optC', $any($event.target).value)" placeholder="গ) অপশন C">
+                    <input class="opt-input" [value]="insertForm().optD" (input)="updateInsertForm('optD', $any($event.target).value)" placeholder="ঘ) অপশন D">
+                  </div>
+                  <div class="insert-footer mt-2">
+                    <select class="field-input w-auto" [value]="insertForm().correct" (change)="updateInsertForm('correct', $any($event.target).value)">
+                      <option value="A">ক) সঠিক</option><option value="B">খ) সঠিক</option><option value="C">গ) সঠিক</option><option value="D">ঘ) সঠিক</option>
+                    </select>
+                    <select class="field-input w-auto" [value]="insertForm().subject" (change)="updateInsertForm('subject', $any($event.target).value)">
+                      <option>General Knowledge</option><option>Mathematics</option><option>English</option><option>Bengali</option><option>Physics</option><option>Chemistry</option><option>Biology</option><option>ICT</option>
+                    </select>
+                    <button class="btn-save-insert" (click)="saveInsertQuestion()" [disabled]="isSavingInsert()">
+                      @if (isSavingInsert()) { <span class="spin-sm"></span> } @else { <i class="fas fa-plus me-1"></i> }
+                      সংরক্ষণ করুন
+                    </button>
+                  </div>
+                </div>
+              } @else {
+                <button class="btn-insert" (click)="openInsertForm(q.order)">
+                  <i class="fas fa-plus-circle me-1"></i> এখানে প্রশ্ন যোগ করুন
+                </button>
+              }
+            </div>
           }
         </div>
 

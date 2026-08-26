@@ -13,6 +13,7 @@ import {
 })
 export class ExamQuestionEditor implements OnInit {
   private readonly route = inject(ActivatedRoute);
+  private readonly http = inject(HttpClient);
   private readonly svc   = inject(ExamEditorService);
 
   readonly exam        = signal<ExamManageDetail | null>(null);
@@ -135,6 +136,43 @@ export class ExamQuestionEditor implements OnInit {
         this.showToast('ব্যাখ্যার ছবি মুছে গেছে', 'success');
       },
       error: () => this.showToast('মুছতে ব্যর্থ হয়েছে', 'error'),
+    });
+  }
+
+  openInsertForm(afterOrder: number): void {
+    this.insertingAfter.set(afterOrder);
+    this.insertForm.set({ text: '', optA: '', optB: '', optC: '', optD: '', correct: 'A', subject: 'General Knowledge' });
+  }
+
+  closeInsertForm(): void { this.insertingAfter.set(null); }
+
+  updateInsertForm(field: string, value: string): void {
+    this.insertForm.update(f => ({ ...f, [field]: value }));
+  }
+
+  saveInsertQuestion(): void {
+    const f = this.insertForm();
+    if (!f.text.trim()) { this.showToast('প্রশ্নের টেক্সট লিখুন', 'error'); return; }
+    this.isSavingInsert.set(true);
+    const examId = this.route.snapshot.paramMap.get('examId')!;
+    const fd = new FormData();
+    fd.append('insert_after', String(this.insertingAfter()!));
+    fd.append('text', f.text);
+    fd.append('option_a', f.optA);
+    fd.append('option_b', f.optB);
+    fd.append('option_c', f.optC);
+    fd.append('option_d', f.optD);
+    fd.append('correct_option', f.correct);
+    fd.append('subject', f.subject);
+    this.http.post<any>(`${this.svc['base']}/api/exam-import/exams/${examId}/insert-question/`, fd).subscribe({
+      next: (newQ) => {
+        this.isSavingInsert.set(false);
+        this.insertingAfter.set(null);
+        // Reload questions to get updated ordering
+        this.loadExam(+examId);
+        this.showToast('প্রশ্ন যোগ হয়েছে', 'success');
+      },
+      error: () => { this.isSavingInsert.set(false); this.showToast('যোগ করতে ব্যর্থ', 'error'); },
     });
   }
 
