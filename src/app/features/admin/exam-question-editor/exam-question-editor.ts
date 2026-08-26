@@ -1,5 +1,6 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import { MathRenderPipe } from '../../../core/pipes/math-render.pipe';
 import {
   ExamEditorService, ExamManageDetail, EditorQuestion, EditorOption
@@ -172,7 +173,14 @@ export class ExamQuestionEditor implements OnInit {
         this.isSavingInsert.set(false);
         this.insertingAfter.set(null);
         // Reload questions to get updated ordering
-        this.loadExam(+examId);
+        // Reload questions after insert
+        this.svc.getExamQuestions(+examId).subscribe({
+          next: (data) => {
+            this.exam.set(data);
+            this.questions.set(data.questions ?? []);
+          },
+          error: () => {}
+        });
         this.showToast('প্রশ্ন যোগ হয়েছে', 'success');
       },
       error: (_e: unknown) => { this.isSavingInsert.set(false); this.showToast('যোগ করতে ব্যর্থ', 'error'); },
