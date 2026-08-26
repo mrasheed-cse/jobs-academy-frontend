@@ -96,10 +96,15 @@
                       <i class="fas fa-check-circle me-1"></i>
                       সঠিক: <strong>{{ correctLetter(q) }}. {{ correctOption(q) }}</strong>
                     </div>
-                    @if (q.explanation) {
+                    @if (q.explanation || q.explanation_image) {
                       <div class="explanation-box">
                         <div class="explanation-label"><i class="fas fa-lightbulb me-1"></i>ব্যাখ্যা</div>
-                        <div class="explanation-text">{{ q.explanation }}</div>
+                        @if (q.explanation) {
+                          <div class="explanation-text" [innerHTML]="q.explanation | mathRender"></div>
+                        }
+                        @if (q.explanation_image) {
+                          <img [src]="q.explanation_image" alt="ব্যাখ্যার ছবি" class="explanation-img mt-2">
+                        }
                       </div>
                     }
                   }
