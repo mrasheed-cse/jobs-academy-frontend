@@ -41,6 +41,7 @@ export interface ExamQuestion {
   text:        string;
   subject:     string;
   marks:       number;
+  image: string | null;
   explanation: string;
   explanation_image: string | null;
   options:     QuestionOption[];
