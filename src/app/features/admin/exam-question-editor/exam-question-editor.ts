@@ -156,7 +156,7 @@ export class ExamQuestionEditor implements OnInit {
 
   saveInsertQuestion(): void {
     const f = this.insertForm();
-    if (!f.text.trim()) { this.showToast('প্রশ্নের টেক্সট লিখুন', 'error'); return; }
+    // text is optional
     this.isSavingInsert.set(true);
     const examId = this.route.snapshot.paramMap.get('examId')!;
     const fd = new FormData();
