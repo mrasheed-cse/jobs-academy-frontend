@@ -20,6 +20,9 @@ export class ExamQuestionEditor implements OnInit {
   readonly questions   = signal<EditorQuestion[]>([]);
   readonly isLoading   = signal(true);
   readonly isPublishing = signal(false);
+  readonly insertingAfter   = signal<number | null>(null);
+  readonly insertForm       = signal({ text: '', optA: '', optB: '', optC: '', optD: '', correct: 'A', subject: 'General Knowledge' });
+  readonly isSavingInsert   = signal(false);
   readonly toast       = signal<string | null>(null);
   readonly toastType   = signal<'success' | 'error'>('success');
 
