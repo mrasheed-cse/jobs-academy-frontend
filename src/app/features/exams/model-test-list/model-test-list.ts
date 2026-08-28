@@ -22,6 +22,8 @@ export class ModelTestList implements OnInit {
   readonly examsWithSubject = computed(() => this.exams().filter((e) => e.subject_name));
   readonly examsWithoutSubject = computed(() => this.exams().filter((e) => !e.subject_name));
 
+  goBack(): void { window.history.back(); }
+
   ngOnInit(): void {
     const examTypeId = this.route.snapshot.paramMap.get('typeId');
     if (!examTypeId) {
