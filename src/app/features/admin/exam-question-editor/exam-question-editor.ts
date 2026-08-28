@@ -24,6 +24,8 @@ export class ExamQuestionEditor implements OnInit {
   readonly insertingAfter   = signal<number | null>(null);
   readonly insertForm       = signal({ text: '', optA: '', optB: '', optC: '', optD: '', correct: 'A', subject: 'General Knowledge' });
   readonly isSavingInsert   = signal(false);
+  readonly missingQuestions = signal<number[]>([]);
+  readonly missingCount     = signal(0);
   readonly toast       = signal<string | null>(null);
   readonly toastType   = signal<'success' | 'error'>('success');
 
@@ -31,12 +33,23 @@ export class ExamQuestionEditor implements OnInit {
     this.questions().filter(q => q.status === 'approved').length
   );
 
+  loadMissingQuestions(examId: number): void {
+    this.http.get<any>(`${this.svc['base']}/api/exam-import/exams/${examId}/missing-questions/`).subscribe({
+      next: (res) => {
+        this.missingQuestions.set(res.missing || []);
+        this.missingCount.set(res.missing_count || 0);
+      },
+      error: () => {}
+    });
+  }
+
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('examId'));
     this.svc.getExamQuestions(id).subscribe({
       next: (data) => {
         this.exam.set(data);
         this.questions.set(data.questions);
+        this.loadMissingQuestions(id);
         this.isLoading.set(false);
       },
       error: () => this.isLoading.set(false),
@@ -141,6 +154,14 @@ export class ExamQuestionEditor implements OnInit {
       },
       error: () => this.showToast('মুছতে ব্যর্থ হয়েছে', 'error'),
     });
+  }
+
+  scrollToInsertAfter(order: number): void {
+    this.openInsertForm(order);
+    setTimeout(() => {
+      const el = document.querySelector('.insert-form-card');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
   }
 
   openInsertForm(afterOrder: number): void {
