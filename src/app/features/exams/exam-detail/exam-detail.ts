@@ -12,12 +12,15 @@ import { ExamDetail as ExamDetailModel } from '../../../core/models/exam.model';
 export class ExamDetail implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly location = inject(Location);
   private readonly examService = inject(ExamService);
 
   readonly exam = signal<ExamDetailModel | null>(null);
   readonly isLoading = signal(true);
   readonly loadFailed = signal(false);
   examId = '';
+
+  goBack(): void { this.location.back(); }
 
   ngOnInit(): void {
     this.examId = this.route.snapshot.paramMap.get('examId') ?? '';
