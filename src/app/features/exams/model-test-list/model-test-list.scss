@@ -108,15 +108,18 @@
   --ink-soft: rgba(43,38,32,.55);
   --clay: #a5281c;
   --clay-soft: rgba(165,40,28,.08);
-  background: var(--exam-bg, #fffff0);
-  padding: 30px 0 30px;
+  padding: 18px 0 20px;
+}
+.hero-panel {
   position: relative;
-  overflow: hidden;
+  display: inline-block;
   &::before {
     content: '';
-    position: absolute; inset: 0;
+    position: absolute; inset: 0 0 14px 0;
     pointer-events: none;
     background-image: repeating-linear-gradient(to bottom, transparent 0 27px, rgba(43,38,32,.06) 27px 28px);
+    -webkit-mask-image: linear-gradient(180deg, #000 0%, transparent 90%);
+            mask-image: linear-gradient(180deg, #000 0%, transparent 90%);
   }
   &::after {
     content: '';
@@ -128,24 +131,24 @@
   position: relative; z-index: 1;
   background: transparent; border: none;
   color: var(--ink-soft); padding: 0; font-size: .8rem;
-  font-weight: 600; cursor: pointer; margin-bottom: 20px; display: inline-flex;
+  font-weight: 600; cursor: pointer; margin-bottom: 12px; display: inline-flex;
   align-items: center; transition: color .15s;
   &:hover { color: var(--clay); }
 }
 .hero-content {
   position: relative; z-index: 1;
-  display: flex; align-items: center; gap: 16px; margin-bottom: 22px;
+  display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
 }
 .hero-icon {
   position: relative;
-  width: 52px; height: 52px; background: var(--clay-soft);
+  width: 42px; height: 42px; background: var(--clay-soft);
   border: 1.5px solid rgba(165,40,28,.25);
   border-radius: 14px; display: flex; align-items: center; justify-content: center;
-  font-size: 1.3rem; color: var(--clay); flex-shrink: 0;
+  font-size: 1.05rem; color: var(--clay); flex-shrink: 0;
   &::before {
     content: '';
     position: absolute; left: -8px; top: 50%; transform: translateY(-50%);
-    width: 8px; height: 22px;
+    width: 6px; height: 16px;
     background: var(--clay); border-radius: 3px 0 0 3px;
   }
   &::after {
@@ -158,11 +161,11 @@
   }
 }
 .hero-title {
-  font-size: 1.7rem; font-weight: 800; color: var(--ink); margin: 0;
+  font-size: 1.35rem; font-weight: 800; color: var(--ink); margin: 0;
   letter-spacing: -.01em;
 }
 .hero-sub {
-  color: var(--ink-soft); font-size: .85rem; margin: 4px 0 0;
+  color: var(--ink-soft); font-size: .78rem; margin: 2px 0 0;
 }
 .hero-tabs {
   position: relative; z-index: 1;
@@ -172,8 +175,8 @@
   border-radius: 12px;
 }
 .hero-tab {
-  padding: 9px 20px; border-radius: 9px; border: none;
-  background: transparent; color: var(--ink-soft); font-size: .84rem;
+  padding: 6px 14px; border-radius: 8px; border: none;
+  background: transparent; color: var(--ink-soft); font-size: .78rem;
   font-weight: 700; cursor: pointer; transition: all .15s;
   &.active {
     background: var(--clay); color: #fffff0;
