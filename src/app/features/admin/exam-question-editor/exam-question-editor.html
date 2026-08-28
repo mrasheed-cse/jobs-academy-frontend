@@ -44,6 +44,19 @@
     } @else {
       <div class="container-fluid px-4">
 
+        <!-- Missing questions banner -->
+        @if (missingCount() > 0) {
+          <div class="missing-banner">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>{{ missingCount() }}টি প্রশ্ন অনুপস্থিত:</strong>
+            <span class="missing-nums">
+              @for (n of missingQuestions(); track n) {
+                <span class="missing-chip" (click)="scrollToInsertAfter(n-1)">{{ n }}</span>
+              }
+            </span>
+            <small class="ms-2 opacity-75">নম্বরে ক্লিক করুন সেখানে যেতে</small>
+          </div>
+        }
         <!-- Success/Error toast -->
         @if (toast()) {
           <div class="toast-bar" [class.toast-success]="toastType()==='success'"
