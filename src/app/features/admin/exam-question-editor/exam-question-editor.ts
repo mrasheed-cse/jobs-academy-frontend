@@ -208,6 +208,17 @@ export class ExamQuestionEditor implements OnInit {
     });
   }
 
+  saveSubject(q: EditorQuestion, value: string): void {
+    if (!value || value === q.subject) return;
+    q.subject = value;
+    const fd = new FormData();
+    fd.append('subject', value);
+    this.svc.updateQuestion(q.peq_id, fd).subscribe({
+      next: () => this.showToast('বিষয় সংরক্ষিত হয়েছে', 'success'),
+      error: () => this.showToast('সংরক্ষণ ব্যর্থ হয়েছে', 'error'),
+    });
+  }
+
   saveExplanation(q: EditorQuestion, event: Event): void {
     const val = (event.target as HTMLTextAreaElement).value.trim();
     if (val === (q.explanation || '')) return;

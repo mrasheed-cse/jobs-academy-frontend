@@ -252,3 +252,10 @@
   font-size: .75rem; font-weight: 700; cursor: pointer;
   &:hover { background: #d97706; }
 }
+
+.subject-chip-select {
+  background: #ede9fe; color: #5b21b6; border: none; border-radius: 20px;
+  padding: 3px 10px; font-size: .72rem; font-weight: 700; cursor: pointer;
+  outline: none;
+  &:focus { box-shadow: 0 0 0 2px #c4b5fd; }
+}

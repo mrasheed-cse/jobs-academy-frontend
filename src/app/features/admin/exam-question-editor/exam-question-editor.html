@@ -87,7 +87,23 @@
                     <option value="approved">অনুমোদিত</option>
                     <option value="rejected">প্রত্যাখ্যাত</option>
                   </select>
-                  <span class="subject-chip">{{ q.subject || 'সাধারণ জ্ঞান' }}</span>
+                  <select class="subject-chip-select"
+                    [value]="q.subject || 'সাধারণ জ্ঞান'"
+                    (change)="saveSubject(q, $any($event.target).value)">
+                    <option>বাংলা ভাষা ও সাহিত্য</option>
+                    <option>ইংরেজি ভাষা ও সাহিত্য</option>
+                    <option>গণিত</option>
+                    <option>সাধারণ জ্ঞান</option>
+                    <option>বাংলাদেশ বিষয়াবলী</option>
+                    <option>আন্তর্জাতিক বিষয়াবলী</option>
+                    <option>বিজ্ঞান ও প্রযুক্তি</option>
+                    <option>কম্পিউটার ও তথ্যপ্রযুক্তি</option>
+                    <option>ভূগোল</option>
+                    <option>পদার্থবিজ্ঞান</option>
+                    <option>রসায়ন</option>
+                    <option>জীববিজ্ঞান</option>
+                    <option>{{ q.subject }}</option>
+                  </select>
                 </div>
                 <button class="btn-delete-q" (click)="deleteQuestion(q)"
                   title="প্রশ্ন মুছুন">
