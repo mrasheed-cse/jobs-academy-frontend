@@ -18,7 +18,7 @@ export const routes: Routes = [
   { path: 'model-tests/take/:examId', canActivate: [authGuard], loadComponent: () => import('./features/exams/exam-take/exam-take').then((m) => m.ExamTake) },
   { path: 'model-tests/results/:examId', canActivate: [authGuard], loadComponent: () => import('./features/exams/exam-results/exam-results').then((m) => m.ExamResults) },
   { path: 'model-tests/leaderboard/:examId', loadComponent: () => import('./features/exams/exam-leaderboard/exam-leaderboard').then((m) => m.ExamLeaderboard) },
-  { path: 'model-tests/:typeId', loadComponent: () => import('./features/exams/model-test-list/model-test-list').then((m) => m.ModelTestList) },
+  { path: 'model-tests/:orgId', loadComponent: () => import('./features/exams/model-test-list/model-test-list').then((m) => m.ModelTestList) },
 
   // --- Past exams ---
   { path: 'past-exams', loadComponent: () => import('./features/past-exams/past-exam-types/past-exam-types').then((m) => m.PastExamTypes) },

@@ -10,14 +10,14 @@
           <div class="spinner-border text-primary" role="status"></div>
         </div>
       } @else if (loadFailed()) {
-        <p class="text-danger text-center py-4">পরীক্ষার ধরন লোড করতে ব্যর্থ হয়েছে।</p>
-      } @else if (examTypes().length === 0) {
-        <p class="text-muted text-center py-4">কোনো পরীক্ষার ধরন পাওয়া যায়নি।</p>
+        <p class="text-danger text-center py-4">সংস্থা লোড করতে ব্যর্থ হয়েছে।</p>
+      } @else if (organizations().length === 0) {
+        <p class="text-muted text-center py-4">কোনো সংস্থা পাওয়া যায়নি।</p>
       } @else {
         <div class="type-grid">
-          @for (type of examTypes(); track type.id) {
-            <button type="button" class="type-card" (click)="openType(type.id)">
-              <h6>{{ type.name }}</h6>
+          @for (org of organizations(); track org.id) {
+            <button type="button" class="type-card" (click)="openOrg(org.id)">
+              <h6>{{ org.name }}</h6>
             </button>
           }
         </div>

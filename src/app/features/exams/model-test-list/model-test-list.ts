@@ -25,14 +25,14 @@ export class ModelTestList implements OnInit {
   goBack(): void { window.history.back(); }
 
   ngOnInit(): void {
-    const examTypeId = this.route.snapshot.paramMap.get('typeId');
-    if (!examTypeId) {
+    const orgId = this.route.snapshot.paramMap.get('orgId');
+    if (!orgId) {
       this.isLoading.set(false);
       this.loadFailed.set(true);
       return;
     }
 
-    this.examService.getModelExams(examTypeId).subscribe({
+    this.examService.getModelExamsByOrg(orgId).subscribe({
       next: (exams) => {
         this.exams.set(exams);
         this.isLoading.set(false);

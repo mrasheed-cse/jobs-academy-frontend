@@ -84,9 +84,19 @@ export class ExamService {
     return this.http.get<ExamType[]>(`${this.baseUrl}/quiz/model/exam-types/`);
   }
 
+  getModelOrganizations(): Observable<Organization[]> {
+    return this.http.get<Organization[]>(`${this.baseUrl}/quiz/model/organizations/`);
+  }
+
   getModelExams(examTypeId: number | string): Observable<ExamListItem[]> {
     return this.http.get<ExamListItem[]>(`${this.baseUrl}/quiz/model-exams/`, {
       params: { exam_type: examTypeId },
+    });
+  }
+
+  getModelExamsByOrg(organizationId: number | string): Observable<ExamListItem[]> {
+    return this.http.get<ExamListItem[]>(`${this.baseUrl}/quiz/model-exams/`, {
+      params: { organization_id: organizationId },
     });
   }
 

@@ -60,7 +60,9 @@
               <div class="card-accent"></div>
               <div class="card-inner">
                 <!-- Type badge -->
-                <div class="type-badge">{{ exam.exam_type_name || 'মডেল টেস্ট' }}</div>
+                @if (exam.exam_type_name) {
+                  <div class="type-badge">{{ exam.exam_type_name }}</div>
+                }
 
                 <!-- Title -->
                 <h5 class="card-title">{{ exam.title || 'শিরোনাম নেই' }}</h5>

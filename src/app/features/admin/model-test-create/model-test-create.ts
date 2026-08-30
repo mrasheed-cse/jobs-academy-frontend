@@ -36,13 +36,13 @@ export class ModelTestCreate implements OnInit {
   readonly allPastExams    = signal<any[]>([]);
   readonly selectedExamIds = signal<number[]>([]);
   readonly recentExams     = signal<any[]>([]);
-  readonly filterOrgId     = signal('');
+  readonly filterOrgIds    = signal<string[]>([]);
 
   readonly filteredPastExams = computed(() => {
-    const orgId = this.filterOrgId();
+    const orgIds = this.filterOrgIds();
     const all = this.allPastExams();
-    if (!orgId) return all;
-    return all.filter((e: any) => String(e.organization_id) === orgId);
+    if (orgIds.length === 0) return all;
+    return all.filter((e: any) => orgIds.includes(String(e.organization_id)));
   });
 
   readonly selectedQuestionCount = computed(() =>
@@ -111,7 +111,12 @@ export class ModelTestCreate implements OnInit {
     });
   }
 
-  setFilterOrg(orgId: string): void { this.filterOrgId.set(orgId); }
+  toggleFilterOrg(orgId: string): void {
+    const current = this.filterOrgIds();
+    this.filterOrgIds.set(current.includes(orgId) ? current.filter(id => id !== orgId) : [...current, orgId]);
+  }
+
+  clearFilterOrg(): void { this.filterOrgIds.set([]); }
 
   onOrgChange(orgId: string): void { this.selectedOrgId.set(orgId); }
 

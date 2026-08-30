@@ -111,11 +111,11 @@
               <div class="org-filter-wrap mb-3">
                 <p class="small fw-semibold mb-2">সংস্থা ফিল্টার করুন (একাধিক নির্বাচন করুন):</p>
                 <div class="org-chips">
-                  <button class="org-chip" [class.active]="!filterOrgId()"
-                    (click)="setFilterOrg('')">সব সংস্থা</button>
+                  <button class="org-chip" [class.active]="filterOrgIds().length === 0"
+                    (click)="clearFilterOrg()">সব সংস্থা</button>
                   @for (org of organizations(); track org.id) {
-                    <button class="org-chip" [class.active]="filterOrgId() === org.id.toString()"
-                      (click)="setFilterOrg(org.id.toString())">{{ org.name }}</button>
+                    <button class="org-chip" [class.active]="filterOrgIds().includes(org.id.toString())"
+                      (click)="toggleFilterOrg(org.id.toString())">{{ org.name }}</button>
                   }
                 </div>
               </div>

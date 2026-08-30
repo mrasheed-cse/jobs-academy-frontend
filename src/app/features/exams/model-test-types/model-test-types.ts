@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { ExamService } from '../../../core/services/exam.service';
-import { ExamType } from '../../../core/models/exam.model';
+import { Organization } from '../../../core/models/exam.model';
 
 @Component({
   selector: 'app-model-test-types',
@@ -13,14 +13,14 @@ export class ModelTestTypes implements OnInit {
   private readonly examService = inject(ExamService);
   private readonly router = inject(Router);
 
-  readonly examTypes = signal<ExamType[]>([]);
+  readonly organizations = signal<Organization[]>([]);
   readonly isLoading = signal(true);
   readonly loadFailed = signal(false);
 
   ngOnInit(): void {
-    this.examService.getModelExamTypes().subscribe({
-      next: (types) => {
-        this.examTypes.set(types);
+    this.examService.getModelOrganizations().subscribe({
+      next: (orgs) => {
+        this.organizations.set(orgs);
         this.isLoading.set(false);
       },
       error: () => {
@@ -30,7 +30,7 @@ export class ModelTestTypes implements OnInit {
     });
   }
 
-  openType(typeId: number): void {
-    this.router.navigate(['/model-tests', typeId]);
+  openOrg(orgId: number): void {
+    this.router.navigate(['/model-tests', orgId]);
   }
 }
