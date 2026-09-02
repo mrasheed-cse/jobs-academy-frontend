@@ -6,8 +6,8 @@
       <div class="d-flex align-items-center gap-3">
         <a routerLink="/admin" class="mc-back"><i class="fas fa-arrow-left"></i></a>
         <div>
-          <h5 class="fw-bold mb-0 text-white">মডেল টেস্ট তৈরি</h5>
-          <span class="text-indigo-200 small">নতুন মডেল টেস্ট পরিকল্পনা করুন</span>
+          <h5 class="fw-bold mb-0 text-white">{{ isEditMode() ? 'মডেল টেস্ট সম্পাদনা' : 'মডেল টেস্ট তৈরি' }}</h5>
+          <span class="text-indigo-200 small">{{ isEditMode() ? 'বিদ্যমান মডেল টেস্ট পরিবর্তন করুন' : 'নতুন মডেল টেস্ট পরিকল্পনা করুন' }}</span>
         </div>
       </div>
     </div>
@@ -188,11 +188,26 @@
           }
 
           <!-- Submit -->
-          <button class="btn-create" (click)="create()" [disabled]="isCreating() || !canCreate()">
-            @if (isCreating()) { <span class="spin-sm"></span> }
-            @else { <i class="fas fa-plus-circle me-2"></i> }
-            মডেল টেস্ট তৈরি করুন
-          </button>
+          @if (!isEditMode()) {
+            <button class="btn-create" (click)="create()" [disabled]="isCreating() || !canCreate()">
+              @if (isCreating()) { <span class="spin-sm"></span> }
+              @else { <i class="fas fa-plus-circle me-2"></i> }
+              মডেল টেস্ট তৈরি করুন
+            </button>
+          } @else {
+            <div class="d-flex gap-2 flex-wrap">
+              <button class="btn-create" (click)="saveDetails()" [disabled]="isSavingDetails() || !title().trim()">
+                @if (isSavingDetails()) { <span class="spin-sm"></span> }
+                @else { <i class="fas fa-save me-2"></i> }
+                বিস্তারিত সংরক্ষণ করুন
+              </button>
+              <button class="btn-create" style="background:#dc2626" (click)="regenerateQuestions()" [disabled]="isRegenerating() || selectedExamIds().length === 0">
+                @if (isRegenerating()) { <span class="spin-sm"></span> }
+                @else { <i class="fas fa-random me-2"></i> }
+                প্রশ্নসমূহ পুনরায় নির্বাচন করুন
+              </button>
+            </div>
+          }
 
         </div>
 

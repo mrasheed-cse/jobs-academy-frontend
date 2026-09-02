@@ -114,11 +114,53 @@
               <!-- Question text editor -->
               <div class="qe-body">
                 <label class="field-label">প্রশ্নের টেক্সট</label>
-                <textarea class="qe-textarea"
+                <div class="math-toolbar">
+                  <button type="button" class="mt-btn" title="বোল্ড"
+                    (click)="wrapSelection(qTextTextarea, q, 'text', 'bold(', ')')"><b>B</b></button>
+                  <button type="button" class="mt-btn" title="ইটালিক"
+                    (click)="wrapSelection(qTextTextarea, q, 'text', 'italic(', ')')"><i>I</i></button>
+                  <button type="button" class="mt-btn" title="আন্ডারলাইন"
+                    (click)="wrapSelection(qTextTextarea, q, 'text', 'underline(', ')')"><u>U</u></button>
+                  <span class="mt-sep"></span>
+                  <button type="button" class="mt-btn" title="সূচক (superscript)"
+                    (click)="wrapSelection(qTextTextarea, q, 'text', '^(', ')')">x²</button>
+                  <button type="button" class="mt-btn" title="নিম্নসূচক (subscript)"
+                    (click)="wrapSelection(qTextTextarea, q, 'text', '_(', ')')">x₁</button>
+                  <button type="button" class="mt-btn" title="বর্গমূল"
+                    (click)="wrapSelection(qTextTextarea, q, 'text', 'sqrt(', ')')">√</button>
+                  <button type="button" class="mt-btn" title="ভগ্নাংশ"
+                    (click)="insertAtCursor(qTextTextarea, q, 'text', 'frac(a,b)')">a/b</button>
+                  <button type="button" class="mt-btn" title="টেবিল যোগ করুন"
+                    (click)="insertAtCursor(qTextTextarea, q, 'text', '\n| শিরোনাম ১ | শিরোনাম ২ |\n|---|---|\n| মান ১ | মান ২ |\n')"><i class="fas fa-table"></i></button>
+                  <span class="mt-sep"></span>
+                  <button type="button" class="mt-btn sym" title="ডিগ্রি"
+                    (click)="insertAtCursor(qTextTextarea, q, 'text', '°')">°</button>
+                  <button type="button" class="mt-btn sym" title="পাই"
+                    (click)="insertAtCursor(qTextTextarea, q, 'text', 'π')">π</button>
+                  <button type="button" class="mt-btn sym" title="গুণ"
+                    (click)="insertAtCursor(qTextTextarea, q, 'text', '×')">×</button>
+                  <button type="button" class="mt-btn sym" title="ভাগ"
+                    (click)="insertAtCursor(qTextTextarea, q, 'text', '÷')">÷</button>
+                  <button type="button" class="mt-btn sym" title="যোগ-বিয়োগ"
+                    (click)="insertAtCursor(qTextTextarea, q, 'text', '±')">±</button>
+                  <button type="button" class="mt-btn sym" title="ছোট বা সমান"
+                    (click)="insertAtCursor(qTextTextarea, q, 'text', '≤')">≤</button>
+                  <button type="button" class="mt-btn sym" title="বড় বা সমান"
+                    (click)="insertAtCursor(qTextTextarea, q, 'text', '≥')">≥</button>
+                  <button type="button" class="mt-btn sym" title="অসমান"
+                    (click)="insertAtCursor(qTextTextarea, q, 'text', '≠')">≠</button>
+                </div>
+                <textarea class="qe-textarea" #qTextTextarea
                   [value]="q.text || ''"
                   (blur)="saveQuestionText(q, $event)"
                   rows="3"
                   placeholder="প্রশ্নের টেক্সট লিখুন..."></textarea>
+                @if (q.text) {
+                  <div class="math-preview">
+                    <div class="math-preview-label"><i class="fas fa-eye me-1"></i>প্রিভিউ</div>
+                    <div class="math-preview-body" [innerHTML]="q.text | mathRender"></div>
+                  </div>
+                }
 
                 <!-- Question image -->
                 <div class="img-row">
@@ -173,11 +215,53 @@
                 <!-- Explanation editor -->
                 <div class="explanation-editor mt-3">
                   <label class="field-label">ব্যাখ্যা (Explanation)</label>
-                  <textarea class="qe-textarea explanation-textarea"
+                  <div class="math-toolbar">
+                    <button type="button" class="mt-btn" title="বোল্ড"
+                      (click)="wrapSelection(expTextarea, q, 'explanation', 'bold(', ')')"><b>B</b></button>
+                    <button type="button" class="mt-btn" title="ইটালিক"
+                      (click)="wrapSelection(expTextarea, q, 'explanation', 'italic(', ')')"><i>I</i></button>
+                    <button type="button" class="mt-btn" title="আন্ডারলাইন"
+                      (click)="wrapSelection(expTextarea, q, 'explanation', 'underline(', ')')"><u>U</u></button>
+                    <span class="mt-sep"></span>
+                    <button type="button" class="mt-btn" title="সূচক (superscript)"
+                      (click)="wrapSelection(expTextarea, q, 'explanation', '^(', ')')">x²</button>
+                    <button type="button" class="mt-btn" title="নিম্নসূচক (subscript)"
+                      (click)="wrapSelection(expTextarea, q, 'explanation', '_(', ')')">x₁</button>
+                    <button type="button" class="mt-btn" title="বর্গমূল"
+                      (click)="wrapSelection(expTextarea, q, 'explanation', 'sqrt(', ')')">√</button>
+                    <button type="button" class="mt-btn" title="ভগ্নাংশ"
+                      (click)="insertAtCursor(expTextarea, q, 'explanation', 'frac(a,b)')">a/b</button>
+                    <button type="button" class="mt-btn" title="টেবিল যোগ করুন"
+                      (click)="insertAtCursor(expTextarea, q, 'explanation', '\n| শিরোনাম ১ | শিরোনাম ২ |\n|---|---|\n| মান ১ | মান ২ |\n')"><i class="fas fa-table"></i></button>
+                    <span class="mt-sep"></span>
+                    <button type="button" class="mt-btn sym" title="ডিগ্রি"
+                      (click)="insertAtCursor(expTextarea, q, 'explanation', '°')">°</button>
+                    <button type="button" class="mt-btn sym" title="পাই"
+                      (click)="insertAtCursor(expTextarea, q, 'explanation', 'π')">π</button>
+                    <button type="button" class="mt-btn sym" title="গুণ"
+                      (click)="insertAtCursor(expTextarea, q, 'explanation', '×')">×</button>
+                    <button type="button" class="mt-btn sym" title="ভাগ"
+                      (click)="insertAtCursor(expTextarea, q, 'explanation', '÷')">÷</button>
+                    <button type="button" class="mt-btn sym" title="যোগ-বিয়োগ"
+                      (click)="insertAtCursor(expTextarea, q, 'explanation', '±')">±</button>
+                    <button type="button" class="mt-btn sym" title="ছোট বা সমান"
+                      (click)="insertAtCursor(expTextarea, q, 'explanation', '≤')">≤</button>
+                    <button type="button" class="mt-btn sym" title="বড় বা সমান"
+                      (click)="insertAtCursor(expTextarea, q, 'explanation', '≥')">≥</button>
+                    <button type="button" class="mt-btn sym" title="অসমান"
+                      (click)="insertAtCursor(expTextarea, q, 'explanation', '≠')">≠</button>
+                  </div>
+                  <textarea class="qe-textarea explanation-textarea" #expTextarea
                     [value]="q.explanation || ''"
                     (blur)="saveExplanation(q, $event)"
                     rows="3"
                     placeholder="প্রশ্নের ব্যাখ্যা লিখুন..."></textarea>
+                  @if (q.explanation) {
+                    <div class="math-preview">
+                      <div class="math-preview-label"><i class="fas fa-eye me-1"></i>প্রিভিউ</div>
+                      <div class="math-preview-body" [innerHTML]="q.explanation | mathRender"></div>
+                    </div>
+                  }
                   <div class="img-row mt-2">
                     @if (q.explanation_image) {
                       <div class="img-preview">

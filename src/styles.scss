@@ -86,3 +86,42 @@ main app-exam-attempt {
   display: block;
   min-height: 100%;
 }
+
+/* Rendered by MathRenderPipe: tables and fractions typed as plain text
+   (| a | b | rows, frac(a,b)) become real HTML here. Must stay global
+   because the pipe injects HTML via [innerHTML] across several pages,
+   and Angular's component-scoped styles don't apply to injected HTML. */
+.mr-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0;
+  font-size: .92em;
+}
+.mr-table th, .mr-table td {
+  border: 1px solid #e2e8f0;
+  padding: 6px 10px;
+  text-align: left;
+}
+.mr-table th {
+  background: #f8fafc;
+  font-weight: 700;
+}
+.mr-table tbody tr:nth-child(even) {
+  background: #fafafa;
+}
+.mr-frac {
+  display: inline-flex;
+  flex-direction: column;
+  vertical-align: middle;
+  text-align: center;
+  margin: 0 2px;
+  font-size: .9em;
+  line-height: 1.1;
+}
+.mr-frac .mr-num {
+  border-bottom: 1.5px solid currentColor;
+  padding: 0 3px 1px;
+}
+.mr-frac .mr-den {
+  padding: 1px 3px 0;
+}

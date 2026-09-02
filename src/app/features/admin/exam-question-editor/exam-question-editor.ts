@@ -231,6 +231,41 @@ export class ExamQuestionEditor implements OnInit {
     });
   }
 
+  // Saves whichever field the toolbar action targeted - the question's
+  // own text, or its explanation.
+  private saveToolbarField(textarea: HTMLTextAreaElement, q: EditorQuestion, field: 'text' | 'explanation'): void {
+    if (field === 'text') {
+      this.saveQuestionText(q, { target: textarea } as unknown as Event);
+    } else {
+      this.saveExplanation(q, { target: textarea } as unknown as Event);
+    }
+  }
+
+  // Wraps the current selection (or a placeholder if nothing is selected)
+  // with the given before/after snippet, e.g. superscript, subscript, sqrt.
+  wrapSelection(textarea: HTMLTextAreaElement, q: EditorQuestion, field: 'text' | 'explanation', before: string, after: string): void {
+    const start = textarea.selectionStart ?? textarea.value.length;
+    const end = textarea.selectionEnd ?? textarea.value.length;
+    const selected = textarea.value.slice(start, end) || 'x';
+    const insertText = before + selected + after;
+    textarea.value = textarea.value.slice(0, start) + insertText + textarea.value.slice(end);
+    const cursorPos = start + insertText.length;
+    textarea.focus();
+    textarea.setSelectionRange(cursorPos, cursorPos);
+    this.saveToolbarField(textarea, q, field);
+  }
+
+  // Inserts a literal snippet (symbol, table template) at the cursor.
+  insertAtCursor(textarea: HTMLTextAreaElement, q: EditorQuestion, field: 'text' | 'explanation', snippet: string): void {
+    const start = textarea.selectionStart ?? textarea.value.length;
+    const end = textarea.selectionEnd ?? textarea.value.length;
+    textarea.value = textarea.value.slice(0, start) + snippet + textarea.value.slice(end);
+    const cursorPos = start + snippet.length;
+    textarea.focus();
+    textarea.setSelectionRange(cursorPos, cursorPos);
+    this.saveToolbarField(textarea, q, field);
+  }
+
   saveOptionText(opt: EditorOption, event: Event): void {
     const text = (event.target as HTMLInputElement).value.trim();
     if (text === opt.text) return;

@@ -14,6 +14,7 @@ import {
   ExamLeaderboardResponse,
   ExamType,
   Organization,
+  ModelExamBestScores,
 } from '../models/exam.model';
 import { PastExamAttempt, PastExamListItem, PastExamSubmitResponse } from '../models/past-exam.model';
 
@@ -64,6 +65,18 @@ export class ExamService {
     return this.http
       .get<ExamAttempt[]>(`${this.baseUrl}/quiz/attempts/user_attempts/`, { params: { exam_id: examId } })
       .pipe(catchError((err) => (err.status === 404 ? of([]) : throwError(() => err))));
+  }
+
+  getModelExamBestScores(examId: string): Observable<ModelExamBestScores> {
+    return this.http.get<ModelExamBestScores>(`${this.baseUrl}/quiz/model-exams/${examId}/best-scores/`);
+  }
+
+  updateModelExamDetails(examId: string, payload: FormData): Observable<any> {
+    return this.http.patch<any>(`${this.baseUrl}/quiz/model-exams/${examId}/update-details/`, payload);
+  }
+
+  regenerateModelExamQuestions(examId: string, payload: FormData): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/quiz/model-exams/${examId}/regenerate-questions/`, payload);
   }
 
   getExamLeaderboard(examId: string): Observable<ExamLeaderboardResponse> {

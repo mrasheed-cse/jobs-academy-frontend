@@ -117,6 +117,7 @@ export interface ExamDetail {
   position_name: string | null;
   exam_type: number;
   exam_type_name: string;
+  source_past_exam_ids?: number[];
 }
 
 export interface ExamStartResponse {
@@ -182,4 +183,9 @@ export interface ExamAttempt {
   score: number;
   is_passed: boolean;
   attempt_time: string;
+}
+
+export interface ModelExamBestScores {
+  exam_best_score: number | null;
+  exam_total_mark: number;
 }

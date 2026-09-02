@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ExamService } from '../../../core/services/exam.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { ExamListItem } from '../../../core/models/exam.model';
 
 @Component({
@@ -13,6 +14,12 @@ export class ModelTestList implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly examService = inject(ExamService);
+  private readonly authService = inject(AuthService);
+
+  readonly isAdminOrTeacher = computed(() => {
+    const role = this.authService.currentUser()?.role;
+    return role === 'admin' || role === 'teacher';
+  });
 
   readonly exams = signal<ExamListItem[]>([]);
   readonly isLoading = signal(true);
@@ -50,6 +57,11 @@ export class ModelTestList implements OnInit {
 
   openDetails(examId: string): void {
     this.router.navigate(['/model-tests', 'details', examId]);
+  }
+
+  openEdit(examId: string, event: Event): void {
+    event.stopPropagation();
+    this.router.navigate(['/admin/model-tests/edit', examId]);
   }
 
   async share(examId: string, title: string): Promise<void> {

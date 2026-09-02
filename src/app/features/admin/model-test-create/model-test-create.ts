@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal, computed, Pipe, PipeTransform } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { RouterLink, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
@@ -20,6 +20,12 @@ export class OrgNamePipe implements PipeTransform {
 export class ModelTestCreate implements OnInit {
   private readonly http = inject(HttpClient);
   private readonly base = environment.apiBaseUrl;
+  private readonly route = inject(ActivatedRoute);
+
+  readonly isEditMode      = signal(false);
+  readonly editingExamId   = signal<string | null>(null);
+  readonly isSavingDetails = signal(false);
+  readonly isRegenerating  = signal(false);
 
   readonly method         = signal<'question_bank' | 'excel'>('question_bank');
   readonly title          = signal('');
@@ -71,6 +77,13 @@ export class ModelTestCreate implements OnInit {
     this.loadExamTypes();
     this.loadRecentExams();
     this.loadAllPastExams();
+
+    const examId = this.route.snapshot.paramMap.get('examId');
+    if (examId) {
+      this.isEditMode.set(true);
+      this.editingExamId.set(examId);
+      this.loadExamForEdit(examId);
+    }
   }
 
   private showToast(msg: string, type: 'ok' | 'err' = 'ok'): void {
@@ -178,5 +191,66 @@ export class ModelTestCreate implements OnInit {
         error: (err) => { this.isCreating.set(false); this.showToast(err.error?.error || 'তৈরি করতে ব্যর্থ', 'err'); },
       });
     }
+  }
+
+  private loadExamForEdit(examId: string): void {
+    this.http.get<any>(`${this.base}/quiz/model-exams/${examId}/`).subscribe({
+      next: (res) => {
+        this.title.set(res.title || '');
+        this.selectedOrgId.set(res.organization != null ? String(res.organization) : '');
+        this.examTypeId.set(res.exam_type != null ? String(res.exam_type) : '');
+        this.totalQuestions.set(res.total_questions || 50);
+        this.totalMarks.set(res.total_mark || 100);
+        this.passMark.set(res.pass_mark || 50);
+        this.negativeMark.set(res.negative_mark ?? 0.25);
+        this.duration.set(this.parseDurationToMinutes(res.duration));
+        this.selectedExamIds.set(res.source_past_exam_ids || []);
+      },
+      error: () => this.showToast('মডেল টেস্ট লোড করতে ব্যর্থ হয়েছে', 'err'),
+    });
+  }
+
+  private parseDurationToMinutes(duration: string | undefined): number {
+    if (!duration) return 60;
+    const parts = duration.split(':').map(Number);
+    if (parts.length === 3) return parts[0] * 60 + parts[1] + Math.round(parts[2] / 60);
+    if (parts.length === 2) return parts[0] + Math.round(parts[1] / 60);
+    return 60;
+  }
+
+  saveDetails(): void {
+    const examId = this.editingExamId();
+    if (!examId || !this.title().trim() || this.isSavingDetails()) return;
+    this.isSavingDetails.set(true);
+    const fd = new FormData();
+    fd.append('title', this.title());
+    fd.append('organization_id', this.selectedOrgId());
+    fd.append('exam_type_id', this.examTypeId());
+    fd.append('pass_mark', String(this.passMark()));
+    fd.append('duration', String(this.duration()));
+    fd.append('negative_mark', String(this.negativeMark()));
+    fd.append('total_marks', String(this.totalMarks()));
+    this.svcUpdateDetails(examId, fd);
+  }
+
+  private svcUpdateDetails(examId: string, fd: FormData): void {
+    this.http.request<any>('PATCH', `${this.base}/quiz/model-exams/${examId}/update-details/`, { body: fd }).subscribe({
+      next: (res) => { this.isSavingDetails.set(false); this.showToast(res.message); },
+      error: (err) => { this.isSavingDetails.set(false); this.showToast(err.error?.error || 'সংরক্ষণ ব্যর্থ হয়েছে', 'err'); },
+    });
+  }
+
+  regenerateQuestions(): void {
+    const examId = this.editingExamId();
+    if (!examId || this.selectedExamIds().length === 0 || this.isRegenerating()) return;
+    if (!confirm('বর্তমান সকল প্রশ্ন মুছে নতুনভাবে এলোমেলোভাবে নির্বাচন করা হবে। আপনি কি নিশ্চিত?')) return;
+    this.isRegenerating.set(true);
+    const fd = new FormData();
+    this.selectedExamIds().forEach(id => fd.append('past_exam_ids', String(id)));
+    fd.append('total_questions', String(this.totalQuestions()));
+    this.http.post<any>(`${this.base}/quiz/model-exams/${examId}/regenerate-questions/`, fd).subscribe({
+      next: (res) => { this.isRegenerating.set(false); this.showToast(res.message); },
+      error: (err) => { this.isRegenerating.set(false); this.showToast(err.error?.error || 'ব্যর্থ হয়েছে', 'err'); },
+    });
   }
 }
