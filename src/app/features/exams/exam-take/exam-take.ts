@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy, inject, signal, computed } from '@angular/core';
+import { forkJoin, of, catchError } from 'rxjs';
 import { MathRenderPipe } from '../../../core/pipes/math-render.pipe';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ExamService } from '../../../core/services/exam.service';
@@ -74,21 +75,21 @@ export class ExamTake implements OnInit, OnDestroy {
       return;
     }
 
-    this.examService.checkExamPermission(this.examId).subscribe({
-      next: (res) => this.loadExam(res.has_access === true),
-      error: () => this.loadExam(false),
-    });
-  }
-
-  ngOnDestroy(): void {
-    if (this.timerHandle) clearInterval(this.timerHandle);
-  }
-
-  private loadExam(hasFullAccess: boolean): void {
-    this.hasFullAccess.set(hasFullAccess);
-
-    this.examService.getModelExamDetail(this.examId).subscribe({
-      next: (exam) => {
+    // Fetch permission and exam detail in parallel - previously
+    // getModelExamDetail() only started after checkExamPermission()
+    // fully completed, doubling the network round-trip before the exam
+    // could render, even though the detail fetch never actually depends
+    // on the permission result. A failed permission check should still
+    // let the exam load (matching the original behaviour), so its error
+    // is caught locally instead of failing the whole forkJoin.
+    forkJoin({
+      permission: this.examService.checkExamPermission(this.examId).pipe(
+        catchError(() => of({ has_access: false as const })),
+      ),
+      exam: this.examService.getModelExamDetail(this.examId),
+    }).subscribe({
+      next: ({ permission, exam }) => {
+        this.hasFullAccess.set(permission.has_access === true);
         this.exam.set(exam);
         this.isLoading.set(false);
         this.startTimer(exam.duration);
@@ -98,6 +99,10 @@ export class ExamTake implements OnInit, OnDestroy {
         this.loadFailed.set(true);
       },
     });
+  }
+
+  ngOnDestroy(): void {
+    if (this.timerHandle) clearInterval(this.timerHandle);
   }
 
   private startTimer(duration: string): void {
